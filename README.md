@@ -12,7 +12,6 @@ usage: jekesa [options]
 OPTIONS:
         -p      Path to output directory or project name
         -f      Path to file with list of sample IDs (one ID per line)
-
         -a      Select the assembler to use. Options available: 'spades', 'skesa'
                 (default='spades')
         -s      Species scheme name to use for mlst typing.
