@@ -5,21 +5,21 @@ An automated bacterial whole genome assembly and typing pipeline which primarily
 Jekesa (Illuminate) currently runs on a server (single compute node), and the folowing tools have to be installed or in your path prior to running it. The pipeline is written in Bash and R, and is still under development.
 
 #### _De novo_ genome assembly and classification
-* spades
-* skesa
-* kraken
-* minikraken database
+* [spades](http://cab.spbu.ru/software/spades/)
+* [skesa](https://github.com/ncbi/SKESA)
+* [kraken](https://github.com/DerrickWood/kraken)
+* [MiniKraken DB_8GB](https://ccb.jhu.edu/software/kraken/)
 
 #### MLST typing
 * [mlst](https://github.com/tseemann/mlst)
 
 #### Resistance profiling
-- ariba
-- seroba
+- [ariba](https://github.com/sanger-pathogens/ariba)
+- [seroba](https://github.com/sanger-pathogens/seroba)
 
 #### Visualization and reporting
-* quast
-* multiQC
+* [QUAST](http://quast.sourceforge.net/quast)
+* [MultiQC](https://github.com/ewels/MultiQC)
 * R
 * Rscript
 
