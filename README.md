@@ -5,6 +5,7 @@ An automated bacterial whole genome assembly and typing pipeline which primarily
 Jekesa (Illuminate) currently runs on a server (single compute node), and the folowing tools have to be installed or available in your path prior to running it. The pipeline is written in Bash and R, and is still under development.
 
 #### _De novo_ genome assembly and classification
+* [trim_galore]()
 * [spades](http://cab.spbu.ru/software/spades/)
 * [skesa](https://github.com/ncbi/SKESA)
 * [kraken](https://github.com/DerrickWood/kraken)
