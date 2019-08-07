@@ -15,7 +15,10 @@ Jekesa (Illuminate) currently runs on a server (single compute node), and the fo
 
 #### Resistance profiling
 - [ariba](https://github.com/sanger-pathogens/ariba)
+
+#### _Streptococcus pneumoniae_ specific analysis
 - [seroba](https://github.com/sanger-pathogens/seroba)
+- [PBP gene typing scripts and database adapted from the CDC Streptococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference)
 
 #### Visualization and reporting
 * [QUAST](http://quast.sourceforge.net/quast)
