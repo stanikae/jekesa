@@ -11,7 +11,7 @@ Jekesa (Illuminate) currently runs on a server (single compute node), and the fo
 * minikraken database
 
 #### MLST typing
-* [mlst] (https://github.com/tseemann/mlst)
+* [mlst](https://github.com/tseemann/mlst)
 
 #### Resistance profiling
 - ariba
