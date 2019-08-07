@@ -1,7 +1,29 @@
 # JEKESA
 An automated bacterial whole genome assembly and typing pipeline which primarily uses Illumina paired-end sequencing data.
 
-# Usage
+## Required tools/dependencies
+Jekesa currently runs on a server (single compute node), and the folowing tools have to be installed or in your path prior to running it. The pipeline is written in Bash and R, and is still under development.
+
+#### _De novo_ genome assembly and classification
+* spades
+* skesa
+* kraken
+* minikraken database
+
+#### MLST typing
+* mlst
+
+#### Resistance profiling
+- ariba
+- seroba
+
+#### Visualization and reporting
+* quast
+* multiQC
+* R
+* Rscript
+
+## Usage
 ```
 usage: jekesa [options]
 
