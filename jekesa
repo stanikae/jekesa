@@ -15,12 +15,11 @@ usage: $0 <options>
 OPTIONS:
         -p      Path to output directory or project name
         -f      Path to file with list of sample IDs (one ID per line)
-
         -a      Select the assembler to use. Options available: 'spades', 'skesa'
                 (default='spades')
-        -s      Species scheme name to use for mlst typing. Use mlst --longList to view different schema names.
-                In addition, this option is required for streptococcus pneumoniae in order to allow detailed analysis,
-                Use: 'spneumoniae', otherwise if you don't know your schema use: 'noScheme'
+        -s      Species scheme name to use for mlst typing.
+		This option is required for streptococcus pneumoniae in order to allow detailed analysis. Use: 'spneumoniae'.
+		To check other available schema names use: mlst --longList. Otherwise if you don't know your schema use: 'noScheme'.
         -t      Number of threads to use <integer>, (minimum value should be: 6)
         -h      Show this help
         -v      Show version
@@ -79,7 +78,7 @@ echo -e "Parameters supplied by the User"
 echo -e "$project\t$filename\t$assembler\t$threads\t$MLSTscheme\n"
 declare -x projectName=$(basename $project)
 declare -x SCRIPTS_DIR=${BASH_SOURCE%/*}/bin
-
+declare -x DATABASES_DIR=${BASH_SOURCE%/*}/db
 
 # create working directory if it's not already available
 if ! [ -d "$project" ]
@@ -160,9 +159,17 @@ mkdir -p $aribaDir
 # check if MLST scheme is present in the mlst database
 mlst --longlist > $project/schemeList.txt
 declare -x schemeList=$project/schemeList.txt
+##############################################################################################################
 
+## databases ##
 # ariba reference database
-declare -x ariba_ref=~/ariba_DBs/out.card.prepareref
+declare -x ariba_ref=$DATABASES_DIR/ariba_DBs/out.card.prepareref
+# minikraken database
+
+# PBP typing using CDC Strep Lab scripts and database
+declare -x allDB_dir=$DATABASES_DIR/SPN_Reference_DB
+
+###############################################################################################################
 
 #echo -e "\nStarting quality control of sequencing reads for sample: $samples"; date
 #echo -e "\n==============================================================="
@@ -316,7 +323,7 @@ if [[ "$MLSTscheme" == "spneumoniae" ]]; then
   #declare -x spadesDir=$spadesDir
   #declare -x now=$(date +"%d_%b_%Y")
   declare -x batch_dir=$krakenDir #/home/stanford/kedibone/CRDM-08r/kraken #/41467
-  declare -x allDB_dir=/home/stanford/repos/Spn_Scripts_Reference/SPN_Reference_DB
+#  declare -x allDB_dir=/home/stanford/repos/Spn_Scripts_Reference/SPN_Reference_DB
   declare -x out_dir=$project
   declare -x batch_name=$projectName  #$(basename $project)
   declare -x out_analysis=$pbpDir
