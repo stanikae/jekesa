@@ -74,11 +74,19 @@ while getopts ":hvp:f:t:a:s:" opt; do
 done
 shift $((OPTIND -1))
 
+if [ $# == 0 ]; then
+	usage
+	exit 1
+fi
+
+
+
 echo -e "Parameters supplied by the User"
 echo -e "$project\t$filename\t$assembler\t$threads\t$MLSTscheme\n"
 declare -x projectName=$(basename $project)
 declare -x SCRIPTS_DIR=${BASH_SOURCE%/*}/bin
 declare -x DATABASES_DIR=${BASH_SOURCE%/*}/db
+declare -x SPN_SCRIPTS_DIR=${BASH_SOURCE%/*}/spn_scripts
 
 # create working directory if it's not already available
 if ! [ -d "$project" ]

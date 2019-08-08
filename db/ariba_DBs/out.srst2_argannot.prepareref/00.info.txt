@@ -1,0 +1,3 @@
+input fasta file:	out.srst2_argannot.fa
+input tsv file:	out.srst2_argannot.tsv
+genetic_code	11

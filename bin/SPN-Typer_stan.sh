@@ -37,22 +37,22 @@ for i in `find $spadesDir/$just_name -maxdepth 1 -type f \( -name "${just_name}*
 	ln -s $i $sampl_out/velvet_output/contigs.fa
 done
 
-perl ~/repos/JanOw_Dependencies/PBP-Gene_Typer.pl -1 "$readPair_1" -2 "$readPair_2" -r "$allDB_dir/MOD_bLactam_resistance.fasta" -n "$just_name" -s SPN -p 1A,2B,2X
+perl $SPN_SCRIPTS_DIR/PBP-Gene_Typer.pl -1 "$readPair_1" -2 "$readPair_2" -r "$allDB_dir/MOD_bLactam_resistance.fasta" -n "$just_name" -s SPN -p 1A,2B,2X
 ## OUTPUT file ===> TEMP_pbpID_Results.txt #####
 ## PBP genes: PBP_Code(1A:2B:2X) ##### 
 
 echo -e "COMPLETED BLACTAM RESISTANCE TYPING\n"
 
 ###Predict bLactam MIC### Minimum Inihibitory Concentration
-bash /home/stanford/repos/Spn_Scripts_Reference/bLactam_MIC_Rscripts/PBP_AA_sampledir_to_MIC_20180710.sh $sampl_out
+bash $SPN_SCRIPTS_DIR/bLactam_MIC_Rscripts/PBP_AA_sampledir_to_MIC_20180710.sh $sampl_out
 ## OUTPUT file ===> BLACTAM_MIC_RF_with_SIR.txt #####
 
 echo -e "COMPLETED PREDICTION OF BLACTAM MIC (Minimum Inihibitory Concentration)\n"
 
 ###Call GBS Misc. Resistances###
-perl ~/repos/Spn_Scripts_Reference/SPN_Res_Typer.pl -1 "$readPair_1" -2 "$readPair_2" -d "$allDB_dir" -r SPN_Res_Gene-DB_Final.fasta -n "$just_name"
+perl $SPN_SCRIPTS_DIR/SPN_Res_Typer.pl -1 "$readPair_1" -2 "$readPair_2" -d "$allDB_dir" -r SPN_Res_Gene-DB_Final.fasta -n "$just_name"
 ## OUTPUT file ===> OUT_Res_Results.txt #####
-perl /home/stanford/repos/Spn_Scripts_Reference/SPN_Target2MIC.pl OUT_Res_Results.txt "$just_name"
+perl $SPN_SCRIPTS_DIR/SPN_Target2MIC.pl OUT_Res_Results.txt "$just_name"
 ## OUTPUT file ===> RES-MIC_45186
 
 echo -e "COMPLETED CALLING SPN MISC. RESISTANCE GENES\n"
