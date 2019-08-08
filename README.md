@@ -2,7 +2,7 @@
 An automated bacterial whole genome assembly and typing pipeline which primarily uses Illumina paired-end sequencing data.
 
 ## Required tools/dependencies
-Jekesa (Illuminate) currently runs on a server (single compute node), and the folowing tools have to be installed or available in your path prior to running it. The pipeline is written in Bash and R, and is still under development.
+Jekesa (Illuminate) currently runs on a server (single compute node), and the folowing tools have to be installed or available in your path prior to running it. The pipeline is written in Bash and R, and generates the results report in an excel worksheet (.xlsx format).
 
 #### _De novo_ genome assembly and classification
 * [trim_galore]()
