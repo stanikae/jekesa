@@ -1,0 +1,23 @@
+name: jekesa
+channels:
+  - agbiome
+  - r
+  - anaconda
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - trim-galore=0.6.2
+  - kraken=1.1.*
+  - spades=3.13.*
+  - quast=5.0.*
+  - mlst=2.16.*
+  - ariba=2.14.*
+  - seroba=1.0.*
+  - multiqc=1.6
+  - fastqc=0.11.*
+  - skesa=2.3.*
+  - python=3.5
+  - bbtools=37.62
+  - 
+
