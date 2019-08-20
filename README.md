@@ -60,7 +60,7 @@ To activate JEKESA environment run:
 `````
 conda activate jekesa 
 `````
-##### Setting up required databases
+#### Setting up required databases
 `````
 ## ARIBA database set-up
 # 1. First install cd-hit and change the max_seq size
