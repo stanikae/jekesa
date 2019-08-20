@@ -49,5 +49,13 @@ OPTIONS:
 
 ````
 Clone the git repository:
-git clone 
+git clone https://github.com/stanikae/jekesa.git
 ````
+The dependencie can then be installed using conda as follows
+`````
+# after cloning the jekesa git repo, do the following to create the conda environment
+cd jekesa
+conda env create -n jekesa --file ./lib/jekesa.yml
+`````
+To activate JEKESA environment run:
+`conda activate `
