@@ -46,3 +46,8 @@ OPTIONS:
         
 ````
 ## Installation
+
+````
+Clone the git repository:
+git clone 
+````
