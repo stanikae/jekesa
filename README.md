@@ -57,4 +57,19 @@ cd jekesa
 conda env create -n jekesa --file ./lib/jekesa.yml
 `````
 To activate JEKESA environment run:
-`````conda activate jekesa `````
+`````
+conda activate jekesa 
+`````
+##### Setting up required databases
+`````
+# ARIBA database set-up
+# 1. First install cd-hit and change the max_seq size
+git clone https://github.com/weizhongli/cdhit.git
+cd cdhit
+make MAX_SEQ=10000000
+
+# 2. Download and set-up the CARD database
+
+
+
+`````
