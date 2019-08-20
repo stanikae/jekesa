@@ -16,6 +16,7 @@ Jekesa (Illuminate) currently runs on a server (single compute node), and the fo
 
 #### Resistance profiling
 - [ariba](https://github.com/sanger-pathogens/ariba)
+- [CARD](https://card.mcmaster.ca/)
 
 #### _Streptococcus pneumoniae_ specific analysis
 - [seroba](https://github.com/sanger-pathogens/seroba)
