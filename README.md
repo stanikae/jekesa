@@ -45,3 +45,4 @@ OPTIONS:
         -v      Show version
         
 ````
+## Installation
