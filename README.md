@@ -65,9 +65,11 @@ conda activate jekesa
 `````
 ## ARIBA database set-up
 # 1. First install cd-hit and change the max_seq size
+cd /opt # or any of your preferred location
 git clone https://github.com/weizhongli/cdhit.git
 cd cdhit
 make MAX_SEQ=10000000
+export PATH="/opt/cdhit:$PATH"
 
 # 2. Download and set-up the CARD database
 # version ...  of CARD is already prepared and provided in jekesa/dbs/ariba_DBs
@@ -78,15 +80,16 @@ ariba prepareref -f out.card.fa -m out.card.tsv out.card.prepareref
 
 ## SEROBA database set-up
 # 1. Clone the git repository:
+cd /opt # or any of your preferred location
 git clone https://github.com/sanger-pathogens/seroba.git
-cp -r seroba/database jekesa/db/seroba_db
+cp -r /opt/seroba/database jekesa/db/seroba_db
 seroba createDBs jekesa/db/seroba_db/ 71
 
 ## Minikraken_DB download and set-up
 mkdir -p $HOME/minikraken_db # choose most appropriate location for your system
 wget -c -P $HOME/minikraken_db/ https://ccb.jhu.edu/software/kraken/dl/minikraken_20171019_8GB.tgz
 cd $HOME/minikraken_db
-tar xzf minikraken_db/minikraken_20171019_8GB.tgz
+tar xzvf minikraken_db/minikraken_20171019_8GB.tgz
 rm $HOME/minikraken_db/minikraken_20171019_8GB.tgz
 ln -s $HOME/minikraken_db/minikraken_20171019_8GB jekesa/db/kraken_db
 `````
