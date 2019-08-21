@@ -86,7 +86,7 @@ seroba createDBs jekesa/db/seroba_db/ 71
 mkdir -p $HOME/minikraken_db # choose most appropriate location for your system
 wget -c -P $HOME/minikraken_db/ https://ccb.jhu.edu/software/kraken/dl/minikraken_20171019_8GB.tgz
 cd $HOME/minikraken_db
-tar xzf minikraken_db/minikraken_20171019_8GB.tgz
+tar xzvf minikraken_db/minikraken_20171019_8GB.tgz
 rm $HOME/minikraken_db/minikraken_20171019_8GB.tgz
 ln -s $HOME/minikraken_db/minikraken_20171019_8GB jekesa/db/kraken_db
 `````
