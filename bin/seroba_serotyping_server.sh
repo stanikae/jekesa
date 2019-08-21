@@ -11,7 +11,7 @@
 #samples=$filename
 sample=$samples
 #now=$(date +"%d_%b_%Y")
-db_dir=/opt/seroba_db
+#db_dir=/opt/seroba_db
 #cleanReads=$indir
 #indir=$trimmedReads
 indir=$filteredReads

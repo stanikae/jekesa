@@ -1,6 +1,6 @@
 #!/bin/bash
 
-krakenDB=/media/60tb/src/kraken/NCBI
+#krakenDB=/media/60tb/src/kraken/NCBI
 name=$samples
 outdir=$filteredReads
 bbmapDir=$filteredReads/bbmap

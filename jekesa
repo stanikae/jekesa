@@ -87,6 +87,7 @@ declare -x projectName=$(basename $project)
 declare -x SCRIPTS_DIR=${BASH_SOURCE%/*}/bin
 declare -x DATABASES_DIR=${BASH_SOURCE%/*}/db
 declare -x SPN_SCRIPTS_DIR=${BASH_SOURCE%/*}/spn_scripts
+declare -x GAS_SCRIPTS_DIR=${BASH_SOURCE%/*}/GAS_scripts
 
 # create working directory if it's not already available
 if ! [ -d "$project" ]
@@ -173,9 +174,11 @@ declare -x schemeList=$project/schemeList.txt
 # ariba reference database
 declare -x ariba_ref=$DATABASES_DIR/ariba_DBs/out.card.prepareref
 # minikraken database
-
+declare -x krakenDB=/media/60tb/src/kraken/NCBI
+# seroba database
+declare -x db_dir=$DATABASES_DIR/seroba_db
 # PBP typing using CDC Strep Lab scripts and database
-declare -x allDB_dir=$DATABASES_DIR/SPN_Reference_DB
+#declare -x allDB_dir=$DATABASES_DIR/SPN_Reference_DB
 
 ###############################################################################################################
 
@@ -328,10 +331,9 @@ fi
 
 # Perform PBP typing using scripts adapted from Ben Metcalf at CDC, USA
 if [[ "$MLSTscheme" == "spneumoniae" ]]; then
-  #declare -x spadesDir=$spadesDir
-  #declare -x now=$(date +"%d_%b_%Y")
+  # PBP typing using CDC Strep Lab scripts and database
+  declare -x allDB_dir=$DATABASES_DIR/SPN_Reference_DB	
   declare -x batch_dir=$krakenDir #/home/stanford/kedibone/CRDM-08r/kraken #/41467
-#  declare -x allDB_dir=/home/stanford/repos/Spn_Scripts_Reference/SPN_Reference_DB
   declare -x out_dir=$project
   declare -x batch_name=$projectName  #$(basename $project)
   declare -x out_analysis=$pbpDir
@@ -348,6 +350,31 @@ if [[ "$MLSTscheme" == "spneumoniae" ]]; then
 
   # convert output file to xlsx
   Rscript $SCRIPTS_DIR/convert_SPN-PBP-Typing-Results_2_xlsx.R $out_analysis/TABLE_SPN_"$batch_name"_Typing_Results.txt $reportsDir/${projectName}_pbp-typing.xlsx
+
+fi
+
+# Perform emm typing using scripts adapted from Ben Metcalf at CDC, USA
+if [[ "$MLSTscheme" == "spyogenes" ]]; then
+  # PBP typing using CDC Strep Lab scripts and database
+  declare -x allDB_dir=$DATABASES_DIR/GAS_Reference_DB
+  declare -x batch_dir=$krakenDir #/home/stanford/kedibone/CRDM-08r/kraken #/41467
+  declare -x out_dir=$project
+  declare -x batch_name=$projectName  #$(basename $project)
+  declare -x out_analysis=$pbpDir
+
+  #bash /home/stanford/repos/bacteria_denovo_assembly/SPN-typing_jobInputFile.sh
+  $GAS_SCRIPTS_DIR/StrepLab-JanOw_GAS-wrapr.sh
+
+  # Perform GAS typing for each sample
+  if [ -s "$out_analysis/job-control.txt" ]; then
+    while read -r line; do
+      $GAS_SCRIPTS_DIR/StrepLab-JanOw_GAS-Typer.sh "$line"
+    done < $out_analysis/job-control.txt
+  fi
+
+  # convert output file to xlsx
+  Rscript $SCRIPTS_DIR/convert_SPN-PBP-Typing-Results_2_xlsx.R $out_analysis/TABLE_GAS_"$batch_name"_Typing_Results.txt $reportsDir/${projectName}_pbp-typing
+.xlsx
 
 fi
 
