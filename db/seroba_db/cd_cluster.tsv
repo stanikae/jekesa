@@ -1,0 +1,59 @@
+cluster	01
+cluster_1	02
+cluster_10	16A
+cluster_11	16F
+cluster_12	03
+cluster_13	17A
+cluster_14	17F
+cluster_15	18A	18B	18C	18F
+cluster_16	19A
+cluster_17	19B	19C
+cluster_18	19F
+cluster_19	20
+cluster_2	10A	10B
+cluster_20	21
+cluster_21	22A	22F
+cluster_22	23A	23B	23F
+cluster_23	04
+cluster_24	23B1
+cluster_25	24A
+cluster_26	24B
+cluster_27	24F
+cluster_28	25A	25F	38
+cluster_29	27
+cluster_3	10C	10F
+cluster_30	28A	28F
+cluster_31	29
+cluster_32	31
+cluster_33	32A
+cluster_34	05
+cluster_35	32F
+cluster_36	33A	33F	37
+cluster_37	33B	33D
+cluster_38	33C
+cluster_39	34
+cluster_4	10X
+cluster_40	35A	35C	42
+cluster_41	35B	35D
+cluster_42	35F
+cluster_43	36
+cluster_44	39
+cluster_45	06A	06B	06C	06D	06E	06F	06G
+cluster_46	39X
+cluster_47	41A	41F
+cluster_48	43
+cluster_49	45
+cluster_5	11A	11B	11C	11D	11E	11F
+cluster_50	47A
+cluster_51	47F
+cluster_52	48
+cluster_53	Swiss_NT
+cluster_54	alternative_aliB_NT
+cluster_55	07A	07F
+cluster_56	07B	07C	40
+cluster_57	08
+cluster_58	09A	09L	09N	09V
+cluster_6	12A	12B	12F	44	46
+cluster_7	13
+cluster_8	14
+cluster_9	15A	15B	15C	15F

@@ -1,0 +1,3 @@
+input fasta file:	/home/stanford/Programs/updated-git/temp_aribaXj86pbb4l/temp_fasta_genes.fasta
+input tsv file:	/home/stanford/Programs/updated-git/temp_aribaXj86pbb4l/temp_meta_genes.tsv
+genetic_code	11
