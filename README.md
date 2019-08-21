@@ -65,9 +65,11 @@ conda activate jekesa
 `````
 ## ARIBA database set-up
 # 1. First install cd-hit and change the max_seq size
+cd /opt # or any of your preferred location
 git clone https://github.com/weizhongli/cdhit.git
 cd cdhit
 make MAX_SEQ=10000000
+export PATH="/opt/cdhit:$PATH"
 
 # 2. Download and set-up the CARD database
 # version ...  of CARD is already prepared and provided in jekesa/dbs/ariba_DBs
