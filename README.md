@@ -80,8 +80,9 @@ ariba prepareref -f out.card.fa -m out.card.tsv out.card.prepareref
 
 ## SEROBA database set-up
 # 1. Clone the git repository:
+cd /opt # or any of your preferred location
 git clone https://github.com/sanger-pathogens/seroba.git
-cp -r seroba/database jekesa/db/seroba_db
+cp -r /opt/seroba/database jekesa/db/seroba_db
 seroba createDBs jekesa/db/seroba_db/ 71
 
 ## Minikraken_DB download and set-up
