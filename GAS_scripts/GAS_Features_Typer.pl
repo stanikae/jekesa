@@ -6,7 +6,7 @@ use Data::Dumper;
 #use Getopt::Long;
 use Getopt::Std;
 
-local $ENV{PATH} = "${HOME}/anaconda3/envs/srst2/bin:$ENV{PATH}";
+local $ENV{PATH} = "$ENV{HOME}/anaconda3/envs/srst2/bin:$ENV{PATH}";
 
 sub checkOptions {
     my %opts;
