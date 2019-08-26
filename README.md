@@ -93,3 +93,9 @@ tar xzvf minikraken_db/minikraken_20171019_8GB.tgz
 rm $HOME/minikraken_db/minikraken_20171019_8GB.tgz
 ln -s $HOME/minikraken_db/minikraken_20171019_8GB jekesa/db/kraken_db
 `````
+#### Setting-up environment for srst2 and its dependencies
+
+`````
+cd jekesa
+conda env create -n srst2 --file ./lib/srst2.yml
+`````
