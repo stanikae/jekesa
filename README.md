@@ -21,7 +21,10 @@ Jekesa (Illuminate) currently runs on a server (single compute node), and the fo
 #### _Streptococcus pneumoniae_ specific analysis
 - [seroba](https://github.com/sanger-pathogens/seroba)
 - Pili detection
-- [CDC Streptococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) PBP gene typing scripts and databases 
+- [CDC Streptococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) PBP gene typing scripts and databases
+
+#### _Streptococcus pyogenes_ specific analysis
+- [CDC Stretococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) EMM typing and MIC profiling scripts and databases
 
 #### Visualization and reporting
 * [QUAST](http://quast.sourceforge.net/quast)
