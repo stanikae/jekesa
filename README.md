@@ -1,5 +1,5 @@
 # JEKESA
-An automated bacterial whole genome assembly and typing pipeline which primarily uses Illumina paired-end sequencing data.
+An automated bacterial whole genome assembly and typing pipeline which primarily uses Illumina paired-end sequencing data. In addition, Jekesa performs extensive analyses for Streptococcus pneumoniae and Streptococcus pyogenes (Group A Streptococcus) using some of the [CDC Streptococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) scripts for PBP and EMM typing; as well as MIC (minimum inhibitory concentration) profiling.
 
 ## Required tools/dependencies
 Jekesa (Illuminate) currently runs on a server (single compute node), and the folowing tools have to be installed or available in your path prior to running it. The pipeline is written in Bash and R, and generates the results report in an excel worksheet (.xlsx format).
