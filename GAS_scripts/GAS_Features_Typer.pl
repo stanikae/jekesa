@@ -12,6 +12,10 @@ use Getopt::Std;
 #module load Python/2.7
 #module load freebayes/0.9.21
 
+#my $srst2 = "/home/stanford/anaconda3/envs/srst2/bin/srst2";
+#my $SPN_SCRIPTS_DIR = "~/repos/jekesa/spn_scripts";
+local $ENV{PATH} = "/home/stanford/anaconda3/envs/srst2/bin:$ENV{PATH}";
+
 sub checkOptions {
     my %opts;
     getopts('h1:2:d:f:o:n:', \%opts);
@@ -415,16 +419,16 @@ while (my ($key, $val) = each %Feat_Col) {
     #print $fh "$key\t$val_out\n";
 }
 
-print $fh "T_Type|$Feat_Col{'T_Type'}\n";
-print $fh "GACI|$Feat_Col{'GACI'}\n";
-print $fh "EMM_Family|$Feat_Col{'EMM_Family'}\n";
-print $fh "ECM|$Feat_Col{'ECM'}\n";
-print $fh "HASA|$Feat_Col{'HASA'}\n";
-print $fh "SDA1|$Feat_Col{'SDA1'}\n";
-print $fh "SLAA|$Feat_Col{'SLAA'}\n";
-print $fh "SIC|$Feat_Col{'SIC'}\n";
-print $fh "ROCA|$Feat_Col{'ROCA'}\n";
-print $fh "PNGA|$Feat_Col{'PNGA'}\n";
-print $fh "SLO-G|$Feat_Col{'SLO-G'}\n";
-print $fh "Exotoxins|$Feat_Col{'Exotoxins'}\n";
+print $fh "T_Type\t$Feat_Col{'T_Type'}\n";
+print $fh "GACI\t$Feat_Col{'GACI'}\n";
+print $fh "EMM_Family\t$Feat_Col{'EMM_Family'}\n";
+print $fh "ECM\t$Feat_Col{'ECM'}\n";
+print $fh "HASA\t$Feat_Col{'HASA'}\n";
+print $fh "SDA1\t$Feat_Col{'SDA1'}\n";
+print $fh "SLAA\t$Feat_Col{'SLAA'}\n";
+print $fh "SIC\t$Feat_Col{'SIC'}\n";
+print $fh "ROCA\t$Feat_Col{'ROCA'}\n";
+print $fh "PNGA\t$Feat_Col{'PNGA'}\n";
+print $fh "SLO-G\t$Feat_Col{'SLO-G'}\n";
+print $fh "Exotoxins\t$Feat_Col{'Exotoxins'}\n";
 ###############################################################################################

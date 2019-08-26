@@ -152,6 +152,15 @@ if (length(args) == 9) {
 	# write results to xlsx file
 	openxlsx::write.xlsx(cmd_df, paste(dir, args[7], sep = "/"), overwrite = T)
 
+} else if (length(args) == 7) {
+        pbp <- read_excel(paste(dir, args[7], sep = "/"), col_names = TRUE)
+        #head(seroba)
+        names(pbp)[1] <- "SampleID"
+        # Merging the three data sets, metrics, mlst, and serotyping
+        cmd_df <- plyr::join_all(list(kraken,metrics2,mlst,ariba,pbp), by='SampleID', type='full')
+	# write results to xlsx file
+        openxlsx::write.xlsx(cmd_df, paste(dir, args[6], sep = "/"), overwrite = T)
+
 } else {
 	print(args[1]) # path denovo assembly reports directory
 #	print(args[2]) # assembly metrics file (sequencing data QC)

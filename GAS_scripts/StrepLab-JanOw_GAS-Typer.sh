@@ -1,13 +1,7 @@
 #!/bin/bash -l
 
-#temp_path=$(pwd)
-#export PATH=$PATH:$temp_path
+read -a PARAM <<< $(echo $1)
 
-## -- begin embedded SGE options --
-read -a PARAM <<< $( echo $1)
-## -- end embedded SGE options --
-
-###Load Modules###
 #. /usr/share/Modules/init/bash
 #module load perl/5.22.1
 #module load ncbi-blast+/2.2.29
@@ -26,7 +20,7 @@ read1=${PARAM[0]}
 read2=${PARAM[1]}
 allDB_dir=${PARAM[2]}
 batch_out=${PARAM[3]}
-sampl_out=${PARAM[4]}
+declare -x sampl_out=${PARAM[4]}
 
 
 ###Start Doing Stuff###
@@ -36,13 +30,17 @@ cd "$sampl_out"
 #out_name=$(echo "$readPair_1" | awk -F"/" '{print $(NF-1)"--"$(NF)}' | sed 's/_S[0-9]\+_L[0-9]\+_R[0-9]\+.*//g')   ###Otherwise Use This###
 #just_name=$(echo "$readPair_1" | awk -F"/" '{print $(NF)}' | sed 's/_S[0-9]\+_L[0-9]\+_R[0-9]\+.*//g')
 just_name=$(echo "$read1" | awk -F "/" '{print $(NF)}' | sed 's/_.*//g')
-out_nameMLST=MLST_"$just_name"
+#out_nameMLST=MLST_"$just_name"
 #out_nameEMM=EMM_"$just_name"
 #out_namePBP=PBP_"$just_name"
-
+echo -e "$sampl_out\n$just_name"
 ###Pre-Process Paired-end Reads###
 
 sampleName=$(basename $sampl_out)
+#if [[ "$read1" =~ ".gz" ]]; then
+# gunzip $read1
+# gunzip $read2
+#fi
 ln -s $read1 $sampl_out/${sampleName}_1.fastq.gz
 ln -s $read2 $sampl_out/${sampleName}_2.fastq.gz
 readPair_1=$sampl_out/${sampleName}_1.fastq.gz
@@ -66,18 +64,29 @@ done
 #module unload perl/5.22.1
 #module load perl/5.16.1-MT
 perl $GAS_SCRIPTS_DIR/emm_typer.pl -1 "$readPair_1" -2 "$readPair_1" -r "$allDB_dir" -n "$just_name"
-perl $SPN_SCRIPTS_DIR/PBP-Gene_Typer.pl -1 "$readPair_1" -2 "$readPair_2" -r "$allDB_dir/GAS_bLactam_Ref.fasta" -n "$just_name" -s GAS -p 2X
+echo -e "\n************************************"
+echo -e "COMPLETED: emm_typing"; date
+echo -e "************************************\n"
+perl $GAS_SCRIPTS_DIR/PBP-Gene_Typer.pl -1 "$readPair_1" -2 "$readPair_2" -r "$allDB_dir/GAS_bLactam_Ref.fasta" -n "$just_name" -s GAS -p 2X
 #module unload perl/5.16.1-MT
 #module load perl/5.22.1
-
+echo -e "\n************************************"
+echo -e "COMPLETED: pbp-gene_typing"; date
+echo -e "************************************\n"
 ###Call GAS Misc Resistance###
 perl $GAS_SCRIPTS_DIR/GAS_Res_Typer.pl -1 "$readPair_1" -2 "$readPair_2" -d "$allDB_dir" -r GAS_Res_Gene-DB_Final.fasta -n "$just_name"
+echo -e "\n************************************"
+echo -e "COMPLETED: res_typing"; date
+echo -e "************************************\n"
 perl $GAS_SCRIPTS_DIR/GAS_Target2MIC.pl TEMP_Res_Results.txt "$just_name" TEMP_pbpID_Results.txt
-
+echo -e "\n************************************"
+echo -e "COMPLETED: target2MIC"; date
+echo -e "************************************\n"
 ###Type Surface and Secretory Proteins###
 perl $GAS_SCRIPTS_DIR/GAS_Features_Typer.pl -1 "$readPair_1" -2 "$readPair_2" -d "$allDB_dir" -f GAS_features_Gene-DB_Final.fasta -n "$just_name"
-
-
+echo -e "\n************************************"
+echo -e "COMPLETED: feature_typing"; date
+echo -e "************************************\n"
 ###Output the emm type/MLST/drug resistance data for this sample to it's results output file###
 tabl_out="TABLE_Isolate_Typing_results.txt"
 bin_out="BIN_Isolate_Typing_results.txt"
@@ -101,6 +110,7 @@ do
 done <<< "$(sed 1d *__emm-Type__Results.txt)"
 printf "$emm_out\t" >> "$tabl_out"
 printf "$emm_out," >> "$bin_out"
+echo -e "\nCOMPLETED: emm_output"; date
 ###MLST OUTPUT###
 #sed 1d "$out_nameMLST"__mlst__Streptococcus_pyogenes__results.txt | while read -r line
 #do
@@ -118,18 +128,20 @@ do
     FEAT_targ=$(echo "$line" | cut -f2)
     printf "$FEAT_targ\t" >> "$tabl_out"
 done < TEMP_protein_Results.txt
-
+echo -e "\n************************************\n"
+echo -e "\nCOMPLETED: features-output"; date
+echo -e "\n************************************\n"
 ###PBP_ID Output###
 justPBPs="NF"
 sed 1d TEMP_pbpID_Results.txt | while read -r line
 do
     if [[ -n "$line" ]]
     then
-	justPBPs=$(echo "$line" | awk -F"\t" '{print $2}')
+        justPBPs=$(echo "$line" | awk -F"\t" '{print $2}')
     fi
     printf "$justPBPs\t" >> "$tabl_out"
 done
-
+echo -e "\nCOMPLETED: pbp-output"; date
 ###Resistance Targets###
 while read -r line
 do
@@ -142,14 +154,16 @@ printf "\n" >> "$tabl_out"
 cat BIN_Features_Results.txt | sed 's/$/,/g' >> "$bin_out"
 cat BIN_Res_Results.txt >> "$bin_out"
 printf "\n" >> "$bin_out"
-
+echo -e "\nCOMPLETED: res_output"; date
 ###Output the emm type/MLST/drug resistance data for this sample to it's results output file###
 #batch_name=$(basename `dirname $batch_out`) #$(echo $line | awk -F" " '{print $1}' | awk -F"/" '{print $(NF-4)}')
 final_outDir=$sampl_out #$(echo $line | awk -F" " '{print $5}')
 final_result_Dir=$batch_out #$(echo $line | awk -F" " '{print $4}')
-cat $final_outDir/TABLE_Isolate_Typing_results.txt >> $final_result_Dir/TABLE_GAS_"$batch_name"_Typing_Results.txt
+cat $final_outDir/TABLE_Isolate_Typing_results.txt | sed 's/\t/|/g' | sed '$s/|$//' >> $final_result_Dir/TABLE_GAS_"$batch_name"_Typing_Results.txt
 #cat $final_outDir/BIN_Isolate_Typing_results.txt >> $final_result_Dir/BIN_GBS_"$batch_name"_Typing_Results.txt
 if [[ -e $final_outDir/TEMP_newPBP_allele_info.txt ]]; then
   cat $final_outDir/TEMP_newPBP_allele_info.txt >> $final_result_Dir/UPDATR_GAS_"$batch_name"_Typing_Results.txt
 fi
-
+echo -e "\n************************************"
+echo -e "COMPLETED: Added all results for $just_name"; date
+echo -e "************************************\n"

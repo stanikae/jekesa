@@ -318,13 +318,13 @@ my $out_nameARG = "ARG_".$outName;
 my $out_nameRESFI = "RESFI_".$outName;
 my $out_nameFOLP = "FOLP_".$outName;
 print "resistance db: $res_DB\n";
-system("srst2 --samtools_args '\\-A' --input_pe $fastq1 $fastq2 --output $outNameRES --log --save_scores --min_coverage 99.9 --max_divergence 5 --gene_db $res_DB");
+system("$srst2 --samtools_args '\\-A' --input_pe $fastq1 $fastq2 --output $outNameRES --log --save_scores --min_coverage 99.9 --max_divergence 5 --gene_db $res_DB");
 ###Type ARG-ANNOT Resistance Genes###
-system("srst2 --samtools_args '\\-A' --input_pe $fastq1 $fastq2 --output $out_nameARG --log --save_scores --min_coverage 70 --max_divergence 30 --gene_db $ref_dir/ARGannot_r1.fasta");
+system("$srst2 --samtools_args '\\-A' --input_pe $fastq1 $fastq2 --output $out_nameARG --log --save_scores --min_coverage 70 --max_divergence 30 --gene_db $ref_dir/ARGannot_r1.fasta");
 ###Type ResFinder Resistance Genes###
-system("srst2 --samtools_args '\\-A' --input_pe $fastq1 $fastq2 --output $out_nameRESFI --log --save_scores --min_coverage 70 --max_divergence 30 --gene_db $ref_dir/ResFinder.fasta");
+system("$srst2 --samtools_args '\\-A' --input_pe $fastq1 $fastq2 --output $out_nameRESFI --log --save_scores --min_coverage 70 --max_divergence 30 --gene_db $ref_dir/ResFinder.fasta");
 ###Type FOLP Resistance Gene###
-system("srst2 --samtools_args '\\-A' --input_pe $fastq1 $fastq2 --output $out_nameFOLP --log --save_scores --min_coverage 95.0 --max_divergence 15 --gene_db $ref_dir/SPN_FOLP_Gene-DB_Final.fasta");
+system("$srst2 --samtools_args '\\-A' --input_pe $fastq1 $fastq2 --output $out_nameFOLP --log --save_scores --min_coverage 95.0 --max_divergence 15 --gene_db $ref_dir/SPN_FOLP_Gene-DB_Final.fasta");
 #=cut
 
 my @TEMP_RES_bam = glob("RES_*\.sorted\.bam");

@@ -38,6 +38,12 @@ while getopts ":hvp:f:t:a:s:" opt; do
     f )
       declare -x filename=${OPTARG}
       ;;
+    a )
+      declare -x assembler=${OPTARG}
+      ;;
+    s )
+      declare -x MLSTscheme=${OPTARG}
+      ;;
     t )
       declare -x threads=${OPTARG}
       if [[ "$threads" -lt 6 ]]; then
@@ -45,12 +51,6 @@ while getopts ":hvp:f:t:a:s:" opt; do
         echo "Use [$0 -h] to see minimum thread value"
         exit
       fi
-      ;;
-    s )
-      declare -x MLSTscheme=${OPTARG}
-      ;;
-    a )
-      declare -x assembler=${OPTARG}
       ;;
     h )
       usage
@@ -74,10 +74,10 @@ while getopts ":hvp:f:t:a:s:" opt; do
 done
 shift $((OPTIND -1))
 
-if [ $# == 0 ]; then
-	usage
-	exit 1
-fi
+#if [ $# == 0 ]; then
+#	usage
+#	exit 1
+#fi
 
 
 
@@ -88,6 +88,7 @@ declare -x SCRIPTS_DIR=${BASH_SOURCE%/*}/bin
 declare -x DATABASES_DIR=${BASH_SOURCE%/*}/db
 declare -x SPN_SCRIPTS_DIR=${BASH_SOURCE%/*}/spn_scripts
 declare -x GAS_SCRIPTS_DIR=${BASH_SOURCE%/*}/GAS_scripts
+declare -x srst2=/home/stanford/anaconda3/envs/srst2/bin/srst2
 
 # create working directory if it's not already available
 if ! [ -d "$project" ]
@@ -128,6 +129,16 @@ if [[ "$MLSTscheme" == "spneumoniae" ]]
 	mkdir -p $serobaDir
 	mkdir -p $pilusDir
 	mkdir -p $pbpDir
+fi
+
+if [[ "$MLSTscheme" == "spyogenes" ]]
+ then
+#        declare -x serobaDir=$project/seroba_${now}_analysis
+#        declare -x pilusDir=$project/pili_${now}_analysis
+        declare -x pbpDir=$project/pbp-typing_${now}_analysis
+#        mkdir -p $serobaDir
+#        mkdir -p $pilusDir
+        mkdir -p $pbpDir
 fi
 
 # kraken directory
@@ -215,8 +226,12 @@ for sampleID in $(cat $filename)
 			date
 			echo -e "\nPerforming bacterial de novo genome assembly using spades and MLST typing for sample: $samples"
 			echo -e "===============================================================\n"
-			nohup $SCRIPTS_DIR/spades_assembly_server.sh & 
-	
+			
+			if [[ "$assembler" == "spades" ]]; then
+			    nohup $SCRIPTS_DIR/spades_assembly_server.sh & 
+			else 
+			    nohup $SCRIPTS_DIR/skesa_assembly.sh &
+			fi
 			# Detection of resistance genes, virulence factors and plasmid detection
 			date
         		echo -e "\nPerforming detection of resistance genes using ARIBA for sample: $samples"
@@ -368,13 +383,12 @@ if [[ "$MLSTscheme" == "spyogenes" ]]; then
   # Perform GAS typing for each sample
   if [ -s "$out_analysis/job-control.txt" ]; then
     while read -r line; do
-      $GAS_SCRIPTS_DIR/StrepLab-JanOw_GAS-Typer.sh "$line"
+      $GAS_SCRIPTS_DIR/StrepLab-JanOw_GAS-Typer.sh "$line" </dev/null
     done < $out_analysis/job-control.txt
   fi
 
   # convert output file to xlsx
-  Rscript $SCRIPTS_DIR/convert_SPN-PBP-Typing-Results_2_xlsx.R $out_analysis/TABLE_GAS_"$batch_name"_Typing_Results.txt $reportsDir/${projectName}_pbp-typing
-.xlsx
+  Rscript $SCRIPTS_DIR/convert_SPN-PBP-Typing-Results_2_xlsx.R $out_analysis/TABLE_GAS_"$batch_name"_Typing_Results.txt $reportsDir/${projectName}_pbp-typing.xlsx
 
 fi
 
@@ -386,6 +400,10 @@ fi
 if [[ "$MLSTscheme" == "spneumoniae" ]]; then
   Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir ${projectName}_quastResults.xlsx ${projectName}_mlstResults.xlsx ${projectName}-ariba_final.xlsx ${projectName}-kraken_combinedReports.xlsx ${projectName}_serobaResults.xlsx ${projectName}_WGS-typing-report.xlsx ${projectName}_pili-results.xlsx ${projectName}_pbp-typing.xlsx
 
+elif [[ "$MLSTscheme" == "spyogenes" ]]; then
+ Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir ${projectName}_quastResults.xlsx ${projectName}_mlstResults.xlsx ${projectName}-ariba_final.xlsx ${projectName}-kraken_
+combinedReports.xlsx ${projectName}_WGS-typing-report.xlsx ${projectName}_pbp-typing.xlsx
+ 
 else
  Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir ${projectName}_quastResults.xlsx ${projectName}_mlstResults.xlsx ${projectName}-ariba_final.xlsx ${projectName}-kraken_combinedReports.xlsx ${projectName}_WGS-typing-report.xlsx
 

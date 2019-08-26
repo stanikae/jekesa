@@ -16,6 +16,11 @@ use Env;
 #module load Python/2.7
 #module load freebayes/0.9.21
 
+my $srst2 = "/home/stanford/anaconda3/envs/srst2/bin/srst2";
+my $SPN_SCRIPTS_DIR = "~/repos/jekesa/spn_scripts";
+local $ENV{PATH} = "/home/stanford/anaconda3/envs/srst2/bin:$ENV{PATH}";
+
+
 sub checkOptions {
     my %opts;
     getopts('h1:2:d:r:o:n:', \%opts);
@@ -890,10 +895,10 @@ while (my ($key, $val) = each %drugRes_Col) {
     #print $fh "$key\t$val_out\n";
 }
 
-print $fh "ER_CL|$drugRes_Col{'ER_CL'}\n";
-print $fh "TET|$drugRes_Col{'TET'}\n";
-print $fh "GYRA_PARC|$drugRes_Col{'GYRASPY_PARC'}\n";
-#print $fh "FOLA_FOLP|$drugRes_Col{'FOLA_FOLP'}\n";
-#print $fh "RARE|$drugRes_Col{'RARE'}\n";
-print $fh "OTHER|$drugRes_Col{'OTHER'}\n";
+print $fh "ER_CL\t$drugRes_Col{'ER_CL'}\n";
+print $fh "TET\t$drugRes_Col{'TET'}\n";
+print $fh "GYRA_PARC\t$drugRes_Col{'GYRASPY_PARC'}\n";
+#print $fh "FOLA_FOLP\t$drugRes_Col{'FOLA_FOLP'}\n";
+#print $fh "RARE\t$drugRes_Col{'RARE'}\n";
+print $fh "OTHER\t$drugRes_Col{'OTHER'}\n";
 ###############################################################################################

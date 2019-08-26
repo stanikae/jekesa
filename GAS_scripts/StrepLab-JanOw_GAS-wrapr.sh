@@ -14,7 +14,7 @@
 
 
 ###Create the batch output files###
-batch_name=$(echo "$batch_dir" | awk -F"/" '{print $(NF-3)}')
+#batch_name=$(echo "$batch_dir" | awk -F"/" '{print $(NF-3)}')
 #printf "Sample_Name\temm_Type\temm_Seq\t%_identity\tmatch_length\n" >> "$out_analysis"/JanOw_"$batch_name"_emmType_results.txt
 printf "Sample|emm_Type|T_Type|Group_A|EMM_Family|Other_Surface_Proteins|Capsule|SDA1|SLAA|SIC|ROCA|PNGA3|NADase_D330G|Exotoxins|PBP_ID|WGS_ZOX_SIGN|WGS_ZOX|WGS_ZOX_SIR|WGS_FOX_SIGN|WGS_FOX|WGS_FOX_SIR|WGS_TAX_SIGN|WGS_TAX|WGS_TAX_SIR|WGS_CFT_SIGN|WGS_CFT|WGS_CFT_SIR|WGS_CPT_SIGN|WGS_CPT|WGS_CPT_SIR|WGS_AMP_SIGN|WGS_AMP|WGS_AMP_SIR|WGS_PEN_SIGN|WGS_PEN|WGS_PEN_SIR|WGS_MER_SIGN|WGS_MER|WGS_MER_SIR|ER_CL|WGS_ERY_SIGN|WGS_ERY|WGS_ERY_SIR|WGS_CLI_SIGN|WGS_CLI|WGS_CLI_SIR|WGS_LZO_SIGN|WGS_LZO|WGS_LZO_SIR|WGS_SYN_SIGN|WGS_SYN|WGS_SYN_SIR|WGS_ERY/CLI|TET|WGS_TET_SIGN|WGS_TET|WGS_TET_SIR|GYRA_PARC|WGS_LFX_SIGN|WGS_LFX|WGS_LFX_SIR|OTHER|WGS_DAP_SIGN|WGS_DAP|WGS_DAP_SIR|WGS_VAN_SIGN|WGS_VAN|WGS_VAN_SIR|WGS_RIF_SIGN|WGS_RIF|WGS_RIF_SIR|WGS_CHL_SIGN|WGS_CHL|WGS_CHL_SIR|WGS_SXT_SIGN|WGS_SXT|WGS_SXT_SIR\n" >> "$out_analysis"/TABLE_GAS_"$batch_name"_Typing_Results.txt
 #printf "Sample,MLST,emm_Type,T_Type,MRP,ENN,FBAA,PRTF2,SFB1,R28,SOF,HASA,SDA1,SIC,ROCAM3,ROCAM18,PNGA,SLOG,SpeA,SpeC,SpeG,SpeH,SpeI,SpeJ,SpeK,SpeL,SpeM,SSA,SMEZ,23S1,23S3,CAT,ERMB,ERMT,ERMA,FOLA,FOLP1,FOLP2,GYRA,LNUB,LSAC,LSAE,MEF,PARC,RPOB1,RPOBN,TETL,TETM,TETO\n" >> "$out_analysis"/BIN_GAS_"$batch_name"_Typing_Results.txt
@@ -27,7 +27,7 @@ for sample in $batch_dir_star
 do
     if [[ "$sample" =~ val_1.fq ]]
     then
-        sampl_name=$(echo "$sample" | sed 's/^.*\///g' | sed 's/_S.*.fq.gz//g')
+        sampl_name=$(echo "$sample" | sed 's/^.*\///g' | sed 's/_S.*.f*//g')
     fi
     sampl_out=$out_analysis/$sampl_name
     eval sampl_out=$sampl_out

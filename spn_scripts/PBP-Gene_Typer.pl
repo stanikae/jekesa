@@ -13,6 +13,9 @@ use File::Spec;
 #module load BEDTools/2.17.0
 #module load Python/2.7
 
+my $SPN_SCRIPTS_DIR = ~/repos/jekesa/spn_scripts;
+
+
 sub checkOptions {
     my %opts;
     getopts('h1:2:r:o:n:s:p:', \%opts);
@@ -166,10 +169,11 @@ sub PBP_blastTyper {
 
     my $db_path = dirname($PBP_DB);
     my $blastDB_name = "Blast_bLactam_".$pbp_type."_prot_DB";
+    print "BlastDB name: $blastDB_name\n";
     my $blast_seq = $species."_bLactam_".$pbp_type."-DB.faa";
     my $blast_out = "TEMP_".$outName."_blast-out_".$pbp_type.".txt";
     print "Blast DB name: $db_path/$blastDB_name\n";
-    if (!(glob("$db_path/$blastDB_name*"))) {
+    unless ( -e $db_path/$blastDB_name."*.psq") {
 	print "Need to make a new Blast database\n";
 	system("makeblastdb -in $db_path/$blast_seq -dbtype prot -out $db_path/$blastDB_name");
 	system("blastp -db $db_path/$blastDB_name -query TEMP_query_sequence.faa -outfmt 6 -out $blast_out");

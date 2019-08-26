@@ -12,6 +12,8 @@ use Getopt::Std;
 #module load BEDTools/2.17.0
 #module load Python/2.7
 
+my $velvet_output = "./velvet_output";
+
 sub checkOptions {
     my %opts;
     getopts('h1:2:r:o:n:', \%opts);
@@ -114,11 +116,9 @@ my ($help, $fastq1, $fastq2, $emm_DB, $outDir, $outName) = checkOptions( @ARGV )
 chdir "$outDir";
 my $emmType_output = "emm-Type_Results.txt";
 open(my $fh,'>',$emmType_output) or die "Could not open file '$emmType_output' $!";
-print $fh "Sample_Name|emm_Type|emm_Seq|Percent_Identity|Match_Length\n";
+print $fh "Sample_Name\temm_Type\temm_Seq\tPercent_Identity\tMatch_Length\n";
 
-my $fastq1_trimd = $outName."_1.fastq.gz";
-my $fastq2_trimd = $outName."_2.fastq.gz";
-####Preprocess with Cutadapt###
+###Preprocess with Cutadapt###
 #my $fastq1_trimd = "cutadapt_".$outName."_S1_L001_R1_001.fastq";
 #my $fastq2_trimd = "cutadapt_".$outName."_S1_L001_R2_001.fastq";
 #if( -e $fastq1_trimd) {
@@ -137,7 +137,7 @@ my $fastq2_trimd = $outName."_2.fastq.gz";
 #    unlink $tempDel_2;
 #}
 
-if( -d "./velvet_output") {
+if( -d "$velvet_output") {
     print "Velvet assembly has already been completed\n";
 } else {
     print "Beginning Velvet\n";
@@ -147,10 +147,10 @@ if( -d "./velvet_output") {
 
 print "Blast assembled contigs against the forward primer reference sequence\n";
 if (glob("$emm_DB/blast_frwd_primr-nucl_DB*")) {
-    system("blastn -db $emm_DB/blast_frwd_primr-nucl_DB -query ./velvet_output/contigs.fa -outfmt 6 -word_size 4 -out contig-vs-frwd_nucl.txt");
+    system("blastn -db $emm_DB/blast_frwd_primr-nucl_DB -query $velvet_output/contigs.fa -outfmt 6 -word_size 4 -out contig-vs-frwd_nucl.txt");
 } else {
     system("makeblastdb -in $emm_DB/frwd_primr-DB_Final.fasta -dbtype nucl -out $emm_DB/blast_frwd_primr-nucl_DB");
-    system("blastn -db $emm_DB/blast_frwd_primr-nucl_DB -query ./velvet_output/contigs.fa -outfmt 6 -word_size 4 -out contig-vs-frwd_nucl.txt");
+    system("blastn -db $emm_DB/blast_frwd_primr-nucl_DB -query $velvet_output/contigs.fa -outfmt 6 -word_size 4 -out contig-vs-frwd_nucl.txt");
 }
 
 ###Get the best blast hit by sorting the blast output by bit score, then % ID, then alignment length and select the first hit as the best match.###
@@ -173,19 +173,19 @@ if ($best_frwd_len == 19 && $best_frwd_iden >= 94.5) {
 	##Extract the +500 sequence with Bedtools##
 	my $query_extract = $query_strt + 500;
 	open(my $fh, '>', 'emm_region_extract.bed') or die "Could not open file 'emm_region_extract.bed' $!";
-	print $fh "$best_frwd_name|$query_strt|$query_extract\n";
+	print $fh "$best_frwd_name\t$query_strt\t$query_extract\n";
 	close $fh;
 	#print "done\n";
-	system("bedtools getfasta -fi ./velvet_output/contigs.fa -bed emm_region_extract.bed -fo emm_region_extract.fasta");
+	system("bedtools getfasta -fi $velvet_output/contigs.fa -bed emm_region_extract.bed -fo emm_region_extract.fasta");
     } else {
 	print "extract from reverse strand\n";
 	##Extract the -500 sequence with Bedtools##
         my $query_extract = $query_strt - 500;
         open(my $fh, '>', 'emm_region_extract.bed');
-        print $fh "$best_frwd_name|$query_extract|$query_strt\n";
+        print $fh "$best_frwd_name\t$query_extract\t$query_strt\n";
         close $fh;
 	
-	my $extract_emm1 = `bedtools getfasta -tab -fi ./velvet_output/contigs.fa -bed emm_region_extract.bed -fo stdout`;
+	my $extract_emm1 = `bedtools getfasta -tab -fi $velvet_output/contigs.fa -bed emm_region_extract.bed -fo stdout`;
         print "extract emm is:\n$extract_emm1\n";
 	my @emm1_array = split('\t',$extract_emm1);
 	my $rev_comp_emm1 = reverse($emm1_array[1]);
@@ -198,7 +198,7 @@ if ($best_frwd_len == 19 && $best_frwd_iden >= 94.5) {
     }
 } else {
     print "The best blast hit ($best_frwd_name) obtained from querying the assembled contigs against the emm forward primers\ndidn't meet minimum criteria of length and identity to call a true match.\n";
-    print $fh "$outName|Extraction_Error|--|--|--\n";
+    print $fh "$outName\tExtraction_Error\t--\t--\t--\n";
     my $old_name = "emm-Type_Results.txt";
     my $emm_out = $outName."__emm-Type__Results.txt";
     rename $old_name, $emm_out;
@@ -215,7 +215,7 @@ if ( -s "emm_region_extract.fasta") {
     }
 } else {
     print "Although the best blast hit found a true match against the 19bp primer, the matching contig didn't contain the\nfull 500bp region downstream of the primer that comprises the emm-typing region\n";
-    print $fh "$outName|Extraction_Error|--|--|--\n";
+    print $fh "$outName\tExtraction_Error\t--\t--\t--\n";
     my $old_name = "emm-Type_Results.txt";
     my $emm_out = $outName."__emm-Type__Results.txt";
     rename $old_name, $emm_out;
@@ -238,12 +238,12 @@ if ($best_emm_iden == 100 && $best_emm_len == 180) {
     #$best_emm_name =~ /\d+__EMM(.*)__EMM.*__\d+/;
     $best_emm_name =~ /\d+__[A-Z]+(.*)__.*__\d+/;
     my $emmType = $1;
-    print $fh "$finalName|$emmType|$best_emm_name|$best_emm_iden|$best_emm_len\n";
+    print $fh "$finalName\t$emmType\t$best_emm_name\t$best_emm_iden\t$best_emm_len\n";
 } else {
     #$best_emm_name =~ /\d+__EMM(.*)__EMM.*__\d+/;
     $best_emm_name =~ /\d+__[A-Z]+(.*)__.*__\d+/;
     my $emmType = $1;
-    print $fh "$finalName|$emmType*|$best_emm_name|$best_emm_iden|$best_emm_len\n";
+    print $fh "$finalName\t$emmType*\t$best_emm_name\t$best_emm_iden\t$best_emm_len\n";
     ###OPEN 'Check_Target_Sequence.txt' FOR APPENDING (CHECK FOR FAILURES)
     open ( my $exOUT, ">>", 'Check_Target_Sequence.txt' ) or die "Could not open file 'Check_Target_Sequence.txt': $!";
     ###OPEN 'emm_region_extract.fasta' for READING (CHECK FOR FAILURES)
