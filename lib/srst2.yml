@@ -1,0 +1,11 @@
+name: srst2
+channels:
+  - r
+  - anaconda
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=2.7.5
+  - srst2=0.2.0
+  - samtools=0.1.18
