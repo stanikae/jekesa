@@ -10,9 +10,9 @@ use Env;
 #use lib $ENV{MODULESHOME}."/init";
 #use perl;
 
-my $srst2 = "${HOME}/anaconda3/envs/srst2/bin/srst2";
-my $SPN_SCRIPTS_DIR = "~/repos/jekesa/spn_scripts";
-local $ENV{PATH} = "${HOME}/anaconda3/envs/srst2/bin:$ENV{PATH}";
+#my $srst2 = "$ENV{HOME}/anaconda3/envs/srst2/bin/srst2";
+#my $SPN_SCRIPTS_DIR = "~/repos/jekesa/spn_scripts";
+local $ENV{PATH} = "$ENV{HOME}/anaconda3/envs/srst2/bin:$ENV{PATH}";
 
 
 sub checkOptions {
