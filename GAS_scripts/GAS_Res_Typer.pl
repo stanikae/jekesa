@@ -10,15 +10,9 @@ use Env;
 #use lib $ENV{MODULESHOME}."/init";
 #use perl;
 
-###MODULE LOAD###
-#module load samtools/0.1.18
-#module load bowtie2/2.1.0
-#module load Python/2.7
-#module load freebayes/0.9.21
-
-my $srst2 = "/home/stanford/anaconda3/envs/srst2/bin/srst2";
+my $srst2 = "${HOME}/anaconda3/envs/srst2/bin/srst2";
 my $SPN_SCRIPTS_DIR = "~/repos/jekesa/spn_scripts";
-local $ENV{PATH} = "/home/stanford/anaconda3/envs/srst2/bin:$ENV{PATH}";
+local $ENV{PATH} = "${HOME}/anaconda3/envs/srst2/bin:$ENV{PATH}";
 
 
 sub checkOptions {
