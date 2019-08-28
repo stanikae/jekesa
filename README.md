@@ -101,3 +101,7 @@ ln -s $HOME/minikraken_db/minikraken_20171019_8GB jekesa/db/kraken_db
 cd jekesa
 conda env create -n srst2 --file ./lib/srst2.yml
 `````
+To deactivate jekesa (At the end of the analysis)
+`````
+conda deactivate jekesa
+`````
