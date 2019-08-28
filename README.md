@@ -66,7 +66,7 @@ conda activate jekesa
 #### Setting up required databases
 `````
 ## ARIBA database set-up
-# 1. First install cd-hit and change the max_seq size
+# 1. First re-install cd-hit and change the max_seq size
 cd /opt # or any of your preferred location
 git clone https://github.com/weizhongli/cdhit.git
 cd cdhit
