@@ -105,3 +105,7 @@ To deactivate jekesa (At the end of the analysis)
 `````
 conda deactivate jekesa
 `````
+## License
+
+## Citation
+Kwenda S. _Jekesa_ **Github** [https://github.com/stanikae/jekesa](https://github.com/stanikae/jekesa)
