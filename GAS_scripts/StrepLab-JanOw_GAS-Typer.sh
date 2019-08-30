@@ -2,6 +2,9 @@
 
 read -a PARAM <<< $(echo $1)
 
+declare -x SPN_SCRIPTS_DIR=${BASH_SOURCE%/*}/spn_scripts
+declare -x GAS_SCRIPTS_DIR=${BASH_SOURCE%/*}/GAS_scripts
+
 #. /usr/share/Modules/init/bash
 #module load perl/5.22.1
 #module load ncbi-blast+/2.2.29
