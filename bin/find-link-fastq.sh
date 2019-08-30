@@ -15,7 +15,7 @@ fi
 #fastqDir=/media/6tb/nscf_sequencing_data_backup/BGI_fastq/miseq_bgi
 #fastqDir=/media/60tb/nicd/crdm/bacteriology/kedibone/tmp/kraken/47750
 #fastqDir=/media/6tb/nscf_sequencing_data_backup/merged-190712_M02621-190711_M02143
-fastqDir=/media/6tb/nscf_sequencing_data_backup/190823_M02621_0165_000000000-CCLWY
+fastqDir=/mnt/e/190823_M02621_0165_000000000-CCLWY
 #check if the $project directory is exists or not:
 #if exists:
 if [ -d $project ];
