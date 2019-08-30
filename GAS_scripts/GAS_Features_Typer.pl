@@ -14,7 +14,7 @@ use Getopt::Std;
 
 #my $srst2 = "/home/stanford/anaconda3/envs/srst2/bin/srst2";
 #my $SPN_SCRIPTS_DIR = "~/repos/jekesa/spn_scripts";
-local $ENV{PATH} = "/home/stanford/anaconda3/envs/srst2/bin:$ENV{PATH}";
+local $ENV{PATH} = "$ENV{HOME}/anaconda3/envs/srst2/bin:$ENV{PATH}";
 
 sub checkOptions {
     my %opts;

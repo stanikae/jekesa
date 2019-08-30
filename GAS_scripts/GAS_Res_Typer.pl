@@ -17,7 +17,7 @@ use Env;
 #module load freebayes/0.9.21
 
 my $srst2 = "/home/stanford/anaconda3/envs/srst2/bin/srst2";
-my $SPN_SCRIPTS_DIR = "~/repos/jekesa/spn_scripts";
+#my $SPN_SCRIPTS_DIR = "~/repos/jekesa/spn_scripts";
 local $ENV{PATH} = "/home/stanford/anaconda3/envs/srst2/bin:$ENV{PATH}";
 
 

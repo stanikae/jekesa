@@ -401,8 +401,7 @@ if [[ "$MLSTscheme" == "spneumoniae" ]]; then
   Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir ${projectName}_quastResults.xlsx ${projectName}_mlstResults.xlsx ${projectName}-ariba_final.xlsx ${projectName}-kraken_combinedReports.xlsx ${projectName}_serobaResults.xlsx ${projectName}_WGS-typing-report.xlsx ${projectName}_pili-results.xlsx ${projectName}_pbp-typing.xlsx
 
 elif [[ "$MLSTscheme" == "spyogenes" ]]; then
- Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir ${projectName}_quastResults.xlsx ${projectName}_mlstResults.xlsx ${projectName}-ariba_final.xlsx ${projectName}-kraken_
-combinedReports.xlsx ${projectName}_WGS-typing-report.xlsx ${projectName}_pbp-typing.xlsx
+ Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir ${projectName}_quastResults.xlsx ${projectName}_mlstResults.xlsx ${projectName}-ariba_final.xlsx ${projectName}-kraken_combinedReports.xlsx ${projectName}_WGS-typing-report.xlsx ${projectName}_pbp-typing.xlsx
  
 else
  Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir ${projectName}_quastResults.xlsx ${projectName}_mlstResults.xlsx ${projectName}-ariba_final.xlsx ${projectName}-kraken_combinedReports.xlsx ${projectName}_WGS-typing-report.xlsx
