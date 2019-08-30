@@ -16,10 +16,9 @@ OPTIONS:
         -p      Path to output directory or project name
         -f      Path to file with list of sample IDs (one ID per line)
         -a      Select the assembler to use. Options available: 'spades', 'skesa'
-                (default='spades')
         -s      Species scheme name to use for mlst typing.
-		This option is required for streptococcus pneumoniae in order to allow detailed analysis. Use: 'spneumoniae'.
-		To check other available schema names use: mlst --longList. Otherwise if you don't know your schema use: 'noScheme'.
+		Use: 'spneumoniae' or 'spyogenes', for streptococcus pneumoniae or  streptococcus pyogenes detailed analysis.
+		Otherwise for any other schema use: 'other'. To check other available schema names use: mlst --longList.
         -t      Number of threads to use <integer>, (minimum value should be: 6)
         -h      Show this help
         -v      Show version
@@ -74,12 +73,14 @@ while getopts ":hvp:f:t:a:s:" opt; do
 done
 shift $((OPTIND -1))
 
-#if [ $# == 0 ]; then
-#	usage
-#	exit 1
-#fi
+if [ -z $project ]; then
+	usage
+	exit 1
+fi
 
-
+if [[ $MLSTscheme == "other" ]]; then
+    MLSTscheme="noScheme"
+fi
 
 echo -e "Parameters supplied by the User"
 echo -e "$project\t$filename\t$assembler\t$threads\t$MLSTscheme\n"
@@ -88,13 +89,13 @@ declare -x SCRIPTS_DIR=${BASH_SOURCE%/*}/bin
 declare -x DATABASES_DIR=${BASH_SOURCE%/*}/db
 declare -x SPN_SCRIPTS_DIR=${BASH_SOURCE%/*}/spn_scripts
 declare -x GAS_SCRIPTS_DIR=${BASH_SOURCE%/*}/GAS_scripts
-declare -x srst2=/home/stanford/anaconda3/envs/srst2/bin/srst2
+#declare -x srst2=$HOME/anaconda3/envs/srst2/bin/srst2
 
 # create working directory if it's not already available
 if ! [ -d "$project" ]
  then
 	# get the fastq files for the specified sample IDs and create output/project directory
-	$SCRIPTS_DIR/find_link_modified_14Feb19.sh $project $filename
+	$SCRIPTS_DIR/find-link-fastq.sh $project $filename
 
 	# create reports directory
 	now=$(date +"%d_%b_%Y")
@@ -103,17 +104,13 @@ if ! [ -d "$project" ]
 
  else
 	declare -x reportsDir=$(find $project -name "Reports_${projectName}_*" -type d )
-	#$(find $project -name $project/Reports_${projectName}_*) # reports directory
 fi
 
 
 # Beginning bacterial typing steps
 
 now=$(date +"%d_%b_%Y")
-# QC
-#declare -x fastqc_out=$(find $project -maxdepth 1 -name "fastqcReports*" -type d )
 declare -x trimgaloreDir=$(find $project -name "trimGalore*" -type d )
-##
 declare -x krakenDir=$(find $project -name "kraken*" -type d )
 declare -x spadesDir=$project/spades\_$now
 declare -x statsDir=$project/assemblyMetrics\_$now
@@ -133,11 +130,7 @@ fi
 
 if [[ "$MLSTscheme" == "spyogenes" ]]
  then
-#        declare -x serobaDir=$project/seroba_${now}_analysis
-#        declare -x pilusDir=$project/pili_${now}_analysis
         declare -x pbpDir=$project/pbp-typing_${now}_analysis
-#        mkdir -p $serobaDir
-#        mkdir -p $pilusDir
         mkdir -p $pbpDir
 fi
 
@@ -185,7 +178,8 @@ declare -x schemeList=$project/schemeList.txt
 # ariba reference database
 declare -x ariba_ref=$DATABASES_DIR/ariba_DBs/out.card.prepareref
 # minikraken database
-declare -x krakenDB=/media/60tb/src/kraken/NCBI
+#declare -x krakenDB=/media/60tb/src/kraken/NCBI
+declare -x krakenDB=$DATABASES_DIR/kraken_db
 # seroba database
 declare -x db_dir=$DATABASES_DIR/seroba_db
 # PBP typing using CDC Strep Lab scripts and database
