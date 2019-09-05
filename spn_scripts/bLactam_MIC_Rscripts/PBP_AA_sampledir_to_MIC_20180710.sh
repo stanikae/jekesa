@@ -23,7 +23,7 @@ else
   echo "data_dir is a directory that must conatin 3 files with the following exact names, respectively:"
   echo "EXTRACT_1A-S2_target.fasta"
   echo "EXTRACT_2B-S2_target.fasta"
-  echo "EXTRACT_2X-S2_target.fasta"
+  echo "EXTRACT_2B-S2_target.fasta"
   echo ""
   echo "See README.txt for details"
   echo "Program not run"  
@@ -55,7 +55,7 @@ grep -v ">" temp1.faa >> Sample_PBP2X_AA.faa
 
 rm -f temp*
 
-#stanford commented#
+#
 #scr1="/scicomp/groups/OID/NCIRD/DBD/RDB/Strep_Lab/External/share/PBP_AA_to_MIC/scripts/AAtoMICwrapper_2.sh"
 scr1="$SPN_SCRIPTS_DIR/bLactam_MIC_Rscripts/AAtoMICwrapper_2.sh"
 bash $scr1 $AAseqDir
@@ -64,7 +64,7 @@ bash $scr1 $AAseqDir
 
 #
 fin="$AAseqDir"/Sample_PBPtype_MIC2_Prediction.csv
-# stanford commented #scr1="/scicomp/groups/OID/NCIRD/DBD/RDB/Strep_Lab/External/share/PBP_AA_to_MIC/scripts/MIC_format_with_SIR.R"
+#scr1="/scicomp/groups/OID/NCIRD/DBD/RDB/Strep_Lab/External/share/PBP_AA_to_MIC/scripts/MIC_format_with_SIR.R"
 scr1="$SPN_SCRIPTS_DIR/bLactam_MIC_Rscripts/MIC_format_with_SIR.R"
 Rscript $scr1 $fin
 fout="$AAseqDir"/Sample_PBPtype_MIC2_Prediction.csv_MIC_formatted_with_SIR.csv

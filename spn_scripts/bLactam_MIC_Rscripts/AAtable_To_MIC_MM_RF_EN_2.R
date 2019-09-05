@@ -3,13 +3,14 @@
 ## Function PBP_AA_TO_MIC2
 
 PBP_AA_TO_MIC2<- function(cwd){
-  #Stanford commented #dbdir="/scicomp/groups/OID/NCIRD/DBD/RDB/Strep_Lab/External/share/PBP_AA_to_MIC/newDB/"
-  #dbdir="/home/stanford/repos/Spn_Scripts_Reference/bLactam_MIC_Rscripts/newDB/"
-  #blactamDir="/home/stanford/repos/Spn_Scripts_Reference/bLactam_MIC_Rscripts/"
-  #Stanford commented# libpath="/scicomp/groups/OID/NCIRD/DBD/RDB/Strep_Lab/External/share/PBP_AA_to_MIC/Rlib"
+  #dbdir="/scicomp/groups/OID/NCIRD/DBD/RDB/Strep_Lab/External/share/PBP_AA_to_MIC/newDB/"
+  #libpath="/scicomp/groups/OID/NCIRD/DBD/RDB/Strep_Lab/External/share/PBP_AA_to_MIC/Rlib"
+  libpath="/home/stan/repos/jekesa/lib/Rlib"
+  #.libPaths("~/repos/jekesa/lib/Rlib")
   #x1=.libPaths()
-  #Stanford commented #x2=c(libpath, "/usr/lib64/R/library", "/usr/share/R/library")
-  #Stanford commented #.libPaths(x2)
+  #x2=c(libpath, "/usr/lib64/R/library", "/usr/share/R/library")
+  #x2=c(libpath)
+  .libPaths(libpath)
   #.libPaths(c(.libPaths(), libpath))
   library("methods")
   library("randomForest")
@@ -93,7 +94,7 @@ PBP_AA_TO_MIC2<- function(cwd){
   n2=dim(m2.1)[2]
 
 
-  #Stnaford commented # m3=read.csv("/scicomp/groups/OID/NCIRD/DBD/RDB/Strep_Lab/External/share/PBP_AA_to_MIC/scripts/BLOSUM62.csv", colClasses="character", header=T) 
+  #stanford# m3=read.csv("/scicomp/groups/OID/NCIRD/DBD/RDB/Strep_Lab/External/share/PBP_AA_to_MIC/scripts/BLOSUM62.csv", colClasses="character", header=T) 
   m3=read.csv(paste0(blactamDir,"BLOSUM62.csv"), colClasses="character", header=T)
   colnames(m3)[2:25]=m3$src
   m2.1[m2.1=="*"]="-"
