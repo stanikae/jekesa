@@ -7,6 +7,8 @@
 #Sys.setenv(ftp_proxy="http://nicd\\stanfordk:Flower1985@172.20.252.71:3128")
 #Sys.setenv(socks_proxy="http://nicd\\stanfordk:Flower1985@172.20.252.71:3128")
 
+.libPaths("~/repos/jekesa/lib/Rlib")
+
 library(plyr)
 library(tidyverse)
 library(tidyr)
@@ -16,8 +18,8 @@ library(stringr)
 #library(rJava)
 #library(XLConnectJars)
 #library(XLConnect)
-library(openxlsx)
-library(readxl)
+library(openxlsx, lib="lib/")
+library(readxl, lib="lib/")
 
 ######################
 # get input using arguments

@@ -58,7 +58,7 @@ cd $predir
 #dbdir="/home/stanford/repos/Spn_Scripts_Reference/bLactam_MIC_Rscripts/newDB/"
 #blactamDir="/home/stanford/repos/Spn_Scripts_Reference/bLactam_MIC_Rscripts/"
 scr1="$SPN_SCRIPTS_DIR/bLactam_MIC_Rscripts/AAtable_To_MIC_MM_RF_EN_2.R"
-Rscript $scr1 $predir $SPN_SCRIPTS_DIR/bLactam_MIC_Rscripts/newDB $SPN_SCRIPTS_DIR/bLactam_MIC_Rscripts
+Rscript $scr1 $predir $SPN_SCRIPTS_DIR/bLactam_MIC_Rscripts/newDB/ $SPN_SCRIPTS_DIR/bLactam_MIC_Rscripts/
 
 cp Sample_PBPtype_MIC2_Prediction.csv  $AAseqDir
 

@@ -6,7 +6,6 @@ use Data::Dumper;
 #use Getopt::Long;
 use Getopt::Std;
 use File::Basename;
-#use File::Copy;
 
 ###MODULE LOAD###
 #module load perl/5.12.3
@@ -217,9 +216,6 @@ chdir "$outDir";
 
 my $fastq1_trimd = $outName."_1.fastq.gz";
 my $fastq2_trimd = $outName."_2.fastq.gz";
-#readPair_1=$sampl_out/${sampleName}_1.fastq.gz
-#readPair_2=$sampl_out/${sampleName}_2.fastq.gz
-
 
 ###Preprocess with Cutadapt###
 #my $fastq1_trimd = "cutadapt_".$outName."_S1_L001_R1_001.fastq";
@@ -230,7 +226,8 @@ my $fastq2_trimd = $outName."_2.fastq.gz";
 #    print "Beginning cutadapt\n";
 #    system("cutadapt -b AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC -q 20 --minimum-length 50 --paired-output temp2.fastq -o temp1.fastq $fastq1 $fastq2");
 #    system("cutadapt -b AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTAGATCTCGGTGGTCGCCGTATCATT -q 20 --minimum-length 50 --paired-output $fastq1_trimd -o $fastq2_trimd temp2.fastq temp1.fastq");
-
+    #system("cutadapt -b AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC -b CTGTCTCTTATA -q 20 --minimum-length 50 --paired-output temp2.fastq -o temp1.fastq $fastq1 $fastq2"); #Removing Nextera#
+    #system("cutadapt -b AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTAGATCTCGGTGGTCGCCGTATCATT -b CTGTCTCTTATA -q 20 --minimum-length 50 --paired-output $fastq1_trimd -o $fastq2_trimd temp2.fastq temp1.fastq");
 #    my $tempDel_1 = "temp1.fastq";
 #    my $tempDel_2 = "temp2.fastq";
 #    unlink $tempDel_1;
@@ -240,12 +237,9 @@ my $fastq2_trimd = $outName."_2.fastq.gz";
 if( -d "./velvet_output") {
     print "Velvet assembly has already been completed\n";
 } else {
-#    print "Beginning Velvet\n";
-     print "Using contigs from spades step\n";
-#     mkdir "velvet_output";
-#     copy("/media/60tb/nicd/crdm/bacteriology/kedibone/CRDM-02/spades_07_Mar_2019/42224/42224_assembly.fasta", "velvet_output/contigs.fa") or die "Could not copy spades contigs.fa: $!";
+    print "Velvet assembled contigs not available\n";
 #    my $velvetK_val = `velvetk.pl --best --size "$gSize" "$fastq1_trimd" "$fastq2_trimd"`;
-#    `perl /home/stanford/repos/JanOw_Dependencies/VelvetOptimiser.pl -s "$velvetK_val" -e "$velvetK_val" -o "-scaffolding no" -f "-shortPaired -separate -fastq $fastq1_trimd $fastq2_trimd" -d velvet_output`;  #-c "(Lbp*n50)/ncon"`;
+#    `VelvetOptimiser.pl -s "$velvetK_val" -e "$velvetK_val" -o "-scaffolding no" -f "-shortPaired -separate -fastq $fastq1_trimd $fastq2_trimd" -d velvet_output`;  #-c "(Lbp*n50)/ncon"`;
 }
 
 print "Beginning Prodigal\n";
