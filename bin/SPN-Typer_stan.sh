@@ -2,6 +2,8 @@
 
 read -a PARAM <<< $(echo $1) # $1 == job script
 
+declare -x SPN_SCRIPTS_DIR=$SPN_SCRIPTS_DIR
+declare -x GAS_SCRIPTS_DIR=$GAS_SCRIPTS_DIR
 ###This script is called for each job in the qsub array. The purpose of this code is to read in and parse a line of the job-control.txt file
 ###created by 'StrepLab-JanOw_GAS-wrapr.sh' and pass that information, as arguments, to other programs responsible for various parts of strain
 ###characterization (MLST, emm type and antibiotic drug resistance prediction).
@@ -52,6 +54,7 @@ echo -e "COMPLETED PREDICTION OF BLACTAM MIC (Minimum Inihibitory Concentration)
 ###Call GBS Misc. Resistances###
 perl $SPN_SCRIPTS_DIR/SPN_Res_Typer.pl -1 "$readPair_1" -2 "$readPair_2" -d "$allDB_dir" -r SPN_Res_Gene-DB_Final.fasta -n "$just_name"
 ## OUTPUT file ===> OUT_Res_Results.txt #####
+sed -i 's/,/;/g' OUT_Res_Results.txt
 perl $SPN_SCRIPTS_DIR/SPN_Target2MIC.pl OUT_Res_Results.txt "$just_name"
 ## OUTPUT file ===> RES-MIC_45186
 
@@ -60,8 +63,8 @@ echo -e "COMPLETED CALLING SPN MISC. RESISTANCE GENES\n"
 ###Output the emm type/MLST/drug resistance data for this sample to it's results output file###
 tabl_out="TABLE_Isolate_Typing_results.txt"
 bin_out="BIN_Isolate_Typing_results.txt"
-printf "$just_name|" >> "$tabl_out"
-printf "$just_name|" >> "$bin_out"
+printf "$just_name\t" >> "$tabl_out"
+printf "$just_name," >> "$bin_out"
 
 ###PBP_ID Output###
 justPBPs="NF"
@@ -69,25 +72,25 @@ sed 1d TEMP_pbpID_Results.txt | while read -r line
 do
     if [[ -n "$line" ]]
     then
-        justPBPs=$(echo "$line" | awk -F"\t" '{print $2}' | tr ':' '|')
-        justPBP_BIN=$(echo "$line" | awk -F"\t" '{print $2}' | tr ':' '|')
+        justPBPs=$(echo "$line" | awk -F"\t" '{print $2}' | tr ':' '\t')
+        justPBP_BIN=$(echo "$line" | awk -F"\t" '{print $2}' | tr ':' ',')
     fi
-    printf "$justPBPs|" >> "$tabl_out"
-    printf "$justPBP_BIN|" >> "$bin_out"
+    printf "$justPBPs\t" >> "$tabl_out"
+    printf "$justPBP_BIN," >> "$bin_out"
 done
 
 ###bLactam Predictions###
 pbpID=$(tail -n1 "TEMP_pbpID_Results.txt" | awk -F"\t" '{print $2}')
-if [[ ! "$pbpID" =~ .*NF.* ]] && [[ ! "$pbpID" =~ .*NEW.* ]]
+if [[ ! "$pbpID" =~ .*NF.* ]] #&& [[ ! "$pbpID" =~ .*NEW.* ]]
 then
-    echo "No NF or NEW outputs for PBP Type"
-    bLacTab=$(tail -n1 "BLACTAM_MIC_RF_with_SIR.txt" | tr ' ' '|')
+    echo "No NF outputs for PBP Type" #"No NF or NEW outputs for PBP Type"
+    bLacTab=$(tail -n1 "BLACTAM_MIC_RF_with_SIR.txt" | tr ' ' '\t')
     printf "$bLacTab" >> "$tabl_out"
     #bLacCom=$(echo "$line" | tr ' ' ',')
     #printf "$bLacCom," >> "$bin_out"
 else
-    echo "One of the PBP types has an NF or NEW"
-    printf "NF|NF|NF|NF|NF|NF|NF|NF|NF|NF|NF|NF|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|" >> "$tabl_out"
+    echo "One of the PBP types has an NF" # or NEW"
+    printf "NF\tNF\tNF\tNF\tNF\tNF\tNF\tNF\tNF\tNF\tNF\tNF\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\t" >> "$tabl_out"
     #printf "NF\tNF\tNF\tNF\tNF\tNF\tNF\tNF\tNF\tNF\tNF\tNF," >> "$bin_out"
 fi
 
@@ -97,14 +100,15 @@ while read -r line
 do
     #RES_targ=$(echo "$line" | cut -f2)
     #printf "$RES_targ\t" >> "$tabl_out"
-#    printf "$line\t" | tr ',' '\t' >> "$tabl_out"
-    printf "$line\n" >> "$tabl_out"
+#   printf "$line\t" | tr ',' '\t' >> "$tabl_out"
+    printf "$line\t" | tr ',' '\t' >> "$tabl_out"
+    #printf "$line\n" >> "$tabl_out"
 done < RES-MIC_"$just_name"
 
 #batch_name=$(basename `dirname $batch_out`) #$(echo $line | awk -F" " '{print $1}' | awk -F"/" '{print $(NF-4)}')
 final_outDir=$sampl_out #$(echo $line | awk -F" " '{print $5}')
 final_result_Dir=$batch_out #$(echo $line | awk -F" " '{print $4}')
-cat $final_outDir/TABLE_Isolate_Typing_results.txt >> $final_result_Dir/TABLE_SPN_"$batch_name"_Typing_Results.txt
+cat $final_outDir/TABLE_Isolate_Typing_results.txt | sed 's/\t/|/g' | sed '$s/|$/\n/' >> $final_result_Dir/TABLE_SPN_"$batch_name"_Typing_Results.txt
 #cat $final_outDir/BIN_Isolate_Typing_results.txt >> $final_result_Dir/BIN_GBS_"$batch_name"_Typing_Results.txt
 if [[ -e $final_outDir/TEMP_newPBP_allele_info.txt ]]; then
   cat $final_outDir/TEMP_newPBP_allele_info.txt >> $final_result_Dir/UPDATR_SPN_"$batch_name"_Typing_Results.txt

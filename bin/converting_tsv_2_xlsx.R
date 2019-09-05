@@ -17,6 +17,7 @@
 #library(XLConnectJars)
 #library(XLConnect)
 #library(stringr)
+.libPaths("~/repos/jekesa/lib/Rlib")
 
 library("openxlsx")
 
