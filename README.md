@@ -112,6 +112,6 @@ conda env create -n r_env --file ./lib/r_env.yml
 conda deactivate jekesa
 `````
 ## License
-
+[GPL 3.0](https://github.com/stanikae/jekesa/blob/master/LICENSE)
 ## Citation
 Kwenda S. _Jekesa_ **Github** [https://github.com/stanikae/jekesa](https://github.com/stanikae/jekesa)
