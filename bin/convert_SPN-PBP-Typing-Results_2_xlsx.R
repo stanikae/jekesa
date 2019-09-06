@@ -1,6 +1,7 @@
 #!/usr/bin/env Rscript
 #args = commandArgs(trailingOnly=TRUE)
-.libPaths("~/repos/jekesa/lib/Rlib")
+
+#.libPaths("~/repos/jekesa/lib/Rlib")
 library("openxlsx")
 
 args <- commandArgs(TRUE)

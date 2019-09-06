@@ -1,14 +1,8 @@
 #!/usr/bin/env Rscript
 #args = commandArgs(trailingOnly=TRUE)
 
-
-#Sys.setenv(http_proxy="http://nicd\\stanfordk:Chiko%4006@172.20.252.71:3128")
-#Sys.setenv(https_proxy="http://nicd\\stanfordk:Chiko%4006@172.20.252.71:3128")
-#Sys.setenv(ftp_proxy="http://nicd\\stanfordk:Chiko%4006@172.20.252.71:3128")
-#Sys.setenv(socks_proxy="http://nicd\\stanfordk:Chiko%4006@172.20.252.71:3128")
-
 #options(java.parameters = "-Xmx1024m")
-.libPaths("~/repos/jekesa/lib/Rlib")
+#.libPaths("~/repos/jekesa/lib/Rlib")
 
 library(plyr)
 library(tidyverse)
