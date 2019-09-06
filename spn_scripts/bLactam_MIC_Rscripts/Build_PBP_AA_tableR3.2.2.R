@@ -12,11 +12,11 @@ Build_PBP_AA_table<- function(datafolder)
   setwd(datafolder)
 
   #stan #libpath="/scicomp/groups/OID/NCIRD/DBD/RDB/Strep_Lab/External/share/PBP_AA_to_MIC/Rlib"
-  libpath="/home/stan/repos/jekesa/lib/Rlib"
   #x1=.libPaths()
   #stan #x2=c(libpath, "/usr/lib64/R/library", "/usr/share/R/library")
   #x2=c(libpath)
-  .libPaths(libpath)
+  #libpath="/home/stan/repos/jekesa/lib/Rlib"
+  #.libPaths(libpath)
 
   library("Biostrings")
   #cmd0="/scicomp/groups/OID/NCIRD/DBD/RDB/Strep_Lab/External/share/PBP_AA_to_MIC/bin/"

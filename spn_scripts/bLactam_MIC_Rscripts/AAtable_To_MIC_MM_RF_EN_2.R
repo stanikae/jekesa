@@ -5,12 +5,12 @@
 PBP_AA_TO_MIC2<- function(cwd){
   #dbdir="/scicomp/groups/OID/NCIRD/DBD/RDB/Strep_Lab/External/share/PBP_AA_to_MIC/newDB/"
   #libpath="/scicomp/groups/OID/NCIRD/DBD/RDB/Strep_Lab/External/share/PBP_AA_to_MIC/Rlib"
-  libpath="/home/stan/repos/jekesa/lib/Rlib"
   #.libPaths("~/repos/jekesa/lib/Rlib")
   #x1=.libPaths()
   #x2=c(libpath, "/usr/lib64/R/library", "/usr/share/R/library")
   #x2=c(libpath)
-  .libPaths(libpath)
+ # libpath="/home/stan/repos/jekesa/lib/Rlib"
+ # .libPaths(libpath)
   #.libPaths(c(.libPaths(), libpath))
   library("methods")
   library("randomForest")
