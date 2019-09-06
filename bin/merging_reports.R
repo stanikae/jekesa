@@ -2,12 +2,7 @@
 #args = commandArgs(trailingOnly=TRUE)
 
 
-#Sys.setenv(http_proxy="http://nicd\\stanfordk:Flower1985@172.20.252.71:3128")
-#Sys.setenv(https_proxy="http://nicd\\stanfordk:Flower1985@172.20.252.71:3128")
-#Sys.setenv(ftp_proxy="http://nicd\\stanfordk:Flower1985@172.20.252.71:3128")
-#Sys.setenv(socks_proxy="http://nicd\\stanfordk:Flower1985@172.20.252.71:3128")
-
-.libPaths("~/repos/jekesa/lib/Rlib")
+#.libPaths("~/repos/jekesa/lib/Rlib")
 
 library(plyr)
 library(tidyverse)
@@ -18,8 +13,8 @@ library(stringr)
 #library(rJava)
 #library(XLConnectJars)
 #library(XLConnect)
-library(openxlsx, lib="lib/")
-library(readxl, lib="lib/")
+library(openxlsx)
+library(readxl)
 
 ######################
 # get input using arguments
