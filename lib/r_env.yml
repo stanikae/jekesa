@@ -1,0 +1,22 @@
+name: r_env
+channels:
+  - r
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - r-base
+  - r-essentials
+  - r-tidyverse
+  - r-openxlsx
+  - r-biocManager
+  - bioconductor-biostrings
+  - r-randomForest
+  - r-readxl
+  - r-plyr
+  - r-purrr
+  - r-stringr
+  - r-iterators
+  - r-foreach
+  - r-glmnet
+  - r-r.methodss3
