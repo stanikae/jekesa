@@ -27,3 +27,4 @@ dependencies:
   - tabix=0.2.6
   - clustalo=1.2.*
   - emboss=6.6.*
+  - poppunk=1.1.*
