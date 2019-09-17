@@ -2,13 +2,13 @@
 #!/bin/sh
 
 #check and and take the arragments from the command line:
-if [ $# != 2 ]; 
+if [ $# != 3 ]; 
  then
-	echo "Usage: `basename $0` <absolute path to project_name> <sample_list>"
+	echo "Usage: `basename $0` <absolute path to project_name> <sample_list> <absolute path to directory with fastq files>"
 	exit
 fi
-#project=$1
-#filename=$2
+project=$1
+filename=$2
 #path=$3
 #fastqDir=/media/6tb/nscf_sequencing_data_backup
 #fastqDir=/media/6tb/nscf_sequencing_data_backup/Kedibone-SPN
@@ -16,7 +16,9 @@ fi
 #fastqDir=/media/60tb/nicd/crdm/bacteriology/kedibone/tmp/kraken/47750
 #fastqDir=/media/6tb/nscf_sequencing_data_backup/merged-190712_M02621-190711_M02143
 #fastqDir=/mnt/e/190823_M02621_0165_000000000-CCLWY
-fastqDir=/mnt/f/2016
+#fastqDir=/media/6tb/nscf_sequencing_data_backup/190906_M02621_0167_000000000-CL4NR
+#fastqDir=/media/60tb/ftp-data-transfer/sanger-data-transfer/pathogen_2245
+fastqDir=$3
 #check if the $project directory is exists or not:
 #if exists:
 if [ -d $project ];

@@ -19,6 +19,7 @@ echo -e "\n$fq2"
 trim_galore -q 20 \
 --length 50 --trim-n -o $trimmedReads --gzip \
 --paired $fq1 $fq2 \
+--cores 4 \
 --retain_unpaired -r1 85 -r2 85
 #--fastqc_args "-o $qcReports --contaminants $contaminants --adapters $adapters --threads $threads" \
 

@@ -98,18 +98,23 @@ declare -x GAS_SCRIPTS_DIR=${BASH_SOURCE%/*}/GAS_scripts
 export PATH="$HOME/anaconda3/envs/r_env/bin:$PATH"
 
 # create working directory if it's not already available
+now=$(date +"%d_%b_%Y")
 if ! [ -d "$project" ]
  then
 	# get the fastq files for the specified sample IDs and create output/project directory
-	$SCRIPTS_DIR/find-link-fastq.sh $project $filename
+	#$SCRIPTS_DIR/find-link-fastq.sh $project $filename
 
 	# create reports directory
-	now=$(date +"%d_%b_%Y")
-	declare -x reportsDir=$project/Reports_${projectName}_${now}
-	mkdir -p $reportsDir
+	#now=$(date +"%d_%b_%Y")
+	#declare -x reportsDir=$project/Reports_${projectName}_${now}
+	#mkdir -p $reportsDir
+	echo -e "$project doesn't exist ....... exiting\n"
+	exit
 
  else
-	declare -x reportsDir=$(find $project -name "Reports_${projectName}_*" -type d )
+        declare -x reportsDir=$project/Reports_${projectName}_${now}
+        mkdir -p $reportsDir
+	#declare -x reportsDir=$(find $project -name "Reports_${projectName}_*" -type d )
 fi
 
 
@@ -206,22 +211,29 @@ for sampleID in $(cat $filename)
 	nohup $SCRIPTS_DIR/trim-reads.sh &
 	wait
 	
-        echo "\nStarting species identification using kraken for sample: $samples"; date
-        echo -e "==================================================================\n"
-	declare -x filteredReads=$krakenDir/$samples
-	mkdir -p $filteredReads
-        nohup $SCRIPTS_DIR/kraken_classification_step.sh &
-        wait
-	
-	# delete linked input fastq files
-	rm $project/*${sampleID}*.f*q.gz
-		
-	fileTest=`find $filteredReads -maxdepth 1 -name "${samples}*val_1*.gz"`
-	fileTest2=`find $filteredReads -maxdepth 1 -name "${samples}*val_2*.gz"`
+	fileTest=$(find $trimmedReads -name "${samples}_*val_1*fq.gz")
+	fileTest2=$(find $trimmedReads -name "${samples}_*val_2*fq.gz")
 
 	if [ -s "$fileTest" ]; then
-		if [ -s "$fileTest2" ]; then 
-			#echo "files exist"; fi; fi
+                if [ -s "$fileTest2" ]; then
+
+			mv $fileTest $trimmedReads/${samples}_S_val_1.fq.gz
+			mv $fileTest2 $trimmedReads/${samples}_S_val_2.fq.gz
+       
+			echo "\nStarting species identification using kraken for sample: $samples"; date
+        		echo -e "==================================================================\n"
+			declare -x filteredReads=$krakenDir/$samples
+			mkdir -p $filteredReads
+        		nohup $SCRIPTS_DIR/kraken_classification_step.sh &
+        		#wait
+	
+			# delete linked input fastq files
+			rm $project/*${sampleID}*.f*q.gz
+		
+			#fileTest=`find $ -maxdepth 1 -name "${samples}*val_1*.gz"`
+			#fileTest2=`find $ -maxdepth 1 -name "${samples}*val_2*.gz"`
+			
+			filteredReads=$trimmedReads
 
 			date
 			echo -e "\nPerforming bacterial de novo genome assembly using spades and MLST typing for sample: $samples"
@@ -253,7 +265,7 @@ for sampleID in $(cat $filename)
 			echo -e "===============================================================\n"
 
 		else
-			echo -e "$samples did not pass the kraken step, skipping ................\n"
+			echo -e "$samples did not pass the trimming step, skipping ................\n"
 		fi
 	else
 		echo -e "\n $fileTest has not been found, moving to next ID `date`"
@@ -280,7 +292,7 @@ Rscript $SCRIPTS_DIR/combining_quast_output.R $quastDir $reportsDir/${projectNam
 if [[ "$MLSTscheme" == "noScheme" ]]; then
   names1=$(echo -e "FILE\tSCHEME\tST")
   num1=$(cat $mlstDir/mlst_allele.tsv | head -n1 | awk '{print NF}')
-  num="$(($10-3))" #"$(($num1-3))"
+  num="$(($num1-3))"
   names2=$(yes "gene" | head -n $num | paste -s -d '\t' -)
   names=$(echo -e "$names1\t$names2")
   (echo $names | tr ' ' '\t') > $mlstDir/mlst_merged.tsv && awk -v OFS='\t' '{gsub(/_.*/,"",$1);print}' $mlstDir/mlst_allele.tsv >> $mlstDir/mlst_merged.tsv
@@ -329,10 +341,6 @@ echo "assembly,kraken_match_#1,kraken_match_#2,kraken_match_#3,kraken_unclassifi
 for file in $(find $inDir -name "*.kraken.report-top-4.txt"); do
   name=$(basename -s .kraken.report-top-4.txt $file)
   report1=$(cat $file | sed 's/,[[:space:]]\+/,/' | sort -t ',' -k1,1nr | awk -F ',' '{print $NF, "("$1"%)"}' | tr '\n' ',')
-		
-  #report1=$(cat $file | awk -F '\t' '{print $1, $NF}' | grep "Streptococcus pneumoniae$" | awk '{print $2"_"$NF,"("$1"%)"}')
-  #report2=$(cat $file | awk -F '\t' '{print $1, $NF}' | grep -w "unclassified$" | awk '{print $NF,"("$1"%)"}')
-  #echo -e "$name,$report1,$report2" >> $outDir/${projectName}-kraken_combinedReports.csv
   echo -e "$name,$report1" >> $outDir/${projectName}-kraken_combinedReports.csv
 done
 
@@ -348,7 +356,7 @@ fi
 if [[ "$MLSTscheme" == "spneumoniae" ]]; then
   # PBP typing using CDC Strep Lab scripts and database
   declare -x allDB_dir=$DATABASES_DIR/SPN_Reference_DB	
-  declare -x batch_dir=$krakenDir #/home/stanford/kedibone/CRDM-08r/kraken #/41467
+  declare -x batch_dir=$trimmedReads #krakenDir #/home/stanford/kedibone/CRDM-08r/kraken #/41467
   declare -x out_dir=$project
   declare -x batch_name=$projectName  #$(basename $project)
   declare -x out_analysis=$pbpDir
@@ -372,7 +380,7 @@ fi
 if [[ "$MLSTscheme" == "spyogenes" ]]; then
   # PBP typing using CDC Strep Lab scripts and database
   declare -x allDB_dir=$DATABASES_DIR/GAS_Reference_DB
-  declare -x batch_dir=$krakenDir #/home/stanford/kedibone/CRDM-08r/kraken #/41467
+  declare -x batch_dir=$trimmedReads #krakenDir #/home/stanford/kedibone/CRDM-08r/kraken #/41467
   declare -x out_dir=$project
   declare -x batch_name=$projectName  #$(basename $project)
   declare -x out_analysis=$pbpDir

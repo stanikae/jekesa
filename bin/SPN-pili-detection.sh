@@ -12,9 +12,9 @@ spadesDir=$spadesDir
 #fi
 
 for sample in $(cat $filename); do
-	file=$(find $spadesDir -name "${sample}_scaffolds.fasta")
+	file=$(find $spadesDir -name "${sample}*assembly.fasta")
 	contigs=$file
-	name=$(basename -s _scaffolds.fasta $contigs)
+	name=$(basename -s _assembly.fasta $contigs)
 	outdir=$workdir/$name
 
 	if ! [ -d "$outdir" ]; then
@@ -38,7 +38,7 @@ for sample in $(cat $filename); do
 
 	# Step 3: perform blast analysis to check for presence of Pili
 	# blastn
-	blastn -db $outdir/spnDBnt -query ~/tmp/spn_pili.fna -out $outdir/spn_pili.out -word_size 7 -evalue 0.01 -outfmt "6 qseqid sseqid pident qlen slen length mismatch evalue bitscore qcovs"
+	blastn -db $outdir/spnDBnt -query $DATABASES_DIR/spn_pili.fna -out $outdir/spn_pili.out -word_size 7 -evalue 0.01 -outfmt "6 qseqid sseqid pident qlen slen length mismatch evalue bitscore qcovs"
 
 	# Step 4: Sorting blastp output
 	#cat $outdir/spn_pili.out | sort -k8,8nr -k3,3nr  

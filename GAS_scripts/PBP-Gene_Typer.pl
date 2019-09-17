@@ -13,7 +13,7 @@ use File::Spec;
 #module load BEDTools/2.17.0
 #module load Python/2.7
 
-#my $SPN_SCRIPTS_DIR = "~/repos/jekesa/spn_scripts";
+my $SPN_SCRIPTS_DIR = "~/repos/jekesa/spn_scripts";
 
 sub checkOptions {
     my %opts;

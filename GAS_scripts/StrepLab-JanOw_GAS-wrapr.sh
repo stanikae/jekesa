@@ -21,7 +21,7 @@ printf "Sample|emm_Type|T_Type|Group_A|EMM_Family|Other_Surface_Proteins|Capsule
 
 ###Will search thru every file in the batch directory and check if it matches the following regexs: _L.*_R1_001.fastq and _L.*_R2_001.fastq###
 ###If both paired end fastq files are found then the full paths of each file will be written to the 'job-control.txt' file###
-batch_dir_star="${batch_dir}/*/*"
+batch_dir_star="${batch_dir}/*" #/*"
 
 for sample in $batch_dir_star
 do
