@@ -52,7 +52,6 @@ OPTIONS:
 ````
 cd jekesa
 #This script will create analysis directory and soft link fastq files
-
 bin/find-link-fastq.sh  path/to/analysis/directory path/to/sampleID/list  path/to/raw/fastqfiles 
 
 # Now run the jekesa pipeline
