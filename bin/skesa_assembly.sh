@@ -5,12 +5,12 @@ echo $spadesDir
 sample=$samples
 
 mkdir -p $spadesDir/$sample
-fq1=$(find $indir -maxdepth 1 -name "$sample*val_1*.gz") #*val_1*.gz #*val_1*f*q.gz
-fq2=$(find $indir -maxdepth 1 -name "$sample*val_2*.gz")
+fq1=$(find $indir -maxdepth 1 -name "${sample}_S*val_1*.gz") #*val_1*.gz #*val_1*f*q.gz
+fq2=$(find $indir -maxdepth 1 -name "${sample}_S*val_2*.gz")
 	
 # unpaired reads after quality filtering
-fqU1=$(find $indir -name "$sample*unpaired_1*f*q.gz")
-fqU2=$(find $indir -name "$sample*unpaired_2*f*q.gz")
+fqU1=$(find $indir -name "${sample}_S*unpaired_1*f*q.gz")
+fqU2=$(find $indir -name "${sample}_S*unpaired_2*f*q.gz")
 	
 
 skesa --fastq $fq1,$fq2 --cores $threads --memory 48 --contigs_out $spadesDir/$sample/${sample}_assembly.fasta
