@@ -43,11 +43,11 @@ if [ -d $project ];
 	mkdir -p $project
 	for sample in `cat $filename`
 	 do
-		found=`find $fastqDir -name "${sample}_S*.gz" -print`
+		found=`find $fastqDir -maxdepth 1 -name "${sample}_S*.gz" -print`
 		if [ -z "$found" ]; then
     			echo "$sample not found"
  		else
-			find $fastqDir -name "${sample}_S*.gz" -exec ln -s {} $project \;
+			find $fastqDir -maxdepth 1 -name "${sample}_S*.gz" -exec ln -s {} $project \;
 			#ln -s "$found" "$project"
 			echo "$sample linked"
  		fi
