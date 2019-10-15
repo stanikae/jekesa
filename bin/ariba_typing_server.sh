@@ -2,7 +2,6 @@
 
 
 # Detection of resistance genes, virulence factors and plasmid detection
-#now=$(date +"%d_%b_%Y")
 #ariba_ref=~/ariba_DBs/out.card.prepareref
 #aribaDir=$project/ariba_${now}_analysis
 
@@ -13,8 +12,8 @@ sample=$samples
 # do
 trimmedReads=$filteredReads
 
-read1=$(find $trimmedReads -maxdepth 1 -name "${sample}*val_1*.gz") #*val_1*.gz #_*val_1*fq.gz
-read2=$(find $trimmedReads -maxdepth 1 -name "${sample}*val_2*.gz")
+read1=$(find $trimmedReads -maxdepth 1 -name "${sample}_S*val_1*.gz") #*val_1*.gz #_*val_1*fq.gz
+read2=$(find $trimmedReads -maxdepth 1 -name "${sample}_S*val_2*.gz")
 ln -s $read1 $aribaDir/${sample}_1.fastq.gz
 ln -s $read2 $aribaDir/${sample}_2.fastq.gz
 fq1=$aribaDir/${sample}_1.fastq.gz

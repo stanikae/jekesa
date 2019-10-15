@@ -308,12 +308,14 @@ fi
 
 
 # summarizing the identified resistance genes
-ariba summary $aribaDir/${projectName}-ariba.summary `find $aribaDir -name "*-report.tsv"`
+ariba summary --known_variants $aribaDir/${projectName}-ariba_known_variants.summary `find $aribaDir -name "*-report.tsv"`
+# ariba cluster all
+ariba summary --preset cluster_all $aribaDir/${projectName}-ariba_cluster_all_summary `find $aribaDir -name "*-report.tsv"`
 # editing the report summary
 if [[ "$MLSTscheme" == "spneumoniae" ]]; then
-  cat $aribaDir/${projectName}-ariba.summary.csv | sed 's|.*\.run/||' | sed 's|-report.tsv||' | sed 's|Streptococcus_pneumoniae|SPN|g' > $aribaDir/${projectName}-ariba-final.csv
+  cat $aribaDir/${projectName}-ariba_known_variants.summary.csv | sed 's|.*\.run/||' | sed 's|-report.tsv||' | sed 's|Streptococcus_pneumoniae|SPN|g' > $aribaDir/${projectName}-ariba-final.csv
 else
-  cat $aribaDir/${projectName}-ariba.summary.csv | sed 's|.*\.run/||' | sed 's|-report.tsv||' > $aribaDir/${projectName}-ariba-final.csv
+  cat $aribaDir/${projectName}-ariba_known_variants.summary.csv | sed 's|.*\.run/||' | sed 's|-report.tsv||' > $aribaDir/${projectName}-ariba-final.csv
 fi
 # writing ariba report to xlsx
 Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R $aribaDir/${projectName}-ariba-final.csv $reportsDir/${projectName}-ariba_final.xlsx
