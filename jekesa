@@ -289,17 +289,18 @@ nohup multiqc -o $reportsDir/${projectName}-quast-post-kraken $quastDir --pdf --
 Rscript $SCRIPTS_DIR/combining_quast_output.R $quastDir $reportsDir/${projectName}_quastResults.xlsx
 
 # saving mlst typing .csv results to xlsx format
-if [[ "$MLSTscheme" == "noScheme" ]]; then
-  names1=$(echo -e "FILE\tSCHEME\tST")
-  num1=$(cat $mlstDir/mlst_allele.tsv | head -n1 | awk '{print NF}')
-  num="$(($num1-3))"
-  names2=$(yes "gene" | head -n $num | paste -s -d '\t' -)
-  names=$(echo -e "$names1\t$names2")
-  (echo $names | tr ' ' '\t') > $mlstDir/mlst_merged.tsv && awk -v OFS='\t' '{gsub(/_.*/,"",$1);print}' $mlstDir/mlst_allele.tsv >> $mlstDir/mlst_merged.tsv
-else
-  (head -n1 $mlstDir/mlst_allele.tsv) > $mlstDir/mlst_merged.tsv && \
-  grep -v "^FILE" $mlstDir/mlst_allele.tsv  | awk -v OFS='\t' '{gsub(/_.*/,"",$1);print}' >> $mlstDir/mlst_merged.tsv
-fi
+#if [[ "$MLSTscheme" == "noScheme" ]]; then
+names1=$(echo -e "FILE\tSCHEME\tST")
+num1=$(cat $mlstDir/mlst_allele.tsv | awk '{print NF}' | sort -nr -u | head -n1)
+#num1=$(cat $mlstDir/mlst_allele.tsv | head -n1 | awk '{print NF}')
+num="$(($num1-3))"
+names2=$(yes "gene" | head -n $num | paste -s -d '\t' -)
+names=$(echo -e "$names1\t$names2")
+(echo $names | tr ' ' '\t') > $mlstDir/mlst_merged.tsv && awk -v OFS='\t' '{gsub(/_.*/,"",$1);print}' $mlstDir/mlst_allele.tsv >> $mlstDir/mlst_merged.tsv
+#else
+#  (head -n1 $mlstDir/mlst_allele.tsv) > $mlstDir/mlst_merged.tsv && \
+#  grep -v "^FILE" $mlstDir/mlst_allele.tsv  | awk -v OFS='\t' '{gsub(/_.*/,"",$1);print}' >> $mlstDir/mlst_merged.tsv
+#fi
 
 # saving mlst typing .csv results to xlsx format
 if [ -e $mlstDir/mlst_merged.tsv ]; then
@@ -376,6 +377,10 @@ if [[ "$MLSTscheme" == "spneumoniae" ]]; then
   # convert output file to xlsx
   Rscript $SCRIPTS_DIR/convert_SPN-PBP-Typing-Results_2_xlsx.R $out_analysis/TABLE_SPN_"$batch_name"_Typing_Results.txt $reportsDir/${projectName}_pbp-typing.xlsx
 
+  # Run PopPunk analysi for S. pneumoniae
+  bash $SCRIPTS_DIR/poppunk.sh $project
+  Rscript $SCRIPTS_DIR/adding_poppunk_results.R $reportsDir $reportsDir/${projectName}_WGS-typing-report.xlsx assigned_gpscs.xlsx assigned_clusters.xlsx $reportsDir/_WGS-typing-poppunk_report.xlsx
+
 fi
 
 # Perform emm typing using scripts adapted from Ben Metcalf at CDC, USA
@@ -400,6 +405,9 @@ if [[ "$MLSTscheme" == "spyogenes" ]]; then
   # convert output file to xlsx
   Rscript $SCRIPTS_DIR/convert_SPN-PBP-Typing-Results_2_xlsx.R $out_analysis/TABLE_GAS_"$batch_name"_Typing_Results.txt $reportsDir/${projectName}_pbp-typing.xlsx
 
+  # Run PopPunk analysi for S. pyogenes
+  bash $SCRIPTS_DIR/poppunk.sh $project
+  Rscript $SCRIPTS_DIR/adding_poppunk_results.R $reportsDir $reportsDir/${projectName}_WGS-typing-report.xlsx assigned_gpscs.xlsx assigned_clusters.xlsx $reportsDir/_WGS-typing-poppunk_report.xlsx 
 fi
 
 # merge selected assembly metrics, mlst results, seroba output
