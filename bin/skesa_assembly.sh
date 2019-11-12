@@ -95,6 +95,7 @@ fi
 #fi
 
 # perform MLST typing using mlst tool
+MLSTscheme="noScheme"
 if grep -q "$MLSTscheme" "$schemeList"; then
         echo -e "$MLSTscheme found in MLST database, proceeding with MLST typing\n"
         mlst --legacy --scheme $MLSTscheme --threads $threads --nopath \

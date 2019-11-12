@@ -1,6 +1,7 @@
 #!/bin/bash
 #/media/60tb/nicd/crdm/bacteriology/sibusisiwe/Repeated-Analyis/190823_M02621
 run_id=$(basename $1)
+#sampleList=$2
 spadesDir=$(find $1 -type d -name "spades_*") #~/kedibone/35B-Isolates/spades_11_Sep_2019
 poppunk_dir=$1/poppunk-analysis #~/kedibone/35B-Isolates/poppunk
 reports_dir=$(find $1 -type d -name "Reports_${run_id}_*")
@@ -10,8 +11,9 @@ echo -e "\n$reports_dir\n"
 #poppunk_dir=~/kedibone/35B-Isolates/poppunk-03
 #poppunk_report=/media/60tb/nicd/crdm/bacteriology/kedibone/35B-Isolates/Reports_35B-Isolates_11_Sep_2019/poppunk
 threads=8
-refDB_dir=/media/60tb/samsa2_databases/PopPunk-Databases
-MLSTscheme="spyogenes"
+refDB_dir=/media/60tb/Databases/PopPunk-Databases
+#MLSTscheme="spyogenes"
+MLSTscheme="spneumoniae"
 
 # create poppunk work directory
 if ! [ -d "$poppunk_dir" ]; then
@@ -23,8 +25,10 @@ if [ -d "$reports_dir" ]; then
  poppunk_report="$reports_dir"/poppunk-results
  mkdir -p $poppunk_report
 fi
+
 # create list of assemblies to analyze
-ls $spadesDir/*/*.fasta > $poppunk_dir/reference_list.txt
+#ls $spadesDir/*/*.fasta | grep -f $sampleList > $poppunk_dir/reference_list.txt
+ls $spadesDir/*/*.fasta | grep -v "58381" > $poppunk_dir/reference_list.txt
 
 # create grep list of IDs
 cat $poppunk_dir/reference_list.txt | awk -F '/' '{print $NF}' > $poppunk_dir/grep_list.txt
@@ -71,8 +75,8 @@ echo -e "\nRe-fitting model"; date
 
 # creating GPSC output file
 if [[ "$MLSTscheme" == "spyogenes" ]]; then
-	head -n1 $poppunk_dir/gas_db/gas_db_external_clusters.csv > $poppunk_dir/assigned_gpscs.csv
-        grep -F -f $poppunk_dir/grep_list.txt $poppunk_dir/gas_db/gas_db_external_clusters.csv | sed 's|/.*/||g' >> $poppunk_dir/assigned_gpscs.csv
+	head -n1 $poppunk_dir/gas_db/gas_db_clusters.csv > $poppunk_dir/assigned_gpscs.csv
+        grep -F -f $poppunk_dir/grep_list.txt $poppunk_dir/gas_db/gas_db_clusters.csv | sed 's|/.*/||g' >> $poppunk_dir/assigned_gpscs.csv
 	Rscript ~/repos/jekesa/bin/converting_csv_2_xlsx.R $poppunk_dir/assigned_gpscs.csv $reports_dir/assigned_gpscs.xlsx
 	# determine if the novel (NA) files are the same or not using the clusters.csv file
 	head -n1 $poppunk_dir/gas_db/gas_db_clusters.csv > $poppunk_dir/assigned_clusters.csv
