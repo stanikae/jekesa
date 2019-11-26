@@ -180,6 +180,13 @@ mkdir -p $quastDir
 mkdir -p $mlstDir
 mkdir -p $aribaDir
 
+# output directory for bactInspector
+#declare -x bact_out=$project/bactInspector
+
+#if ! [ -d $bact_out ]; then
+# mkdir -p $bact_out
+#fi
+
 # check if MLST scheme is present in the mlst database
 mlst --longlist > $project/schemeList.txt
 declare -x schemeList=$project/schemeList.txt
@@ -220,11 +227,13 @@ for sampleID in $(cat $filename)
 			mv $fileTest $trimmedReads/${samples}_S_val_1.fq.gz
 			mv $fileTest2 $trimmedReads/${samples}_S_val_2.fq.gz
        
-			echo "\nStarting species identification using kraken for sample: $samples"; date
+			echo "\nStarting species identification using kraken2 and bactInspector for sample: $samples"; date
         		echo -e "==================================================================\n"
 			declare -x filteredReads=$krakenDir/$samples
 			mkdir -p $filteredReads
-        		nohup $SCRIPTS_DIR/kraken_classification_step.sh &
+        		#nohup $SCRIPTS_DIR/kraken_classification_step.sh &
+			nohup $SCRIPTS_DIR/kraken2_classification.sh &
+			nohup $SCRIPTS_DIR/bactInspector.sh &
         		#wait
 	
 			# delete linked input fastq files
@@ -242,7 +251,8 @@ for sampleID in $(cat $filename)
 			if [[ "$assembler" == "spades" ]]; then
 			    nohup $SCRIPTS_DIR/spades_assembly_server.sh & 
 			else 
-			    nohup $SCRIPTS_DIR/skesa_assembly.sh &
+			    #nohup $SCRIPTS_DIR/skesa_assembly.sh &
+			    nohup $SCRIPTS_DIR/shovill_assembly.sh &
 			fi
 			# Detection of resistance genes, virulence factors and plasmid detection
 			date
@@ -347,8 +357,17 @@ for file in $(find $inDir -name "*.kraken.report-top-4.txt"); do
   echo -e "$name,$report1" >> $outDir/${projectName}-kraken_combinedReports.csv
 done
 
-# convert .csv to .xlsx
+# convert kraken .csv to .xlsx
 Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R $outDir/${projectName}-kraken_combinedReports.csv $reportsDir/${projectName}-kraken_combinedReports.xlsx
+
+# save bactInspector results to xlsx
+echo -e "sampleID,bactInspector_match,refseq_closest_match" > $project/bactInspector/bactInspector_results.csv
+for file in $(find $project/bactInspector -name "*_bactInspector.csv"); do
+  cat $file >> $project/bactInspector/bactInspector_results.csv
+done
+
+# convert bactInspector .csv to .xlsx
+Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R $project/bactInspector/bactInspector_results.csv $reportsDir/${projectName}-bactInspector.xlsx
 
 # Perform SPN pili detection analysis
 if [[ "$MLSTscheme" == "spneumoniae" ]]; then
@@ -379,7 +398,7 @@ if [[ "$MLSTscheme" == "spneumoniae" ]]; then
 
   # Run PopPunk analysi for S. pneumoniae
   bash $SCRIPTS_DIR/poppunk.sh $project
-  Rscript $SCRIPTS_DIR/adding_poppunk_results.R $reportsDir $reportsDir/${projectName}_WGS-typing-report.xlsx assigned_gpscs.xlsx assigned_clusters.xlsx $reportsDir/_WGS-typing-poppunk_report.xlsx
+#  Rscript $SCRIPTS_DIR/adding_poppunk_results.R $reportsDir $reportsDir/${projectName}_WGS-typing-report.xlsx assigned_gpscs.xlsx assigned_clusters.xlsx $reportsDir/_WGS-typing-poppunk_report.xlsx
 
 fi
 
@@ -407,7 +426,7 @@ if [[ "$MLSTscheme" == "spyogenes" ]]; then
 
   # Run PopPunk analysi for S. pyogenes
   bash $SCRIPTS_DIR/poppunk.sh $project
-  Rscript $SCRIPTS_DIR/adding_poppunk_results.R $reportsDir $reportsDir/${projectName}_WGS-typing-report.xlsx assigned_gpscs.xlsx assigned_clusters.xlsx $reportsDir/_WGS-typing-poppunk_report.xlsx 
+#  Rscript $SCRIPTS_DIR/adding_poppunk_results.R $reportsDir $reportsDir/${projectName}_WGS-typing-report.xlsx assigned_gpscs.xlsx assigned_clusters.xlsx $reportsDir/_WGS-typing-poppunk_report.xlsx 
 fi
 
 # merge selected assembly metrics, mlst results, seroba output
@@ -417,14 +436,21 @@ fi
 
 if [[ "$MLSTscheme" == "spneumoniae" ]]; then
   Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir ${projectName}_quastResults.xlsx ${projectName}_mlstResults.xlsx ${projectName}-ariba_final.xlsx ${projectName}-kraken_combinedReports.xlsx ${projectName}_serobaResults.xlsx ${projectName}_WGS-typing-report.xlsx ${projectName}_pili-results.xlsx ${projectName}_pbp-typing.xlsx
+  # add PopPunk results
+  Rscript $SCRIPTS_DIR/adding_poppunk_results.R $reportsDir ${projectName}_WGS-typing-report.xlsx assigned_gpscs.xlsx assigned_clusters.xlsx ${projectName}_WGS-typing-poppunk_report.xlsx
 
 elif [[ "$MLSTscheme" == "spyogenes" ]]; then
  Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir ${projectName}_quastResults.xlsx ${projectName}_mlstResults.xlsx ${projectName}-ariba_final.xlsx ${projectName}-kraken_combinedReports.xlsx ${projectName}_WGS-typing-report.xlsx ${projectName}_pbp-typing.xlsx
- 
+ # add PopPunk results
+ Rscript $SCRIPTS_DIR/adding_poppunk_results.R $reportsDir ${projectName}_WGS-typing-report.xlsx assigned_gpscs.xlsx assigned_clusters.xlsx ${projectName}_WGS-typing-poppunk_report.xlsx 
+
 else
  Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir ${projectName}_quastResults.xlsx ${projectName}_mlstResults.xlsx ${projectName}-ariba_final.xlsx ${projectName}-kraken_combinedReports.xlsx ${projectName}_WGS-typing-report.xlsx
 
 fi
+
+# add bactInspector results to the final report
+Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir ${projectName}_WGS-typing-report.xlsx ${projectName}-bactInspector.xlsx ${projectName}_WGS-typing-bactInspector_report.xlsx
 
 date
 value=$(wc -l $filename | awk '{print $1}')

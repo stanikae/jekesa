@@ -8,7 +8,7 @@ channels:
   - agbiome
 dependencies:
   - boost=1.67
-  - python=3.6
+  - python>=3.5
   - trim-galore=0.6.2
   - blast=2.7.1
   - kraken=1.1
@@ -28,3 +28,9 @@ dependencies:
   - clustalo=1.2.*
   - emboss=6.6.*
   - poppunk=1.1.*
+  - skesa=2.3.*
+  - shovill=1.0.*
+  - kraken2=2.0.8_beta
+  - pip
+  - pip:
+      - bactinspectorMax

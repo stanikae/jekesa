@@ -103,7 +103,7 @@ print("ariba");head(ariba)
 #print("pbp");head(pbp)
 
 # rename kraken column names 
-colnames(kraken) <- c("SampleID","kraken_match_#1","kraken_match_#2","kraken_match_#3","kraken_match_#4","kraken_X")
+colnames(kraken) <- c("SampleID","kraken2_match_#1","kraken2_match_#2","kraken2_match_#3","kraken2_match_#4","kraken2_X")
 print("kraken");head(kraken)
 
 # drop kraken last column
@@ -111,7 +111,7 @@ print("kraken");head(kraken)
 #krak_drop <- tail(krak_names, n=1)
 #krak_names <- krak_names[! krak_names %in% krak_drop]
 #kraken <- kraken[, names(kraken) %in% krak_names]
-kraken <- dplyr::select(kraken, -kraken_X)
+kraken <- dplyr::select(kraken, -kraken2_X)
 
 
 if (length(args) == 9) {
