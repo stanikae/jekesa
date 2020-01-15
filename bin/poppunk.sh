@@ -10,10 +10,13 @@ echo -e "\n$reports_dir\n"
 #spadesDir=~/kedibone/35B-Isolates/spades_11_Sep_2019
 #poppunk_dir=~/kedibone/35B-Isolates/poppunk-03
 #poppunk_report=/media/60tb/nicd/crdm/bacteriology/kedibone/35B-Isolates/Reports_35B-Isolates_11_Sep_2019/poppunk
-threads=8
+threads=8 #$threads
 refDB_dir=/media/60tb/Databases/PopPunk-Databases
+#refDB_dir=$DATABASES_DIR/poppunk_db
 #MLSTscheme="spyogenes"
-MLSTscheme="spneumoniae"
+#MLSTscheme="spneumoniae"
+echo $MLSTscheme
+MLSTscheme=$MLSTscheme
 
 # create poppunk work directory
 if ! [ -d "$poppunk_dir" ]; then
@@ -28,7 +31,7 @@ fi
 
 # create list of assemblies to analyze
 #ls $spadesDir/*/*.fasta | grep -f $sampleList > $poppunk_dir/reference_list.txt
-ls $spadesDir/*/*.fasta | grep -v "58381" > $poppunk_dir/reference_list.txt
+ls $spadesDir/*/*_assembly.fasta > $poppunk_dir/reference_list.txt
 
 # create grep list of IDs
 cat $poppunk_dir/reference_list.txt | awk -F '/' '{print $NF}' > $poppunk_dir/grep_list.txt
