@@ -6,10 +6,6 @@ Jekesa (Illuminate) currently runs on a server (single compute node), and the fo
 
 #### _De novo_ genome assembly and classification
 * [trim_galore](https://github.com/FelixKrueger/TrimGalore)
-Markup : * Bullet list
-              * Nested bullet
-                  * Sub-nested bullet etc
-          * Bullet list item 2
 * [spades](http://cab.spbu.ru/software/spades/)
 * [skesa](https://github.com/ncbi/SKESA)
 * [kraken](https://github.com/DerrickWood/kraken)
