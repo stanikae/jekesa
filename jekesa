@@ -215,6 +215,7 @@ for sampleID in $(cat $filename)
 	declare -x samples=$sampleID
 	echo "\nStarting quality filtering of sequencing reads using trimGalore for sample: $samples"; date
         echo -e "=================================================================\n"
+	#nohup $SCRIPTS_DIR/get_average_read_length.sh >> ${projectName}_read-avg-length.csv &
 	nohup $SCRIPTS_DIR/trim-reads.sh &
 	wait
 	
@@ -425,7 +426,7 @@ if [[ "$MLSTscheme" == "spyogenes" ]]; then
   Rscript $SCRIPTS_DIR/convert_SPN-PBP-Typing-Results_2_xlsx.R $out_analysis/TABLE_GAS_"$batch_name"_Typing_Results.txt $reportsDir/${projectName}_pbp-typing.xlsx
 
   # Run PopPunk analysi for S. pyogenes
-  bash $SCRIPTS_DIR/poppunk.sh $project
+#  bash $SCRIPTS_DIR/poppunk.sh $project
 #  Rscript $SCRIPTS_DIR/adding_poppunk_results.R $reportsDir $reportsDir/${projectName}_WGS-typing-report.xlsx assigned_gpscs.xlsx assigned_clusters.xlsx $reportsDir/_WGS-typing-poppunk_report.xlsx 
 fi
 
@@ -442,7 +443,7 @@ if [[ "$MLSTscheme" == "spneumoniae" ]]; then
 elif [[ "$MLSTscheme" == "spyogenes" ]]; then
  Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir ${projectName}_quastResults.xlsx ${projectName}_mlstResults.xlsx ${projectName}-ariba_final.xlsx ${projectName}-kraken_combinedReports.xlsx ${projectName}_WGS-typing-report.xlsx ${projectName}_pbp-typing.xlsx
  # add PopPunk results
- Rscript $SCRIPTS_DIR/adding_poppunk_results.R $reportsDir ${projectName}_WGS-typing-report.xlsx assigned_gpscs.xlsx assigned_clusters.xlsx ${projectName}_WGS-typing-poppunk_report.xlsx 
+# Rscript $SCRIPTS_DIR/adding_poppunk_results.R $reportsDir ${projectName}_WGS-typing-report.xlsx assigned_gpscs.xlsx assigned_clusters.xlsx ${projectName}_WGS-typing-poppunk_report.xlsx 
 
 else
  Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir ${projectName}_quastResults.xlsx ${projectName}_mlstResults.xlsx ${projectName}-ariba_final.xlsx ${projectName}-kraken_combinedReports.xlsx ${projectName}_WGS-typing-report.xlsx
