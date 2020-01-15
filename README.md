@@ -6,7 +6,7 @@ Jekesa (Illuminate) currently runs on a server (single compute node), and the fo
 
 #### _De novo_ genome assembly and classification
 * [trim_galore](https://github.com/FelixKrueger/TrimGalore)
-*       remove adaptors, low quality bases and reads
+        * remove adaptors, low quality bases and reads
 * [spades](http://cab.spbu.ru/software/spades/)
 * [skesa](https://github.com/ncbi/SKESA)
 * [kraken](https://github.com/DerrickWood/kraken)
