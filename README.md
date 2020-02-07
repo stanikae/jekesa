@@ -31,11 +31,10 @@ Jekesa (Illuminate) currently runs on a server (single compute node), and the fo
 - EMM typing and MIC profiling using [CDC Stretococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) GAS scripts and sequence databases.
 
 #### Visualization and reporting
-* [QUAST](http://quast.sourceforge.net/quast)
+* Generation of assembly metrics using [QUAST](http://quast.sourceforge.net/quast)
 * Visualization of FastQC reports, pre- and post- filtering of reads [MultiQC](https://github.com/ewels/MultiQC).
-* R
-  * R packages: ggtree, knitr, plotly, RColorBrewer, reshape2, rmarkdown
-* Rscript
+* R (Rscript)
+  * R packages implemented using conda: r-essentials, r-tidyverse, r-openxlsx, r-readxl
 
 ## Usage
 ```
