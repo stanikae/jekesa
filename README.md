@@ -14,8 +14,7 @@ Jekesa (Illuminate) currently runs on a server (single compute node), and the fo
 * Multi-locus sequence typing based on assembled contigs using [mlst](https://github.com/tseemann/mlst) and PubMLST database.
 
 #### Resistance profiling
-- Anti-microbial resistance gene predicition using [ariba](https://github.com/sanger-pathogens/ariba)
-- [CARD](https://card.mcmaster.ca/) (The Comprehensive Antibiotic Resistance Database)
+- Anti-microbial resistance gene predicition from clean reads using [ariba](https://github.com/sanger-pathogens/ariba) and either [CARD](https://card.mcmaster.ca/) (The Comprehensive Antibiotic Resistance Database) or [resfinder database](https://bitbucket.org/genomicepidemiology/resfinder_db/src/master/).
 
 #### _Streptococcus pneumoniae_ specific analysis
 - Serotyping using [seroba](https://github.com/sanger-pathogens/seroba)
