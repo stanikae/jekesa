@@ -16,9 +16,15 @@ Jekesa (Illuminate) currently runs on a server (single compute node), and the fo
 #### Resistance profiling
 - Anti-microbial resistance gene predicition from clean reads using [ariba](https://github.com/sanger-pathogens/ariba) and either [CARD](https://card.mcmaster.ca/) (The Comprehensive Antibiotic Resistance Database) or [resfinder database](https://bitbucket.org/genomicepidemiology/resfinder_db/src/master/).
 
+#### Virulence gene predicition
+- Coming soon
+
+#### Plasmid detection
+- Coming soon
+
 #### _Streptococcus pneumoniae_ specific analysis
 - Serotyping using [seroba](https://github.com/sanger-pathogens/seroba)
-- Pili detection. Using reference sequences used in [Nakano et. al, 2018](https://wwwnc.cdc.gov/eid/article/24/2/17-1268-techapp1.pdf)
+- Pili detection based on reference sequences used in [Nakano et. al, 2018](https://wwwnc.cdc.gov/eid/article/24/2/17-1268-techapp1.pdf)
 - PBP gene typing and MIC profiling using [CDC Streptococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) SPN scripts and sequence databases.
 
 #### _Streptococcus pyogenes_ specific analysis
