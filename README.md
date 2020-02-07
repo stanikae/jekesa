@@ -20,10 +20,10 @@ Jekesa (Illuminate) currently runs on a server (single compute node), and the fo
 #### _Streptococcus pneumoniae_ specific analysis
 - Serotyping using [seroba](https://github.com/sanger-pathogens/seroba)
 - Pili detection. Using reference sequences used in [Nakano et. al, 2018](https://wwwnc.cdc.gov/eid/article/24/2/17-1268-techapp1.pdf)
-- PBP gene typing and MIC profiling using [CDC Streptococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) scripts and sequence databases.
+- PBP gene typing and MIC profiling using [CDC Streptococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) SPN scripts and sequence databases.
 
 #### _Streptococcus pyogenes_ specific analysis
-- [CDC Stretococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) EMM typing and MIC profiling scripts and databases
+- EMM typing and MIC profiling using [CDC Stretococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) GAS scripts and sequence databases.
 
 #### Visualization and reporting
 * [QUAST](http://quast.sourceforge.net/quast)
@@ -97,11 +97,11 @@ seroba createDBs jekesa/db/seroba_db/ 71
 
 ## Minikraken_DB download and set-up
 mkdir -p $HOME/minikraken_db # choose most appropriate location for your system
-wget -c -P $HOME/minikraken_db/ https://ccb.jhu.edu/software/kraken/dl/minikraken_20171019_8GB.tgz
+wget -c -P $HOME/minikraken_db/ ftp://ftp.ccb.jhu.edu/pub/data/kraken2_dbs/minikraken2_v2_8GB_201904_UPDATE.tgz
 cd $HOME/minikraken_db
-tar xzvf minikraken_db/minikraken_20171019_8GB.tgz
-rm $HOME/minikraken_db/minikraken_20171019_8GB.tgz
-ln -s $HOME/minikraken_db/minikraken_20171019_8GB jekesa/db/kraken_db
+tar xzvf minikraken_db/minikraken2_v2_8GB_201904_UPDATE.tgz
+rm $HOME/minikraken_db/minikraken2_v2_8GB_201904_UPDATE.tgz
+ln -s $HOME/minikraken_db/minikraken2_v2_8GB_201904_UPDATE jekesa/db/kraken_db
 `````
 #### Setting-up environment for srst2 and its dependencies
 
