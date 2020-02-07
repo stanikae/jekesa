@@ -32,8 +32,9 @@ Jekesa (Illuminate) currently runs on a server (single compute node), and the fo
 
 #### Visualization and reporting
 * [QUAST](http://quast.sourceforge.net/quast)
-* [MultiQC](https://github.com/ewels/MultiQC)
+* Visualization of FastQC reports, pre- and post- filtering of reads [MultiQC](https://github.com/ewels/MultiQC).
 * R
+  * R packages: ggtree, knitr, plotly, RColorBrewer, reshape2, rmarkdown
 * Rscript
 
 ## Usage
