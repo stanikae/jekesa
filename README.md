@@ -5,23 +5,22 @@ An automated bacterial whole genome assembly and typing pipeline which primarily
 Jekesa (Illuminate) currently runs on a server (single compute node), and the folowing tools have to be installed or available in your path prior to running it. The pipeline is written in Bash and R, and generates the results report in an excel worksheet (.xlsx format).
 
 #### _De novo_ genome assembly and classification
-* [trim_galore](https://github.com/FelixKrueger/TrimGalore)
-* [spades](http://cab.spbu.ru/software/spades/)
-* [skesa](https://github.com/ncbi/SKESA)
-* [kraken](https://github.com/DerrickWood/kraken)
-* [MiniKraken DB_8GB](https://ccb.jhu.edu/software/kraken/)
+* QC and read filtering using fastqc and [trim_galore](https://github.com/FelixKrueger/TrimGalore)
+* Species identification and closest reference detection using bactInspector 
+* Check for contamination using [kraken2](https://github.com/DerrickWood/kraken) and [MiniKraken DB_8GB](https://ccb.jhu.edu/software/kraken/)
+* De novo assembly using [SKESA](https://github.com/ncbi/SKESA), [SPAdes](http://cab.spbu.ru/software/spades/), MEGAHIT, or VELVET as implemented in shovill.
 
 #### MLST typing
-* [mlst](https://github.com/tseemann/mlst)
+* Multi-locus sequence typing based on assembled contigs using [mlst](https://github.com/tseemann/mlst) and PubMLST database.
 
 #### Resistance profiling
-- [ariba](https://github.com/sanger-pathogens/ariba)
+- Anti-microbial resistance gene predicition using [ariba](https://github.com/sanger-pathogens/ariba)
 - [CARD](https://card.mcmaster.ca/) (The Comprehensive Antibiotic Resistance Database)
 
 #### _Streptococcus pneumoniae_ specific analysis
-- [seroba](https://github.com/sanger-pathogens/seroba)
+- Serotyping using [seroba](https://github.com/sanger-pathogens/seroba)
 - Pili detection. Using reference sequences used in [Nakano et. al, 2018](https://wwwnc.cdc.gov/eid/article/24/2/17-1268-techapp1.pdf)
-- [CDC Streptococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) PBP gene typing scripts and databases
+- PBP gene typing and MIC profiling using [CDC Streptococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) scripts and sequence databases.
 
 #### _Streptococcus pyogenes_ specific analysis
 - [CDC Stretococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) EMM typing and MIC profiling scripts and databases
