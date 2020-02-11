@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version="1.1"
+version="0.1"
 
 usage () {
 cat << EOF
@@ -211,76 +211,75 @@ declare -x db_dir=$DATABASES_DIR/seroba_db
 
 for sampleID in $(cat $filename)
  do 
-	# performing bacterial de novo genome assembly
-	declare -x samples=$sampleID
-	echo "\nStarting quality filtering of sequencing reads using trimGalore for sample: $samples"; date
-        echo -e "=================================================================\n"
-	#nohup $SCRIPTS_DIR/get_average_read_length.sh >> ${projectName}_read-avg-length.csv &
-	nohup $SCRIPTS_DIR/trim-reads.sh &
-	wait
+   # performing bacterial de novo genome assembly
+   declare -x samples=$sampleID
+   echo "\nStarting quality filtering of sequencing reads using trimGalore for sample: $samples"; date
+   echo -e "=================================================================\n"
+   #nohup $SCRIPTS_DIR/get_average_read_length.sh >> ${projectName}_read-avg-length.csv &
+   nohup $SCRIPTS_DIR/trim-reads.sh &
+   wait
 	
-	fileTest=$(find $trimmedReads -name "${samples}_*val_1*fq.gz")
-	fileTest2=$(find $trimmedReads -name "${samples}_*val_2*fq.gz")
+   fileTest=$(find $trimmedReads -name "${samples}_*val_1*fq.gz")
+   fileTest2=$(find $trimmedReads -name "${samples}_*val_2*fq.gz")
 
-	if [ -s "$fileTest" ]; then
-                if [ -s "$fileTest2" ]; then
+   if [ -s "$fileTest" ]; then
+      if [ -s "$fileTest2" ]; then
 
-			mv $fileTest $trimmedReads/${samples}_S_val_1.fq.gz
-			mv $fileTest2 $trimmedReads/${samples}_S_val_2.fq.gz
+          mv $fileTest $trimmedReads/${samples}_S_val_1.fq.gz
+	  mv $fileTest2 $trimmedReads/${samples}_S_val_2.fq.gz
        
-			echo "\nStarting species identification using kraken2 and bactInspector for sample: $samples"; date
-        		echo -e "==================================================================\n"
-			declare -x filteredReads=$krakenDir/$samples
-			mkdir -p $filteredReads
-        		#nohup $SCRIPTS_DIR/kraken_classification_step.sh &
-			nohup $SCRIPTS_DIR/kraken2_classification.sh &
-			nohup $SCRIPTS_DIR/bactInspector.sh &
-        		#wait
+	  echo "\nStarting species identification using kraken2 and bactInspector for sample: $samples"; date
+          echo -e "==================================================================\n"
+	  declare -x filteredReads=$krakenDir/$samples
+	  mkdir -p $filteredReads
+          #nohup $SCRIPTS_DIR/kraken_classification_step.sh &
+	  nohup $SCRIPTS_DIR/kraken2_classification.sh &
+	  nohup $SCRIPTS_DIR/bactInspector.sh &
+          #wait
 	
-			# delete linked input fastq files
-			rm $project/*${sampleID}*.f*q.gz
+	  # delete linked input fastq files
+	  rm $project/*${sampleID}*.f*q.gz
 		
-			#fileTest=`find $ -maxdepth 1 -name "${samples}*val_1*.gz"`
-			#fileTest2=`find $ -maxdepth 1 -name "${samples}*val_2*.gz"`
+	  #fileTest=`find $ -maxdepth 1 -name "${samples}*val_1*.gz"`
+	  #fileTest2=`find $ -maxdepth 1 -name "${samples}*val_2*.gz"`
 			
-			filteredReads=$trimmedReads
+	  filteredReads=$trimmedReads
 
-			date
-			echo -e "\nPerforming bacterial de novo genome assembly using spades and MLST typing for sample: $samples"
-			echo -e "===============================================================\n"
+	  date
+	  echo -e "\nPerforming bacterial de novo genome assembly using spades and MLST typing for sample: $samples"
+	  echo -e "===============================================================\n"
 			
-			if [[ "$assembler" == "spades" ]]; then
-			    nohup $SCRIPTS_DIR/spades_assembly_server.sh & 
-			else 
-			    #nohup $SCRIPTS_DIR/skesa_assembly.sh &
-			    nohup $SCRIPTS_DIR/shovill_assembly.sh &
-			fi
-			# Detection of resistance genes, virulence factors and plasmid detection
-			date
-        		echo -e "\nPerforming detection of resistance genes using ARIBA for sample: $samples"
-        		echo -e "===============================================================\n"
-			nohup $SCRIPTS_DIR/ariba_typing_server.sh & 
+	  if [[ "$assembler" == "spades" ]]; then
+	     nohup $SCRIPTS_DIR/spades_assembly_server.sh & 
+	  else 
+	     #nohup $SCRIPTS_DIR/skesa_assembly.sh &
+	     nohup $SCRIPTS_DIR/shovill_assembly.sh &
+	  fi
+	  # Detection of resistance genes, virulence factors and plasmid detection
+	  date
+          echo -e "\nPerforming detection of resistance genes using ARIBA for sample: $samples"
+          echo -e "===============================================================\n"
+	  nohup $SCRIPTS_DIR/ariba_typing_server.sh & 
 
-			# serotyping of S. pneumon using seroBA
-			if [[ "$MLSTscheme" == "spneumoniae" ]]
-			 then
-				date
-				echo -e "\n$MLSTscheme is spneumoniae, now performing in silico serotyping for sample: $samples"
-				echo -e "===============================================================\n"
-				nohup $SCRIPTS_DIR/seroba_serotyping_server.sh & 
+	  # serotyping of S. pneumon using seroBA
+	  if [[ "$MLSTscheme" == "spneumoniae" ]]; then
+	     date
+	     echo -e "\n$MLSTscheme is spneumoniae, now performing in silico serotyping for sample: $samples"
+	     echo -e "===============================================================\n"
+	     nohup $SCRIPTS_DIR/seroba_serotyping_server.sh & 
 
-			fi
+	  fi
 
-			wait
-			echo -e "\nTyping of $sampleID completed, moving to next sample"
-			echo -e "===============================================================\n"
+	  wait
+	  echo -e "\nTyping of $sampleID completed, moving to next sample"
+	  echo -e "===============================================================\n"
 
-		else
-			echo -e "$samples did not pass the trimming step, skipping ................\n"
-		fi
-	else
-		echo -e "\n $fileTest has not been found, moving to next ID `date`"
-	fi
+       else
+          echo -e "$samples did not pass the trimming step, skipping ................\n"
+       fi
+     else
+       echo -e "\n $fileTest has not been found, moving to next ID `date`"
+  fi
 
 done
 
