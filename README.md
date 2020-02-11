@@ -1,36 +1,40 @@
 # JEKESA
-An automated bacterial whole genome assembly and typing pipeline which primarily uses Illumina paired-end sequencing data. In addition, Jekesa performs extensive analyses for _Streptococcus pneumoniae_ and _Streptococcus pyogenes_ (Group A Streptococcus) using some of the [CDC Streptococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) scripts for PBP and EMM typing; as well as MIC (minimum inhibitory concentration) profiling.
+An automated bacterial whole genome assembly and typing pipeline which primarily uses Illumina paired-end whole genome sequencing (WGS) data. In addition, Jekesa performs extensive analyses for _Streptococcus pneumoniae_ and _Streptococcus pyogenes_ (Group A Streptococcus) using some of the [CDC Streptococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) scripts for PBP and EMM typing; as well as MIC (minimum inhibitory concentration) profiling.
 
 ## Required tools/dependencies
 Jekesa (Illuminate) currently runs on a server (single compute node), and the folowing tools have to be installed or available in your path prior to running it. The pipeline is written in Bash and R, and generates the results report in an excel worksheet (.xlsx format).
 
 #### _De novo_ genome assembly and classification
-* [trim_galore](https://github.com/FelixKrueger/TrimGalore)
-* [spades](http://cab.spbu.ru/software/spades/)
-* [skesa](https://github.com/ncbi/SKESA)
-* [kraken](https://github.com/DerrickWood/kraken)
-* [MiniKraken DB_8GB](https://ccb.jhu.edu/software/kraken/)
+* QC and read filtering using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) and [trim_galore](https://github.com/FelixKrueger/TrimGalore).
+* Species identification and closest reference detection using [Bactinspector](https://gitlab.com/antunderwood/bactinspector). 
+* Check for contamination using [kraken2](https://ccb.jhu.edu/software/kraken2/index.shtml) and [MiniKraken2_v2_8GB](https://ccb.jhu.edu/software/kraken2/index.shtml?t=downloads)
+* De novo assembly using either [SKESA](https://github.com/ncbi/SKESA), [SPAdes](http://cab.spbu.ru/software/spades/), [MEGAHIT](https://github.com/voutcn/megahit), or [velvet](https://github.com/dzerbino/velvet) as implemented in [Shovill](https://github.com/tseemann/shovill).
 
 #### MLST typing
-* [mlst](https://github.com/tseemann/mlst)
+* Multi-locus sequence typing based on assembled contigs using [mlst](https://github.com/tseemann/mlst) and PubMLST database.
 
 #### Resistance profiling
-- [ariba](https://github.com/sanger-pathogens/ariba)
-- [CARD](https://card.mcmaster.ca/) (The Comprehensive Antibiotic Resistance Database)
+- Anti-microbial resistance gene predicition from clean reads using [ariba](https://github.com/sanger-pathogens/ariba) and either [CARD](https://card.mcmaster.ca/) (The Comprehensive Antibiotic Resistance Database) or [resfinder database](https://bitbucket.org/genomicepidemiology/resfinder_db/src/master/).
+
+#### Virulence gene predicition
+- Coming soon
+
+#### Plasmid detection
+- Coming soon
 
 #### _Streptococcus pneumoniae_ specific analysis
-- [seroba](https://github.com/sanger-pathogens/seroba)
-- Pili detection. Using reference sequences used in [Nakano et. al, 2018](https://wwwnc.cdc.gov/eid/article/24/2/17-1268-techapp1.pdf)
-- [CDC Streptococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) PBP gene typing scripts and databases
+- Serotyping using [seroba](https://github.com/sanger-pathogens/seroba)
+- Pili detection based on reference sequences used in [Nakano et. al, 2018](https://wwwnc.cdc.gov/eid/article/24/2/17-1268-techapp1.pdf)
+- PBP gene typing and MIC profiling using [CDC Streptococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) SPN scripts and sequence databases.
 
 #### _Streptococcus pyogenes_ specific analysis
-- [CDC Stretococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) EMM typing and MIC profiling scripts and databases
+- EMM typing and MIC profiling using [CDC Stretococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) GAS scripts and sequence databases.
 
 #### Visualization and reporting
-* [QUAST](http://quast.sourceforge.net/quast)
-* [MultiQC](https://github.com/ewels/MultiQC)
-* R
-* Rscript
+* Generation of assembly metrics using [QUAST](http://quast.sourceforge.net/quast)
+* Visualization of FastQC reports, pre- and post- filtering of reads [MultiQC](https://github.com/ewels/MultiQC).
+* R (Rscript)
+  * R packages implemented using conda: r-essentials, r-tidyverse, r-openxlsx, r-readxl
 
 ## Usage
 ```
@@ -98,11 +102,11 @@ seroba createDBs jekesa/db/seroba_db/ 71
 
 ## Minikraken_DB download and set-up
 mkdir -p $HOME/minikraken_db # choose most appropriate location for your system
-wget -c -P $HOME/minikraken_db/ https://ccb.jhu.edu/software/kraken/dl/minikraken_20171019_8GB.tgz
+wget -c -P $HOME/minikraken_db/ ftp://ftp.ccb.jhu.edu/pub/data/kraken2_dbs/minikraken2_v2_8GB_201904_UPDATE.tgz
 cd $HOME/minikraken_db
-tar xzvf minikraken_db/minikraken_20171019_8GB.tgz
-rm $HOME/minikraken_db/minikraken_20171019_8GB.tgz
-ln -s $HOME/minikraken_db/minikraken_20171019_8GB jekesa/db/kraken_db
+tar xzvf minikraken_db/minikraken2_v2_8GB_201904_UPDATE.tgz
+rm $HOME/minikraken_db/minikraken2_v2_8GB_201904_UPDATE.tgz
+ln -s $HOME/minikraken_db/minikraken2_v2_8GB_201904_UPDATE jekesa/db/kraken_db
 `````
 #### Setting-up environment for srst2 and its dependencies
 
