@@ -1,14 +1,5 @@
 #!/bin/bash
 
-#krakenDB=/media/60tb/Databases/minikraken2_v2_8GB_201904_UPDATE #/media/60tb/src/kraken/NCBI
-#trimmedReads=/media/60tb/nicd/crdm/bacteriology/kedibone/35B-Isolates/trimGalore_11_Sep_2019/clean_reads
-#samples=11741
-#filteredReads=/media/60tb/nicd/crdm/bacteriology/kedibone/35B-Isolates/trimGalore_11_Sep_2019/clean_reads
-#threads=16
-#spadesDir=/home/stanford/tmp/skesa
-#quastDir=/home/stanford/tmp/quast
-#mlstDir=/home/stanford/tmp/mlst
-
 if ! [ -d $spadesDir ]; then
  mkdir -p $spadesDir
 fi
@@ -34,7 +25,7 @@ fqU1=$(find $indir -name "${sample}_S*unpaired_1*f*q.gz")
 fqU2=$(find $indir -name "${sample}_S*unpaired_2*f*q.gz")
 
 echo $threads	
-shovill --force --depth 100 --cpus 16 --ram 48 --assembler skesa --outdir $spadesDir/$sample --R1 $fq1 --R2 $fq2 
+shovill --force --depth 100 --cpus 16 --ram 48 --assembler $assembler --outdir $spadesDir/$sample --R1 $fq1 --R2 $fq2 
 
 # get WGS statistics from the shovill log
 echo -e "SampleID,Read_avg_len,Read_min_len,Read_max_len,Total_reads,Coverage,Genome_size,Seq_depth,Seq_depth,Depth_downsampled_to" > $spadesDir/$sample/wgs_stats.csv
