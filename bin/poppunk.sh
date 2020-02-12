@@ -7,7 +7,7 @@ reports_dir=$(find $1 -type d -name "Reports_${run_id}_*")
 echo -e "\n$spadesDir"
 echo -e "\n$reports_dir\n"
 threads=8 #$threads
-refDB_dir=/media/60tb/Databases/PopPunk-Databases
+refDB_dir=$DATABASES_DIR/poppunk_db #/media/60tb/Databases/PopPunk-Databases
 # echo $MLSTscheme
 MLSTscheme=$MLSTscheme
 
@@ -23,6 +23,8 @@ if [ -d "$reports_dir" ]; then
 fi
 
 # create list of assemblies to analyze
+#while read -r line; do if [[ "$line" =~ "$MLSTscheme" ]]; then name=$(echo $line | cut -d ' ' -f1); ls ~/kedibone/35B-Isolates/spades*/${name}/${name}*_assembly.fasta; fi; done < ~/kedibone/35B-Isolates/mlst_output_11_Sep_2019/mlst_merged.tsv
+
 #ls $spadesDir/*/*.fasta | grep -f $sampleList > $poppunk_dir/reference_list.txt
 ls $spadesDir/*/*_assembly.fasta > $poppunk_dir/reference_list.txt
 
