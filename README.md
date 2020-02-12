@@ -107,6 +107,16 @@ cd $HOME/minikraken_db
 tar xzvf minikraken_db/minikraken2_v2_8GB_201904_UPDATE.tgz
 rm $HOME/minikraken_db/minikraken2_v2_8GB_201904_UPDATE.tgz
 ln -s $HOME/minikraken_db/minikraken2_v2_8GB_201904_UPDATE jekesa/db/kraken_db
+
+## PopPUNK database set-up for _S. pneumoniae_ and _S. pyogenes_
+mkdir -p $HOME/poppunk_db # choose most appropriate location for your system
+wget -c -P $HOME/poppunk_db https://www.pneumogen.net/gps/GPS_query.tar.bz2
+wget -c -P $HOME/poppunk_db https://www.pneumogen.net/gps/gpsc_definitive.csv
+wget -c -P $HOME/poppunk_db https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/17424146/GAS_query_v2.tar.bz2
+cd $HOME/poppunk_db
+tar -jxf GAS_query_v2.tar.bz2
+tar -jxf GPS_query.tar.bz2
+ln -s $HOME/poppunk_db jekesa/db/kraken_db
 `````
 #### Setting-up environment for srst2 and its dependencies
 
