@@ -101,20 +101,12 @@ export PATH="$HOME/anaconda3/envs/r_env/bin:$PATH"
 now=$(date +"%d_%b_%Y")
 if ! [ -d "$project" ]
  then
-	# get the fastq files for the specified sample IDs and create output/project directory
-	#$SCRIPTS_DIR/find-link-fastq.sh $project $filename
-
-	# create reports directory
-	#now=$(date +"%d_%b_%Y")
-	#declare -x reportsDir=$project/Reports_${projectName}_${now}
-	#mkdir -p $reportsDir
 	echo -e "$project doesn't exist ....... exiting\n"
 	exit
 
  else
         declare -x reportsDir=$project/Reports_${projectName}_${now}
         mkdir -p $reportsDir
-	#declare -x reportsDir=$(find $project -name "Reports_${projectName}_*" -type d )
 fi
 
 
@@ -434,12 +426,11 @@ fi
 if [[ "$MLSTscheme" == "spyogenes" ]]; then
   # PBP typing using CDC Strep Lab scripts and database
   declare -x allDB_dir=$DATABASES_DIR/GAS_Reference_DB
-  declare -x batch_dir=$trimmedReads #krakenDir #/home/stanford/kedibone/CRDM-08r/kraken #/41467
+  declare -x batch_dir=$trimmedReads 
   declare -x out_dir=$project
   declare -x batch_name=$projectName  #$(basename $project)
   declare -x out_analysis=$pbpDir
 
-  #bash /home/stanford/repos/bacteria_denovo_assembly/SPN-typing_jobInputFile.sh
   $GAS_SCRIPTS_DIR/StrepLab-JanOw_GAS-wrapr.sh
 
   # Perform GAS typing for each sample
