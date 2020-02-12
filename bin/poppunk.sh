@@ -1,21 +1,14 @@
 #!/bin/bash
-#/media/60tb/nicd/crdm/bacteriology/sibusisiwe/Repeated-Analyis/190823_M02621
+
 run_id=$(basename $1)
-#sampleList=$2
-spadesDir=$(find $1 -type d -name "spades_*") #~/kedibone/35B-Isolates/spades_11_Sep_2019
-poppunk_dir=$1/poppunk-analysis #~/kedibone/35B-Isolates/poppunk
+spadesDir=$(find $1 -type d -name "spades_*")
+poppunk_dir=$1/poppunk-analysis
 reports_dir=$(find $1 -type d -name "Reports_${run_id}_*")
 echo -e "\n$spadesDir"
 echo -e "\n$reports_dir\n"
-#spadesDir=~/kedibone/35B-Isolates/spades_11_Sep_2019
-#poppunk_dir=~/kedibone/35B-Isolates/poppunk-03
-#poppunk_report=/media/60tb/nicd/crdm/bacteriology/kedibone/35B-Isolates/Reports_35B-Isolates_11_Sep_2019/poppunk
 threads=8 #$threads
 refDB_dir=/media/60tb/Databases/PopPunk-Databases
-#refDB_dir=$DATABASES_DIR/poppunk_db
-#MLSTscheme="spyogenes"
-#MLSTscheme="spneumoniae"
-echo $MLSTscheme
+# echo $MLSTscheme
 MLSTscheme=$MLSTscheme
 
 # create poppunk work directory
