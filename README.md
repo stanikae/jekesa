@@ -26,11 +26,11 @@ Jekesa (Illuminate) currently runs on a server (single compute node), and the fo
 - Serotyping using [seroba](https://github.com/sanger-pathogens/seroba)
 - Pili detection based on reference sequences used in [Nakano et. al, 2018](https://wwwnc.cdc.gov/eid/article/24/2/17-1268-techapp1.pdf)
 - PBP gene typing and MIC profiling using [CDC Streptococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) SPN scripts and sequence databases.
-- Calculate core and accessory distances and cluster/define genomes/strains using [PopPUNK](https://github.com/johnlees/PopPUNK), as well as assign new genomes to clusters.
+- Calculate core and accessory distances and cluster genomes (assigning global pneumococcal sequence clusters; GPSCs) using [PopPUNK](https://github.com/johnlees/PopPUNK), as well as assign new genomes to clusters.
 
 #### _Streptococcus pyogenes_ specific analysis
 - EMM typing and MIC profiling using [CDC Stretococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) GAS scripts and sequence databases.
-- Calculate core and accessory distances and cluster genomes (assigning global pneumococcal sequence clusters; GPSCs) using [PopPUNK](https://github.com/johnlees/PopPUNK), as well as assign new genomes to clusters.
+- Calculate core and accessory distances and cluster/define genomes/strains using [PopPUNK](https://github.com/johnlees/PopPUNK), as well as assign new genomes to clusters.
 
 #### Visualization and reporting
 * Generation of assembly metrics using [QUAST](http://quast.sourceforge.net/quast)
