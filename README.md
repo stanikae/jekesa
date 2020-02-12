@@ -40,19 +40,19 @@ Jekesa (Illuminate) currently runs on a server (single compute node), and the fo
 
 ## Usage
 ```
-usage: jekesa [options]
+usage: jekesa <options>
 
 OPTIONS:
         -p      Path to output directory or project name
         -f      Path to file with list of sample IDs (one ID per line)
-        -a      Select the assembler to use. Options available: 'spades', 'skesa'
+        -a      Select the assembler to use. Options available: 'spades', 'skesa', 'velvet', 'megahit'
         -s      Species scheme name to use for mlst typing.
-                Use: 'spneumoniae' or 'spyogenes', for streptococcus pneumoniae or  streptococcus pyogenes detailed analysis. 
-                Otherwise for any other schema use: 'other'. To check other available schema names use: mlst --longList. 
+                Use: 'spneumoniae' or 'spyogenes', for streptococcus pneumoniae or  streptococcus pyogenes detailed analysis.
+                Otherwise for any other schema use: 'other'. To check other available schema names use: mlst --longList.
         -t      Number of threads to use <integer>, (minimum value should be: 6)
         -h      Show this help
         -v      Show version
-        
+ 
 ````
 #### Example
 ````
