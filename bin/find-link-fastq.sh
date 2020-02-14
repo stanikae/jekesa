@@ -9,15 +9,6 @@ if [ $# != 3 ];
 fi
 project=$1
 filename=$2
-#path=$3
-#fastqDir=/media/6tb/nscf_sequencing_data_backup
-#fastqDir=/media/6tb/nscf_sequencing_data_backup/Kedibone-SPN
-#fastqDir=/media/6tb/nscf_sequencing_data_backup/BGI_fastq/miseq_bgi
-#fastqDir=/media/60tb/nicd/crdm/bacteriology/kedibone/tmp/kraken/47750
-#fastqDir=/media/6tb/nscf_sequencing_data_backup/merged-190712_M02621-190711_M02143
-#fastqDir=/mnt/e/190823_M02621_0165_000000000-CCLWY
-#fastqDir=/media/6tb/nscf_sequencing_data_backup/190906_M02621_0167_000000000-CL4NR
-#fastqDir=/media/60tb/ftp-data-transfer/sanger-data-transfer/pathogen_2245
 fastqDir=$3
 #check if the $project directory is exists or not:
 #if exists:
@@ -30,13 +21,7 @@ if [ -d $project ];
 		echo -e "*** $project *** exists and no fastq files present... exiting..\n"
 		exit
 	fi 
-	#exit
-#	continue
-#for sample in `cat $filename`
-#do
-    # find /media/6tb/nscf_sequencing_data_backup/* -name "$sample"*.gz -exec ln -s {} $path/$project \;
      
-#done
 #if not exists, make $project directory:
  elif [ ! -d $project ]
   then

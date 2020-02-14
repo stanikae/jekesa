@@ -446,7 +446,7 @@ if [[ "$MLSTscheme" == "spyogenes" ]]; then
 	$reportsDir/${projectName}_pbp-typing.xlsx
 
   # Run PopPunk analysi for S. pyogenes
-#  bash $SCRIPTS_DIR/poppunk.sh $project
+  bash $SCRIPTS_DIR/poppunk.sh $project
 fi
 
 #############################################################################################################
@@ -473,9 +473,9 @@ elif [[ "$MLSTscheme" == "spyogenes" ]]; then
 	${projectName}-kraken_combinedReports.xlsx \
 	${projectName}_WGS-typing-report.xlsx ${projectName}_pbp-typing.xlsx
  # add PopPunk results
-#Rscript $SCRIPTS_DIR/adding_poppunk_results.R $reportsDir \
-#	${projectName}_WGS-typing-report.xlsx assigned_gpscs.xlsx \
-#	assigned_clusters.xlsx ${projectName}_WGS-typing-poppunk_report.xlsx 
+ Rscript $SCRIPTS_DIR/adding_poppunk_results.R $reportsDir \
+	${projectName}_WGS-typing-report.xlsx assigned_gpscs.xlsx \
+	assigned_clusters.xlsx ${projectName}_WGS-typing-poppunk_report.xlsx 
 
 else
  Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir \

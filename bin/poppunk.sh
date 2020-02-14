@@ -23,10 +23,16 @@ if [ -d "$reports_dir" ]; then
 fi
 
 # create list of assemblies to analyze
-#while read -r line; do if [[ "$line" =~ "$MLSTscheme" ]]; then name=$(echo $line | cut -d ' ' -f1); ls ~/kedibone/35B-Isolates/spades*/${name}/${name}*_assembly.fasta; fi; done < ~/kedibone/35B-Isolates/mlst_output_11_Sep_2019/mlst_merged.tsv
+while read -r line; do 
+  if [[ "$line" =~ "$MLSTscheme" ]]; then 
+     name=$(echo $line | cut -d ' ' -f1)
+     #ls ~/kedibone/35B-Isolates/spades*/${name}/${name}*_assembly.fasta
+     ls $spadesDir/${name}/${name}*_assembly.fasta >> $poppunk_dir/reference_list.txt
+  fi
+done < $mlstDir/mlst_merged.tsv
 
 #ls $spadesDir/*/*.fasta | grep -f $sampleList > $poppunk_dir/reference_list.txt
-ls $spadesDir/*/*_assembly.fasta > $poppunk_dir/reference_list.txt
+#ls $spadesDir/*/*_assembly.fasta > $poppunk_dir/reference_list.txt
 
 # create grep list of IDs
 cat $poppunk_dir/reference_list.txt | awk -F '/' '{print $NF}' > $poppunk_dir/grep_list.txt
