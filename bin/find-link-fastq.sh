@@ -16,9 +16,9 @@ if [ -d $project ];
  then
 	echo ">>>>$project<<< directory exists"
 	if ls -l $project | egrep -q "fastq|fq"; then 
-	 	echo -e "*** $project *** contains fastq files, proceeding with de novo assembly"
+	 	echo -e "\n*** $project *** contains fastq files already"
 	else 
-		echo -e "*** $project *** exists and no fastq files present... exiting..\n"
+		echo -e "\n*** $project *** exists and no fastq files present... exiting.."
 		exit
 	fi 
      
@@ -30,7 +30,7 @@ if [ -d $project ];
 	 do
 		found=`find $fastqDir -maxdepth 1 -name "${sample}_S*.gz" -print`
 		if [ -z "$found" ]; then
-    			echo "$sample not found"
+    			echo -e "\n$sample not found"
  		else
 			find $fastqDir -maxdepth 1 -name "${sample}_S*.gz" -exec ln -s {} $project \;
 			#ln -s "$found" "$project"

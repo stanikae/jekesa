@@ -7,11 +7,11 @@ if ! [ -d $bact_out ]; then
  mkdir -p $bact_out
 fi
 
-echo -e "Running bactInspector check_species"; date
-bactinspector check_species -i $trimmedReads -o $bact_out -fq ${samples}_S_val_1*.gz
+echo -e "`date` \tRunning bactInspector check_species"
+bactinspector check_species -i $trimmedReads -o $bact_out -fq ${samples}_S_R1_val_1*.gz
 
 # edit check_species output
-sed -i 's/_S_val_1//' $bact_out/species_investigation*.tsv
+sed -i 's/_S_R1_val_1//' $bact_out/species_investigation*.tsv
 if [[ $(wc -l $bact_out/species_investigation_*.tsv | awk '{ print $1 }' ) -gt 2 ]]; then
 	#cat $bact_out/species_investigation_*.tsv | head -n2 > $bact_out/species_investigation-top1.tsv
 	(head -n1 $bact_out/species_investigation_*.tsv) && (tail -n -1 $bact_out/species_investigation_*.tsv | \
@@ -26,7 +26,7 @@ fi
 
 #Rscript $SCRIPTS_DIR/converting_tsv_2_xlsx.R $bact_out/species_investigation-top1.tsv $reportsDir/${projectName}_species_investigation.xlsx
 
-echo -e "Running bactInspector closest_match"; date
+echo -e "`date`\tRunning bactInspector closest_match"
 bactinspector closest_match -i $bact_out -o $bact_out -r -m ${samples}*.msh
 
 # edit closet_species output

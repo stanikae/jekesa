@@ -119,7 +119,9 @@ declare -x spadesDir=$project/spades\_$now
 declare -x statsDir=$project/assemblyMetrics\_$now
 declare -x quastDir=$statsDir/quast_$now
 declare -x mlstDir=$project/mlst_output\_$now
-declare -x aribaDir=$project/ariba_${now}_analysis
+declare -x aribaDir=$project/ariba_${now}
+declare -x confindrDir=$project/confindr_${now}
+declare -x bactInspectorDir=$project/bactInspector
 
 if [[ "$MLSTscheme" == "spneumoniae" ]]
  then
@@ -171,6 +173,8 @@ mkdir -p $spadesDir
 mkdir -p $quastDir
 mkdir -p $mlstDir
 mkdir -p $aribaDir
+mkdir -p $confindrDir
+mkdir -p $bactInspectorDir
 
 # output directory for bactInspector
 #declare -x bact_out=$project/bactInspector
@@ -194,6 +198,8 @@ declare -x krakenDB=$DATABASES_DIR/kraken_db
 declare -x db_dir=$DATABASES_DIR/seroba_db
 # PBP typing using CDC Strep Lab scripts and database
 #declare -x allDB_dir=$DATABASES_DIR/SPN_Reference_DB
+# rMLST database
+declare -x confindrDB=$DATABASES_DIR/confindr_db
 
 ###################################################################################################################
 ### Read trimming, species identification, contamination check, de novo assembly, AMR prediction and serotyping ###
@@ -219,18 +225,22 @@ for sampleID in $(cat $filename)
    if [ -s "$fileTest" ]; then
       if [ -s "$fileTest2" ]; then
 
-          mv $fileTest $trimmedReads/${samples}_S_val_1.fq.gz
-	  mv $fileTest2 $trimmedReads/${samples}_S_val_2.fq.gz
+          mv $fileTest $trimmedReads/${samples}_S_R1_val_1.fq.gz
+	  mv $fileTest2 $trimmedReads/${samples}_S_R2_val_2.fq.gz
        
 	  echo "\nStarting species identification using kraken2 and bactInspector for sample: $samples"; date
           echo -e "==================================================================\n"
 	  declare -x filteredReads=$krakenDir/$samples
 	  mkdir -p $filteredReads
           #nohup $SCRIPTS_DIR/kraken_classification_step.sh &
-	  nohup $SCRIPTS_DIR/kraken2_classification.sh &
-	  nohup $SCRIPTS_DIR/bactInspector.sh &
+	  nohup $SCRIPTS_DIR/kraken2_classification.sh >> $krakenDir/kraken2.log 2>&1 &
+	  
+	  nohup $SCRIPTS_DIR/bactInspector.sh >> $bactInspectorDir/bactinspector.log 2>&1 &
           #wait
-	
+	  echo "\nChecking contamination for sample: $samples"; date
+          echo -e "==================================================================\n"
+	  nohup $SCRIPTS_DIR/confindr_rvsd.sh >> $confindrDir/confindr.log 2>&1 &
+
 	  # delete linked input fastq files
 	  rm $project/*${sampleID}*.f*q.gz
 		
@@ -311,7 +321,7 @@ awk -v OFS='\t' '{gsub(/_.*/,"",$1);print}' $mlstDir/mlst_allele.tsv >> $mlstDir
 #fi
 
 ###################################################################################################################################
-### Saving MLST results, AMR predictions, Serotyping results, kraken2 results, and bactInspector results to excel (.xlsx) files ###
+### Saving MLST results, AMR predictions, Serotyping results, kraken2 results, confindr and bactInspector results to excel (.xlsx) files ###
 ###################################################################################################################################
 
 # saving mlst typing .csv results to xlsx format
@@ -374,7 +384,7 @@ Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
 	$reportsDir/${projectName}-kraken_combinedReports.xlsx
 
 # save bactInspector results to xlsx
-echo -e "sampleID,bactInspector_match,refseq_closest_match" > $project/bactInspector/bactInspector_results.csv
+echo -e "sampleID,Species_Identification,refseq_closest_match" > $project/bactInspector/bactInspector_results.csv
 for file in $(find $project/bactInspector -name "*_bactInspector.csv"); do
   cat $file >> $project/bactInspector/bactInspector_results.csv
 done
@@ -383,6 +393,19 @@ done
 Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
 	$project/bactInspector/bactInspector_results.csv \
 	$reportsDir/${projectName}-bactInspector.xlsx
+
+# Save confindr results in one .csv file
+cat ${confindrDir}/*/*_report.csv > ${confindrDir}/confindr_merged.csv
+echo "Sample,Genera_present,Contamination_Status(%)" > ${confindrDir}/${projectName}-confindr-final.csv
+grep -v '^Sample' ${confindrDir}/confindr_merged.csv | \
+sed 's/_.*1,/,/g' | \
+cut -d "," -f1,2,4,5 | \
+awk -F ',' '{print $1,$2,$3" ("$4"%)"}' OFS="," >> ${confindrDir}/${projectName}-confindr-final.csv
+# Convert confindr results to .xlsx file
+Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
+        $confindrDir/${projectName}-confindr-final.csv \
+        $reportsDir/${projectName}-confindr-final.xlsx
+
 
 # Perform SPN pili detection analysis
 if [[ "$MLSTscheme" == "spneumoniae" ]]; then
@@ -485,10 +508,15 @@ else
 
 fi
 
+# add confindr results to the final report
+Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+        ${projectName}_WGS-typing-report.xlsx ${projectName}-confindr-final.xlsx \
+        ${projectName}_WGS-typing-conf-report.xlsx
+
 # add bactInspector results to the final report
 Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-	${projectName}_WGS-typing-report.xlsx ${projectName}-bactInspector.xlsx \
-	${projectName}_WGS-typing-bactInspector_report.xlsx
+	${projectName}_WGS-typing-conf-report.xlsx ${projectName}-bactInspector.xlsx \
+	${projectName}_WGS-typing-final-report.xlsx
 
 date
 value=$(wc -l $filename | awk '{print $1}')

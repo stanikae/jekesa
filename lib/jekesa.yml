@@ -31,6 +31,7 @@ dependencies:
   - skesa=2.3.*
   - shovill=1.0.*
   - kraken2=2.0.8_beta
+  - confindr=0.7.2
   - pip
   - pip:
       - bactinspectorMax
