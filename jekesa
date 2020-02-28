@@ -482,44 +482,70 @@ if [[ "$MLSTscheme" == "spneumoniae" ]]; then
 	${projectName}-ariba_final.xlsx ${projectName}-kraken_combinedReports.xlsx \
 	${projectName}_serobaResults.xlsx ${projectName}_WGS-typing-report.xlsx \
 	${projectName}_pili-results.xlsx ${projectName}_pbp-typing.xlsx
-  # add PopPunk results
-  Rscript $SCRIPTS_DIR/adding_poppunk_results.R \
+  	# add PopPunk results
+  	Rscript $SCRIPTS_DIR/adding_poppunk_results.R \
 	$reportsDir ${projectName}_WGS-typing-report.xlsx \
-	assigned_gpscs.xlsx assigned_clusters.xlsx \
+	assigned_gpscs.xlsx \
+	assigned_clusters.xlsx \
 	${projectName}_WGS-typing-poppunk_report.xlsx
+	# add confindr results to the final report
+	Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+        ${projectName}_WGS-typing-poppunk_report.xlsx ${projectName}-confindr-final.xlsx \
+        ${projectName}_WGS-typing-conf-report.xlsx
+	# add bactInspector results to the final report
+	Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+        ${projectName}_WGS-typing-conf-report.xlsx ${projectName}-bactInspector.xlsx \
+        ${projectName}_WGS-typing-final-report.xlsx
 
 elif [[ "$MLSTscheme" == "spyogenes" ]]; then
- Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir \
+ 	Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir \
 	${projectName}_quastResults.xlsx \
 	${projectName}_mlstResults.xlsx \
 	${projectName}-ariba_final.xlsx \
 	${projectName}-kraken_combinedReports.xlsx \
 	${projectName}_WGS-typing-report.xlsx ${projectName}_pbp-typing.xlsx
- # add PopPunk results
- Rscript $SCRIPTS_DIR/adding_poppunk_results.R $reportsDir \
-	${projectName}_WGS-typing-report.xlsx assigned_gpscs.xlsx \
-	assigned_clusters.xlsx ${projectName}_WGS-typing-poppunk_report.xlsx 
+	# add PopPunk results
+	Rscript $SCRIPTS_DIR/adding_poppunk_results.R $reportsDir \
+	${projectName}_WGS-typing-report.xlsx \
+	assigned_gpscs.xlsx \
+	assigned_clusters.xlsx \
+	${projectName}_WGS-typing-poppunk_report.xlsx 
+	# add confindr results to the final report
+        Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+        ${projectName}_WGS-typing-poppunk_report.xlsx ${projectName}-confindr-final.xlsx \
+        ${projectName}_WGS-typing-conf-report.xlsx
+        # add bactInspector results to the final report
+        Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+        ${projectName}_WGS-typing-conf-report.xlsx ${projectName}-bactInspector.xlsx \
+        ${projectName}_WGS-typing-final-report.xlsx
 
 else
- Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir \
+ 	Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir \
 	${projectName}_quastResults.xlsx ${projectName}_mlstResults.xlsx \
 	${projectName}-ariba_final.xlsx ${projectName}-kraken_combinedReports.xlsx \
 	${projectName}_WGS-typing-report.xlsx
-
+	# add confindr results to the final report
+	Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+        ${projectName}_WGS-typing-report.xlsx ${projectName}-confindr-final.xlsx \
+        ${projectName}_WGS-typing-conf-report.xlsx
+	# add bactInspector results to the final report
+	Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+        ${projectName}_WGS-typing-conf-report.xlsx ${projectName}-bactInspector.xlsx \
+        ${projectName}_WGS-typing-final-report.xlsx
 fi
 
 # add confindr results to the final report
-Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-        ${projectName}_WGS-typing-report.xlsx ${projectName}-confindr-final.xlsx \
-        ${projectName}_WGS-typing-conf-report.xlsx
+#Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+#        ${projectName}_WGS-typing-report.xlsx ${projectName}-confindr-final.xlsx \
+#        ${projectName}_WGS-typing-conf-report.xlsx
 
 # add bactInspector results to the final report
-Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-	${projectName}_WGS-typing-conf-report.xlsx ${projectName}-bactInspector.xlsx \
-	${projectName}_WGS-typing-final-report.xlsx
+#Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+#	${projectName}_WGS-typing-conf-report.xlsx ${projectName}-bactInspector.xlsx \
+#	${projectName}_WGS-typing-final-report.xlsx
 
 date
 value=$(wc -l $filename | awk '{print $1}')
-echo -e "Analysis of ${value} samples completed"
+echo -e "[[`date`]] Analysis of ${value} samples completed"
 echo "==================================================================="
 echo -e "===============================================================\n"
