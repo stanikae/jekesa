@@ -84,8 +84,8 @@ if [[ $MLSTscheme == "other" ]]; then
 fi
 
 # cretae global variables
-echo -e "Parameters supplied by the User"
-echo -e "$project\t$filename\t$assembler\t$threads\t$MLSTscheme\n"
+echo -e "\t[`date +"%d-%b-%Y %T"`]\tParameters supplied by the User:"
+echo -e "\t\tProject name: $project\n\t\tSample list: $filename\n\t\tAssembler: $assembler\n\t\tThreads: $threads\n\t\tMLSTscheme: $MLSTscheme"
 declare -x projectName=$(basename $project)
 declare -x SCRIPTS_DIR=${BASH_SOURCE%/*}/bin
 declare -x DATABASES_DIR=${BASH_SOURCE%/*}/db
@@ -109,10 +109,9 @@ if ! [ -d "$project" ]
         mkdir -p $reportsDir
 fi
 
-
 # Beginning bacterial typing steps
 
-now=$(date +"%d_%b_%Y")
+declare -x now=$(date +"%d_%b_%Y")
 declare -x trimgaloreDir=$(find $project -name "trimGalore*" -type d )
 declare -x krakenDir=$(find $project -name "kraken*" -type d )
 declare -x spadesDir=$project/spades\_$now
@@ -125,9 +124,9 @@ declare -x bactInspectorDir=$project/bactInspector
 
 if [[ "$MLSTscheme" == "spneumoniae" ]]
  then
-	declare -x serobaDir=$project/seroba_${now}_analysis
-	declare -x pilusDir=$project/pili_${now}_analysis
-	declare -x pbpDir=$project/pbp-typing_${now}_analysis
+	declare -x serobaDir=$project/seroba_${now}
+	declare -x pilusDir=$project/pili_${now}
+	declare -x pbpDir=$project/pbp-typing_${now}
 	mkdir -p $serobaDir
 	mkdir -p $pilusDir
 	mkdir -p $pbpDir
@@ -135,7 +134,7 @@ fi
 
 if [[ "$MLSTscheme" == "spyogenes" ]]
  then
-        declare -x pbpDir=$project/pbp-typing_${now}_analysis
+        declare -x pbpDir=$project/pbp-typing_${now}
         mkdir -p $pbpDir
 fi
 
@@ -147,11 +146,11 @@ if ! [ -d "$krakenDir" ]
 fi
 
 # directory for QC before quality filtering
-#if ! [ -d "$fastqc_out" ]
-# then
-#	declare -x fastqc_out=$project/fastqcReports\_$now
-#	mkdir -p $fastqc_out
-#fi
+if ! [ -d "$fastqc_out" ]
+ then
+	declare -x fastqc_out=$project/fastqcReports\_$now
+	mkdir -p $fastqc_out
+fi
 
 # mkdir for trimgalore
 if ! [ -d "$trimgaloreDir" ]
@@ -191,6 +190,7 @@ declare -x schemeList=$project/schemeList.txt
 ## databases ##
 # ariba reference database
 declare -x ariba_ref=$DATABASES_DIR/ariba_DBs/out.card.prepareref
+declare -x ariba_VFref=$DATABASES_DIR/ariba_DBs/out.vfdb_full.prepareref
 # minikraken database
 #declare -x krakenDB=/media/60tb/src/kraken/NCBI
 declare -x krakenDB=$DATABASES_DIR/kraken_db
@@ -205,18 +205,17 @@ declare -x confindrDB=$DATABASES_DIR/confindr_db
 ### Read trimming, species identification, contamination check, de novo assembly, AMR prediction and serotyping ###
 ###################################################################################################################
 
-#echo -e "\nStarting quality control of sequencing reads for sample: $samples"; date
-#echo -e "\n==============================================================="
-#nohup $SCRIPTS_DIR/fastqc_check_server.sh &
+echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting quality control of sequencing reads for project: $projectName"
+nohup $SCRIPTS_DIR/fastqc_check_server.sh > $fastqc_out/fastqc_check.log 2>&1 &
 
 for sampleID in $(cat $filename)
  do 
    # performing bacterial de novo genome assembly
    declare -x samples=$sampleID
-   echo "\nStarting quality filtering of sequencing reads using trimGalore for sample: $samples"; date
-   echo -e "=================================================================\n"
+   echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting quality filtering of sequencing reads using trimGalore for sample: $samples"
    #nohup $SCRIPTS_DIR/get_average_read_length.sh >> ${projectName}_read-avg-length.csv &
-   nohup $SCRIPTS_DIR/trim-reads.sh &
+   nohup $SCRIPTS_DIR/trim-reads.sh >> $trimgaloreDir/trimGalore.log 2>&1 &
+   nohup $SCRIPTS_DIR/get_coverageDepth.sh &
    wait
 	
    fileTest=$(find $trimmedReads -name "${samples}_*val_1*fq.gz")
@@ -228,8 +227,7 @@ for sampleID in $(cat $filename)
           mv $fileTest $trimmedReads/${samples}_S_R1_val_1.fq.gz
 	  mv $fileTest2 $trimmedReads/${samples}_S_R2_val_2.fq.gz
        
-	  echo "\nStarting species identification using kraken2 and bactInspector for sample: $samples"; date
-          echo -e "==================================================================\n"
+	  echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting species identification using kraken2 and bactInspector"
 	  declare -x filteredReads=$krakenDir/$samples
 	  mkdir -p $filteredReads
           #nohup $SCRIPTS_DIR/kraken_classification_step.sh &
@@ -237,8 +235,7 @@ for sampleID in $(cat $filename)
 	  
 	  nohup $SCRIPTS_DIR/bactInspector.sh >> $bactInspectorDir/bactinspector.log 2>&1 &
           #wait
-	  echo "\nChecking contamination for sample: $samples"; date
-          echo -e "==================================================================\n"
+	  echo -e "\t[`date +"%d-%b-%Y %T"`]\tChecking inter- and intra-species contamination"
 	  nohup $SCRIPTS_DIR/confindr_rvsd.sh >> $confindrDir/confindr.log 2>&1 &
 
 	  # delete linked input fastq files
@@ -249,46 +246,37 @@ for sampleID in $(cat $filename)
 			
 	  filteredReads=$trimmedReads
 
-	  date
-	  echo -e "\nPerforming bacterial de novo genome assembly using spades and MLST typing for sample: $samples"
-	  echo -e "===============================================================\n"
-			
+	  echo -e "\t[`date +"%d-%b-%Y %T"`]\tPerforming bacterial de novo genome assembly using spades and MLST typing"
 	  #if [[ "$assembler" == "spades" ]]; then
 	  #   nohup $SCRIPTS_DIR/spades_assembly_server.sh & 
 	  #else 
 	     #nohup $SCRIPTS_DIR/skesa_assembly.sh &
-	  nohup $SCRIPTS_DIR/shovill_assembly.sh &
+	  nohup $SCRIPTS_DIR/shovill_assembly.sh >> $spadesDir/shovill_assembly.log 2>&1 &
 	  #fi
 	  # Detection of resistance genes, virulence factors and plasmid detection
-	  date
-          echo -e "\nPerforming detection of resistance genes using ARIBA for sample: $samples"
-          echo -e "===============================================================\n"
-	  nohup $SCRIPTS_DIR/ariba_typing_server.sh & 
+          echo -e "\t[`date +"%d-%b-%Y %T"`]\tPerforming detection of resistance genes using ARIBA"
+	  nohup $SCRIPTS_DIR/ariba_typing_server.sh >> $aribaDir/ariba_AMRtyping.log 2>&1 & 
 
 	  # serotyping of S. pneumon using seroBA
 	  if [[ "$MLSTscheme" == "spneumoniae" ]]; then
-	     date
-	     echo -e "\n$MLSTscheme is spneumoniae, now performing in silico serotyping for sample: $samples"
-	     echo -e "===============================================================\n"
-	     nohup $SCRIPTS_DIR/seroba_serotyping_server.sh & 
-
+	     echo -e "\t[`date +"%d-%b-%Y %T"`]\t$MLSTscheme is spneumoniae, now performing in silico serotyping"
+	     nohup $SCRIPTS_DIR/seroba_serotyping_server.sh >> $serobaDir/seroba_serotying.log 2>&1 & 
 	  fi
 
 	  wait
-	  echo -e "\nTyping of $sampleID completed, moving to next sample"
-	  echo -e "===============================================================\n"
+	  echo -e "\t[`date +"%d-%b-%Y %T"`]\tTyping of $sampleID completed, moving to next sample"
 
        else
-          echo -e "$samples did not pass the trimming step, skipping ................\n"
+          echo -e "\t[`date +"%d-%b-%Y %T"`]\t$samples did not pass the trimming step, skipping ..............."
        fi
      else
-       echo -e "\n $fileTest has not been found, moving to next ID `date`"
+       echo -e "\t[`date +"%d-%b-%Y %T"`]\t$fileTest has not been found, moving to next ID"
   fi
 
 done
 
 #########################################################################################################################
-### Report generation using MultiQC, QUAST, 
+			##### Report generation using MultiQC, QUAST, #######
 #########################################################################################################################
 
 # combine all fastqc reports using mulitQC
@@ -300,10 +288,13 @@ done
 #nohup multiqc -o $reportsDir/${projectName}-postQC $qcReports --pdf --export --filename ${projectName}_post_qc &
 
 # QUAST multiqc reports
-nohup multiqc -o $reportsDir/${projectName}-quast-post-kraken $quastDir --pdf --export --filename $projectName\_quast &
+echo -e "\t[`date +"%d-%b-%Y %T"`]\tGenerating reports QC and assembly metrics reports using multiQC"
+nohup multiqc -o $reportsDir/${projectName}-quast-post-kraken $quastDir \
+	      --pdf --export --filename $projectName\_quast >> $project/tmp/quast_post-qc.log 2>&1&
 
 # combining all assembly metrics using custom R script
-Rscript $SCRIPTS_DIR/combining_quast_output.R $quastDir $reportsDir/${projectName}_quastResults.xlsx
+Rscript $SCRIPTS_DIR/combining_quast_output.R $quastDir \
+	$reportsDir/${projectName}_quastResults.xlsx >> $project/tmp/combining_quast.log 2>&1
 
 # saving mlst typing .csv results to xlsx format
 #if [[ "$MLSTscheme" == "noScheme" ]]; then
@@ -323,12 +314,12 @@ awk -v OFS='\t' '{gsub(/_.*/,"",$1);print}' $mlstDir/mlst_allele.tsv >> $mlstDir
 ###################################################################################################################################
 ### Saving MLST results, AMR predictions, Serotyping results, kraken2 results, confindr and bactInspector results to excel (.xlsx) files ###
 ###################################################################################################################################
-
+echo -e "\t[`date +"%d-%b-%Y %T"`]\tSaving WGS typing results in MS excel format"
 # saving mlst typing .csv results to xlsx format
 if [ -e $mlstDir/mlst_merged.tsv ]; then
 Rscript $SCRIPTS_DIR/converting_tsv_2_xlsx.R \
 	$mlstDir/mlst_merged.tsv \
-	$reportsDir/${projectName}_mlstResults.xlsx
+	$reportsDir/${projectName}_mlstResults.xlsx >> $project/tmp/converting_tsv.log 2>&1
 fi
 
 # summarizing the identified resistance genes
@@ -347,7 +338,7 @@ fi
 # writing ariba report to xlsx
 Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
 	$aribaDir/${projectName}-ariba-final.csv \
-	$reportsDir/${projectName}-ariba_final.xlsx
+	$reportsDir/${projectName}-ariba_final.xlsx >> $project/tmp/converting_csv.log 2>&1
 
 # seroba output compilation
 if [[ "$MLSTscheme" == "spneumoniae" ]]; then
@@ -358,7 +349,7 @@ if [[ "$MLSTscheme" == "spneumoniae" ]]; then
   # save seroba results to xlsx excel workbook
   Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R  \
 	$serobaDir/summary_header.csv \
-	$reportsDir/${projectName}_serobaResults.xlsx
+	$reportsDir/${projectName}_serobaResults.xlsx >> $project/tmp/converting_csv.log 2>&1
   cd $HOME
 fi
 
@@ -381,7 +372,7 @@ done
 # convert kraken .csv to .xlsx
 Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
 	$outDir/${projectName}-kraken_combinedReports.csv \
-	$reportsDir/${projectName}-kraken_combinedReports.xlsx
+	$reportsDir/${projectName}-kraken_combinedReports.xlsx >> $project/tmp/converting_csv.log 2>&1
 
 # save bactInspector results to xlsx
 echo -e "sampleID,Species_Identification,refseq_closest_match" > $project/bactInspector/bactInspector_results.csv
@@ -392,11 +383,11 @@ done
 # convert bactInspector .csv to .xlsx
 Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
 	$project/bactInspector/bactInspector_results.csv \
-	$reportsDir/${projectName}-bactInspector.xlsx
+	$reportsDir/${projectName}-bactInspector.xlsx >> $project/tmp/converting_csv.log 2>&1
 
 # Save confindr results in one .csv file
 cat ${confindrDir}/*/*_report.csv > ${confindrDir}/confindr_merged.csv
-echo "Sample,Genera_present,Contamination_Status(%)" > ${confindrDir}/${projectName}-confindr-final.csv
+echo "Sample,Genera_present,ContaminationPresent" > ${confindrDir}/${projectName}-confindr-final.csv
 grep -v '^Sample' ${confindrDir}/confindr_merged.csv | \
 sed 's/_.*1,/,/g' | \
 cut -d "," -f1,2,4,5 | \
@@ -404,20 +395,31 @@ awk -F ',' '{print $1,$2,$3" ("$4"%)"}' OFS="," >> ${confindrDir}/${projectName}
 # Convert confindr results to .xlsx file
 Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
         $confindrDir/${projectName}-confindr-final.csv \
-        $reportsDir/${projectName}-confindr-final.xlsx
+        $reportsDir/${projectName}-confindr-final.xlsx >> $project/tmp/converting_csv.log 2>&1
 
-
-# Perform SPN pili detection analysis
-if [[ "$MLSTscheme" == "spneumoniae" ]]; then
-  $SCRIPTS_DIR/SPN-pili-detection.sh
-fi
+# save coverage results to xlsx
+cat ${project}/coverageDepth/*/*.csv > ${project}/coverageDepth/coverage_merged.csv
+echo "Sample,Est.GenomeSize,CoverageDepth" > ${project}/coverageDepth/${projectName}-coverage-final.csv
+grep -v '^Sample' ${project}/coverageDepth/coverage_merged.csv >> ${project}/coverageDepth/${projectName}-coverage-final.csv
+# convert coverage results to .xlsx file
+Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
+        ${project}/coverageDepth/${projectName}-coverage-final.csv \
+        $reportsDir/${projectName}-coverage-final.xlsx >> $project/tmp/converting_csv.log 2>&1
 
 ################################################################################################################
 ### PBP typing, EMM typing, and MIC predicitions using scripts adapted from CDC StrepLab and PoPunk analysis ###
 ################################################################################################################
 
+# Perform SPN pili detection analysis
+if [[ "$MLSTscheme" == "spneumoniae" ]]; then
+  echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting S. pneumoniae pili detection"
+  $SCRIPTS_DIR/SPN-pili-detection.sh 
+fi
+
+
 # Perform PBP typing using scripts adapted from Ben Metcalf at CDC, USA
 if [[ "$MLSTscheme" == "spneumoniae" ]]; then
+  echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting S. pneumoniae PBP typing using CDC StrepLab scripts"
   # PBP typing using CDC Strep Lab scripts and database
   declare -x allDB_dir=$DATABASES_DIR/SPN_Reference_DB	
   declare -x batch_dir=$trimmedReads #krakenDir #/home/stanford/kedibone/CRDM-08r/kraken #/41467
@@ -438,7 +440,7 @@ if [[ "$MLSTscheme" == "spneumoniae" ]]; then
   # convert output file to xlsx
   Rscript $SCRIPTS_DIR/convert_SPN-PBP-Typing-Results_2_xlsx.R \
 	$out_analysis/TABLE_SPN_"$batch_name"_Typing_Results.txt \
-	$reportsDir/${projectName}_pbp-typing.xlsx
+	$reportsDir/${projectName}_pbp-typing.xlsx >> $project/tmp/convert_SPN-PBP-Typing.log 2>&1
 
   # Run PopPunk analysi for S. pneumoniae
   bash $SCRIPTS_DIR/poppunk.sh $project
@@ -447,6 +449,7 @@ fi
 
 # Perform emm typing using scripts adapted from Ben Metcalf at CDC, USA
 if [[ "$MLSTscheme" == "spyogenes" ]]; then
+  echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting S. pyogenes EMM typing using CDC StrepLab scripts"
   # PBP typing using CDC Strep Lab scripts and database
   declare -x allDB_dir=$DATABASES_DIR/GAS_Reference_DB
   declare -x batch_dir=$trimmedReads 
@@ -466,7 +469,7 @@ if [[ "$MLSTscheme" == "spyogenes" ]]; then
   # convert output file to xlsx
   Rscript $SCRIPTS_DIR/convert_SPN-PBP-Typing-Results_2_xlsx.R \
 	$out_analysis/TABLE_GAS_"$batch_name"_Typing_Results.txt \
-	$reportsDir/${projectName}_pbp-typing.xlsx
+	$reportsDir/${projectName}_pbp-typing.xlsx >> $project/tmp/convert_GAS-PBP-Typing.log 2>&1
 
   # Run PopPunk analysi for S. pyogenes
   bash $SCRIPTS_DIR/poppunk.sh $project
@@ -475,27 +478,31 @@ fi
 #############################################################################################################
 ###                          Save results to the final results excel (.xlsx) file                         ###
 #############################################################################################################
-
+echo -e "\t[`date +"%d-%b-%Y %T"`]\tSaving final bacterial WGS typing report to MS Excel for project $projectName"
 if [[ "$MLSTscheme" == "spneumoniae" ]]; then
   Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir \
 	${projectName}_quastResults.xlsx ${projectName}_mlstResults.xlsx \
 	${projectName}-ariba_final.xlsx ${projectName}-kraken_combinedReports.xlsx \
-	${projectName}_serobaResults.xlsx ${projectName}_WGS-typing-report.xlsx \
-	${projectName}_pili-results.xlsx ${projectName}_pbp-typing.xlsx
+	${projectName}_serobaResults.xlsx ${projectName}_WGS-typing-00.xlsx \
+	${projectName}_pili-results.xlsx ${projectName}_pbp-typing.xlsx >> $project/tmp/merge_reports.log 2>&1
   	# add PopPunk results
   	Rscript $SCRIPTS_DIR/adding_poppunk_results.R \
-	$reportsDir ${projectName}_WGS-typing-report.xlsx \
+	$reportsDir ${projectName}_WGS-typing-00.xlsx \
 	assigned_gpscs.xlsx \
 	assigned_clusters.xlsx \
-	${projectName}_WGS-typing-poppunk_report.xlsx
-	# add confindr results to the final report
-	Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-        ${projectName}_WGS-typing-poppunk_report.xlsx ${projectName}-confindr-final.xlsx \
-        ${projectName}_WGS-typing-conf-report.xlsx
-	# add bactInspector results to the final report
-	Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-        ${projectName}_WGS-typing-conf-report.xlsx ${projectName}-bactInspector.xlsx \
-        ${projectName}_WGS-typing-final-report.xlsx
+	${projectName}_WGS-typing-01.xlsx >> $project/tmp/add_poppunk.log 2>&1
+#	# add confindr results to the final report
+#	Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+#        ${projectName}_WGS-typing-poppunk_report.xlsx ${projectName}-confindr-final.xlsx \
+#        ${projectName}_WGS-typing-conf-report.xlsx >> $project/tmp/add_confindr.log 2>&1
+#	# add bactInspector results to the final report
+#	Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+#        ${projectName}_WGS-typing-conf-report.xlsx ${projectName}-bactInspector.xlsx \
+#        ${projectName}_WGS-typing-bactInsp-report.xlsx >> $project/tmp/add_bactInspector.log 2>&1
+#	# add coverage results results to the final report
+#        Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+#        ${projectName}_WGS-typing-bactInsp-report.xlsx ${projectName}-coverage-final.xlsx \
+#        ${projectName}_WGS-typing-final-report.xlsx >> $project/tmp/add_coverage.log 2>&1
 
 elif [[ "$MLSTscheme" == "spyogenes" ]]; then
  	Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir \
@@ -503,49 +510,58 @@ elif [[ "$MLSTscheme" == "spyogenes" ]]; then
 	${projectName}_mlstResults.xlsx \
 	${projectName}-ariba_final.xlsx \
 	${projectName}-kraken_combinedReports.xlsx \
-	${projectName}_WGS-typing-report.xlsx ${projectName}_pbp-typing.xlsx
+	${projectName}_WGS-typing-00.xlsx ${projectName}_pbp-typing.xlsx >> $project/tmp/merge_reports.log 2>&1
 	# add PopPunk results
 	Rscript $SCRIPTS_DIR/adding_poppunk_results.R $reportsDir \
-	${projectName}_WGS-typing-report.xlsx \
+	${projectName}_WGS-typing-00.xlsx \
 	assigned_gpscs.xlsx \
 	assigned_clusters.xlsx \
-	${projectName}_WGS-typing-poppunk_report.xlsx 
-	# add confindr results to the final report
-        Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-        ${projectName}_WGS-typing-poppunk_report.xlsx ${projectName}-confindr-final.xlsx \
-        ${projectName}_WGS-typing-conf-report.xlsx
-        # add bactInspector results to the final report
-        Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-        ${projectName}_WGS-typing-conf-report.xlsx ${projectName}-bactInspector.xlsx \
-        ${projectName}_WGS-typing-final-report.xlsx
-
+	${projectName}_WGS-typing-01.xlsx >> $project/tmp/add_poppunk.log 2>&1
+#	# add confindr results to the final report
+#        Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+#        ${projectName}_WGS-typing-poppunk_report.xlsx ${projectName}-confindr-final.xlsx \
+#        ${projectName}_WGS-typing-conf-report.xlsx >> $project/tmp/add_confindr.log 2>&1
+#	# add bactInspector results to the final report
+#        Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+#        ${projectName}_WGS-typing-conf-report.xlsx ${projectName}-bactInspector.xlsx \
+#        ${projectName}_WGS-typing-bactInsp-report.xlsx >> $project/tmp/add_bactInspector.log 2>&1
+#        # add coverage results results to the final report
+#        Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+#        ${projectName}_WGS-typing-bactInsp-report.xlsx ${projectName}-coverage-final.xlsx \
+#        ${projectName}_WGS-typing-final-report.xlsx >> $project/tmp/add_coverage.log 2>&1
 else
  	Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir \
 	${projectName}_quastResults.xlsx ${projectName}_mlstResults.xlsx \
 	${projectName}-ariba_final.xlsx ${projectName}-kraken_combinedReports.xlsx \
-	${projectName}_WGS-typing-report.xlsx
-	# add confindr results to the final report
-	Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-        ${projectName}_WGS-typing-report.xlsx ${projectName}-confindr-final.xlsx \
-        ${projectName}_WGS-typing-conf-report.xlsx
-	# add bactInspector results to the final report
-	Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-        ${projectName}_WGS-typing-conf-report.xlsx ${projectName}-bactInspector.xlsx \
-        ${projectName}_WGS-typing-final-report.xlsx
+	${projectName}_WGS-typing-01.xlsx >> $project/tmp/merge_reports.log 2>&1
+#	# add confindr results to the final report
+#	Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+#        ${projectName}_WGS-typing-report.xlsx ${projectName}-confindr-final.xlsx \
+#        ${projectName}_WGS-typing-conf-report.xlsx >> $project/tmp/add_confindr.log 2>&1
+#	# add bactInspector results to the final report
+#        Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+#        ${projectName}_WGS-typing-conf-report.xlsx ${projectName}-bactInspector.xlsx \
+#        ${projectName}_WGS-typing-bactInsp-report.xlsx >> $project/tmp/add_bactInspector.log 2>&1
+#        # add coverage results results to the final report
+#        Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+#        ${projectName}_WGS-typing-bactInsp-report.xlsx ${projectName}-coverage-final.xlsx \
+#        ${projectName}_WGS-typing-final-report.xlsx >> $project/tmp/add_coverage.log 2>&1
 fi
 
 # add confindr results to the final report
-#Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-#        ${projectName}_WGS-typing-report.xlsx ${projectName}-confindr-final.xlsx \
-#        ${projectName}_WGS-typing-conf-report.xlsx
-
+Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+        ${projectName}_WGS-typing-01.xlsx ${projectName}-confindr-final.xlsx \
+        ${projectName}_WGS-typing-conf-02.xlsx >> $project/tmp/add_confindr.log 2>&1
 # add bactInspector results to the final report
-#Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-#	${projectName}_WGS-typing-conf-report.xlsx ${projectName}-bactInspector.xlsx \
-#	${projectName}_WGS-typing-final-report.xlsx
+Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+        ${projectName}_WGS-typing-conf-02.xlsx ${projectName}-bactInspector.xlsx \
+        ${projectName}_WGS-typing-bactInsp-03.xlsx >> $project/tmp/add_bactInspector.log 2>&1
+# add coverage results results to the final report
+Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+        ${projectName}_WGS-typing-bactInsp-03.xlsx ${projectName}-coverage-final.xlsx \
+        ${projectName}_WGS-typing-final-report.xlsx >> $project/tmp/add_coverage.log 2>&1
 
-date
 value=$(wc -l $filename | awk '{print $1}')
-echo -e "[[`date`]] Analysis of ${value} samples completed"
-echo "==================================================================="
-echo -e "===============================================================\n"
+echo -e "\t[`date +"%d-%b-%Y %T"`]\tAnalysis of ${value} samples completed"
+echo -e "\t[`date +"%d-%b-%Y %T"`]\tWGS typing results are in file: $reportsDir/${projectName}_WGS-typing-final-report.xlsx"
+

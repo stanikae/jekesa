@@ -24,8 +24,9 @@ fq2=$(find $indir -maxdepth 1 -name "${sample}_S*val_2*.gz")
 fqU1=$(find $indir -name "${sample}_S*unpaired_1*f*q.gz")
 fqU2=$(find $indir -name "${sample}_S*unpaired_2*f*q.gz")
 
-echo $threads	
-shovill --force --depth 100 --cpus 16 --ram 48 --assembler $assembler --outdir $spadesDir/$sample --R1 $fq1 --R2 $fq2 
+echo $threads
+ram=$(expr ${threads} \* 3)	
+shovill --force --depth 100 --cpus $threads --ram $ram --assembler $assembler --outdir $spadesDir/$sample --R1 $fq1 --R2 $fq2 
 
 # get WGS statistics from the shovill log
 echo -e "SampleID,Read_avg_len,Read_min_len,Read_max_len,Total_reads,Coverage,Genome_size,Seq_depth,Seq_depth,Depth_downsampled_to" > $spadesDir/$sample/wgs_stats.csv
