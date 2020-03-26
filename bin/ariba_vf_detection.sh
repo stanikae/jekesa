@@ -7,11 +7,11 @@
 #$project/ariba_${now}
 #mkdir -p $aribaVF_Dir
 
-aribaVF_Dir=$project/virulenceFactorDetection
+#aribaVF_Dir=$project/virulenceFactorDetection
 
-if ! [ -d $aribaVF_Dir ]; then
- mkdir -p $aribaVF_Dir
-fi
+#if ! [ -d $aribaVF_Dir ]; then
+# mkdir -p $aribaVF_Dir
+#fi
  
 sample=$samples
 trimmedReads=$filteredReads
@@ -24,7 +24,7 @@ fq1=$aribaVF_Dir/${sample}_1.fastq.gz
 fq2=$aribaVF_Dir/${sample}_2.fastq.gz
 
 
-ariba run $ariba_VFref $fq1 $fq2 $aribaVF_Dir/${sample}.run
+ariba run --threads $threads $ariba_VFref $fq1 $fq2 $aribaVF_Dir/${sample}.run
 #rm $aribaVF_Dir/${sample}_1.fastq.gz $aribaVF_Dir/${sample}_2.fastq.gz
 rm $fq1 $fq2
 mv $aribaVF_Dir/${sample}.run/report.tsv $aribaVF_Dir/${sample}.run/${sample}-report.tsv

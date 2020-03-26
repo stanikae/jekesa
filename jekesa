@@ -121,6 +121,7 @@ declare -x mlstDir=$project/mlst_output\_$now
 declare -x aribaDir=$project/ariba_${now}
 declare -x confindrDir=$project/confindr_${now}
 declare -x bactInspectorDir=$project/bactInspector
+declare -x aribaVF_Dir=$project/aribaVF_${now}
 
 if [[ "$MLSTscheme" == "spneumoniae" ]]
  then
@@ -156,15 +157,15 @@ fi
 if ! [ -d "$trimgaloreDir" ]
  then
 	declare -x trimgaloreDir=$project/trimGalore\_$now
-#	declare -x qcReports=$trimgaloreDir/fastqcReports_filtered
+	declare -x qcReports=$trimgaloreDir/fastqcReports_filtered
 	declare -x trimmedReads=$trimgaloreDir/clean_reads
 	mkdir -p $trimgaloreDir
-#	mkdir -p $qcReports
+	mkdir -p $qcReports
 	mkdir -p $trimmedReads
 	#$SCRIPTS_DIR/fastq_trimming_trmGalore.sh
  else
 	declare -x trimgaloreDir=$(find $project -name "trimGalore*" -type d ) #$project/trimGalore*
-#        declare -x qcReports=$(find $trimgaloreDir -name "fastqcReports_filtered*" -type d ) #$trimgaloreDir/fastqcReports_filtered
+        declare -x qcReports=$(find $trimgaloreDir -name "fastqcReports_filtered*" -type d ) #$trimgaloreDir/fastqcReports_filtered
         declare -x trimmedReads=$(find $trimgaloreDir -name "clean_reads" -type d )
 fi
 
@@ -175,6 +176,9 @@ mkdir -p $aribaDir
 mkdir -p $confindrDir
 mkdir -p $bactInspectorDir
 
+if ! [ -d $aribaVF_Dir ]; then
+ mkdir -p $aribaVF_Dir
+fi
 # output directory for bactInspector
 #declare -x bact_out=$project/bactInspector
 
@@ -190,7 +194,7 @@ declare -x schemeList=$project/schemeList.txt
 ## databases ##
 # ariba reference database
 declare -x ariba_ref=$DATABASES_DIR/ariba_DBs/out.card.prepareref
-declare -x ariba_VFref=$DATABASES_DIR/ariba_DBs/out.vfdb_full.prepareref
+declare -x ariba_VFref=$DATABASES_DIR/ariba_DBs/out.vfdb_core.prepareref
 # minikraken database
 #declare -x krakenDB=/media/60tb/src/kraken/NCBI
 declare -x krakenDB=$DATABASES_DIR/kraken_db
@@ -247,15 +251,12 @@ for sampleID in $(cat $filename)
 	  filteredReads=$trimmedReads
 
 	  echo -e "\t[`date +"%d-%b-%Y %T"`]\tPerforming bacterial de novo genome assembly using spades and MLST typing"
-	  #if [[ "$assembler" == "spades" ]]; then
-	  #   nohup $SCRIPTS_DIR/spades_assembly_server.sh & 
-	  #else 
-	     #nohup $SCRIPTS_DIR/skesa_assembly.sh &
 	  nohup $SCRIPTS_DIR/shovill_assembly.sh >> $spadesDir/shovill_assembly.log 2>&1 &
-	  #fi
+	  
 	  # Detection of resistance genes, virulence factors and plasmid detection
-          echo -e "\t[`date +"%d-%b-%Y %T"`]\tPerforming detection of resistance genes using ARIBA"
+          echo -e "\t[`date +"%d-%b-%Y %T"`]\tPerforming detection of resistance genes and virulence factors using ARIBA"
 	  nohup $SCRIPTS_DIR/ariba_typing_server.sh >> $aribaDir/ariba_AMRtyping.log 2>&1 & 
+          nohup $SCRIPTS_DIR/ariba_vf_detection.sh >> $project/tmp/ariba_VFtyping.log 2>&1 &
 
 	  # serotyping of S. pneumon using seroBA
 	  if [[ "$MLSTscheme" == "spneumoniae" ]]; then
@@ -323,22 +324,62 @@ Rscript $SCRIPTS_DIR/converting_tsv_2_xlsx.R \
 fi
 
 # summarizing the identified resistance genes
-ariba summary --known_variants $aribaDir/${projectName}-ariba_known_variants.summary `find $aribaDir -name "*-report.tsv"`
+# get known variants
+ariba summary --known_variants $aribaDir/${projectName}-aribaAMR_known_variants.summary `find $aribaDir -name "*-report.tsv"`
+# get novel variants
+ariba summary --novel_variants $aribaDir/${projectName}-aribaAMR_novel_variants.summary `find $aribaDir -name "*-report.tsv"`
 # ariba cluster all
-ariba summary --preset cluster_all $aribaDir/${projectName}-ariba_cluster_all_summary `find $aribaDir -name "*-report.tsv"`
+ariba summary --preset cluster_all $aribaDir/${projectName}-aribaAMR_cluster_all.summary `find $aribaDir -name "*-report.tsv"`
 # editing the report summary
 if [[ "$MLSTscheme" == "spneumoniae" ]]; then
-  cat $aribaDir/${projectName}-ariba_known_variants.summary.csv | \
-  sed 's|.*\.run/||' | sed 's|-report.tsv||' | \
-  sed 's|Streptococcus_pneumoniae|SPN|g' > $aribaDir/${projectName}-ariba-final.csv
+  for var in $(echo -e "known_variants\nnovel_variants\ncluster_all"); do
+    cat $aribaDir/${projectName}-aribaAMR_${var}.summary.csv | \
+    sed 's|.*\.run/||' | sed 's|-report.tsv||' \
+    sed 's|Streptococcus_pneumoniae|SPN|g' > $aribaDir/${projectName}-aribaAMR-${var}-final.csv
+  done
 else
-  cat $aribaDir/${projectName}-ariba_known_variants.summary.csv | \
-  sed 's|.*\.run/||' | sed 's|-report.tsv||' > $aribaDir/${projectName}-ariba-final.csv
+  for var in $(echo -e "known_variants\nnovel_variants\ncluster_all"); do
+    cat $aribaDir/${projectName}-aribaAMR_${var}.summary.csv | \
+    sed 's|.*\.run/||' | sed 's|-report.tsv||' > $aribaDir/${projectName}-aribaAMR-${var}-final.csv
+  done
 fi
 # writing ariba report to xlsx
-Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
-	$aribaDir/${projectName}-ariba-final.csv \
-	$reportsDir/${projectName}-ariba_final.xlsx >> $project/tmp/converting_csv.log 2>&1
+for var in $(echo -e "known_variants\nnovel_variants\ncluster_all"); do
+    Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
+	$aribaDir/${projectName}-aribaAMR-${var}-final.csv \
+	$reportsDir/${projectName}-aribaAMR-${var}-final.xlsx >> $project/tmp/converting_csv.log 2>&1
+done
+
+# copy ariba AMR .tre and .csv files to reports directory
+rsync -a $aribaDir/*{tre,csv} $reportsDir/ariba-AMR/
+
+# summarizing the identified virulence factors
+# get known variants
+ariba summary --known_variants $aribaVF_Dir/${projectName}-aribaVF_known_variants.summary `find $aribaVF_Dir -name "*-report.tsv"`
+# get novel variants
+ariba summary --novel_variants $aribaVF_Dir/${projectName}-aribaVF_novel_variants.summary `find $aribaVF_Dir -name "*-report.tsv"`
+# ariba cluster all
+ariba summary --preset cluster_all $aribaVF_Dir/${projectName}-aribaVF_cluster_all.summary `find $aribaVF_Dir -name "*-report.tsv"`
+# editing the know_variats report summary
+for var in $(echo -e "known_variants\nnovel_variants\ncluster_all"); do
+    cat $aribaVF_Dir/${projectName}-aribaVF_${var}.summary.csv | \
+    sed 's|.*\.run/||' | sed 's|-report.tsv||' > $aribaVF_Dir/${projectName}-aribaVFs-${var}-final.csv
+    # convert .csv to .xlsx
+    Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
+    $aribaVF_Dir/${projectName}-aribaVFs-${var}-final.csv \
+    $reportsDir/${projectName}-aribaVFs-${var}-final.xlsx >> $project/tmp/converting_csv.log 2>&1
+done
+
+# merge and write ariba AMR and VF reports to xlsx
+Rscript $SCRIPTS_DIR/merge_files.R \
+	$reportsDir \
+	${projectName}-aribaAMR-known_variants-final.xlsx \
+	${projectName}-aribaVFs-known_variants-final.xlsx \
+	${projectName}-ariba_final.xlsx
+
+# copy ariba VF .tre and .csv files to reports directory
+rsync -a $aribaVF_Dir/*{tre,csv} $reportsDir/ariba-VFs/
+###########################################################################################
 
 # seroba output compilation
 if [[ "$MLSTscheme" == "spneumoniae" ]]; then
@@ -491,18 +532,6 @@ if [[ "$MLSTscheme" == "spneumoniae" ]]; then
 	assigned_gpscs.xlsx \
 	assigned_clusters.xlsx \
 	${projectName}_WGS-typing-01.xlsx >> $project/tmp/add_poppunk.log 2>&1
-#	# add confindr results to the final report
-#	Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-#        ${projectName}_WGS-typing-poppunk_report.xlsx ${projectName}-confindr-final.xlsx \
-#        ${projectName}_WGS-typing-conf-report.xlsx >> $project/tmp/add_confindr.log 2>&1
-#	# add bactInspector results to the final report
-#	Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-#        ${projectName}_WGS-typing-conf-report.xlsx ${projectName}-bactInspector.xlsx \
-#        ${projectName}_WGS-typing-bactInsp-report.xlsx >> $project/tmp/add_bactInspector.log 2>&1
-#	# add coverage results results to the final report
-#        Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-#        ${projectName}_WGS-typing-bactInsp-report.xlsx ${projectName}-coverage-final.xlsx \
-#        ${projectName}_WGS-typing-final-report.xlsx >> $project/tmp/add_coverage.log 2>&1
 
 elif [[ "$MLSTscheme" == "spyogenes" ]]; then
  	Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir \
@@ -517,35 +546,11 @@ elif [[ "$MLSTscheme" == "spyogenes" ]]; then
 	assigned_gpscs.xlsx \
 	assigned_clusters.xlsx \
 	${projectName}_WGS-typing-01.xlsx >> $project/tmp/add_poppunk.log 2>&1
-#	# add confindr results to the final report
-#        Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-#        ${projectName}_WGS-typing-poppunk_report.xlsx ${projectName}-confindr-final.xlsx \
-#        ${projectName}_WGS-typing-conf-report.xlsx >> $project/tmp/add_confindr.log 2>&1
-#	# add bactInspector results to the final report
-#        Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-#        ${projectName}_WGS-typing-conf-report.xlsx ${projectName}-bactInspector.xlsx \
-#        ${projectName}_WGS-typing-bactInsp-report.xlsx >> $project/tmp/add_bactInspector.log 2>&1
-#        # add coverage results results to the final report
-#        Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-#        ${projectName}_WGS-typing-bactInsp-report.xlsx ${projectName}-coverage-final.xlsx \
-#        ${projectName}_WGS-typing-final-report.xlsx >> $project/tmp/add_coverage.log 2>&1
 else
  	Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir \
 	${projectName}_quastResults.xlsx ${projectName}_mlstResults.xlsx \
 	${projectName}-ariba_final.xlsx ${projectName}-kraken_combinedReports.xlsx \
 	${projectName}_WGS-typing-01.xlsx >> $project/tmp/merge_reports.log 2>&1
-#	# add confindr results to the final report
-#	Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-#        ${projectName}_WGS-typing-report.xlsx ${projectName}-confindr-final.xlsx \
-#        ${projectName}_WGS-typing-conf-report.xlsx >> $project/tmp/add_confindr.log 2>&1
-#	# add bactInspector results to the final report
-#        Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-#        ${projectName}_WGS-typing-conf-report.xlsx ${projectName}-bactInspector.xlsx \
-#        ${projectName}_WGS-typing-bactInsp-report.xlsx >> $project/tmp/add_bactInspector.log 2>&1
-#        # add coverage results results to the final report
-#        Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-#        ${projectName}_WGS-typing-bactInsp-report.xlsx ${projectName}-coverage-final.xlsx \
-#        ${projectName}_WGS-typing-final-report.xlsx >> $project/tmp/add_coverage.log 2>&1
 fi
 
 # add confindr results to the final report

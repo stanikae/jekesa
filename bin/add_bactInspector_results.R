@@ -29,25 +29,12 @@ wgs <- read_excel(paste(dir,args[2], sep = "/"), col_names = TRUE)
 gpsc <- read_excel(paste(dir, args[3], sep = "/"), col_names = TRUE)
 #clusters <- read_excel(paste(dir, args[4], sep = "/"), col_names = TRUE)
 
-# remove additional strings to remain with only sample ID
-#colnames(gpsc) <- str_remove(colnames(gpsc), "_scaffolds.fasta|_assembly.fasta")
-#colnames(clusters) <- str_remove(colnames(clusters), "_scaffolds.fasta|_assembly.fasta")
-
-
 names(gpsc)[1] <- "SampleID"
-#names(clusters)[1] <- "SampleID"
-
-#gpsc$SampleID <- str_remove(gpsc$SampleID, "_scaffolds.fasta|_assembly.fasta")
-#clusters$SampleID <- str_remove(clusters$SampleID, "_scaffolds.fasta|_assembly.fasta")
-
 brack <- openxlsx::createWorkbook()
 sh_name <- "WGS-Typing-Report"
 ## create and add a style to the column headers
 headerStyle <- createStyle(textDecoration ="bold") #, halign = "center")
 openxlsx::addWorksheet(brack, sheetName = sh_name)
-#openxlsx::writeData(brack, sheet = sh_name, final_file)
-#openxlsx::freezePane(brack, sheet = sh_name, firstRow = T)
-#openxlsx::addStyle(brack, sheet = sh_name, headerStyle, rows = 1, cols = 1:ncol(final_file),gridExpand = TRUE)
 
 if (length(args) == 4) {
 
