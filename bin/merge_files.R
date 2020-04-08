@@ -21,8 +21,11 @@ dir <- file.path(args[1])
 file1 <- read_excel(paste(dir,args[2], sep = "/"), col_names = TRUE)
 file2 <- read_excel(paste(dir, args[3], sep = "/"), col_names = TRUE)
 
-file1$type <- rep("AMR", nrow(file1))
-file2$type <- rep("VFs", nrow(file1))
+file1$AMRGenes <- rep("AMR", nrow(file1))
+file2$VFGenes <- rep("VFs", nrow(file1))
+
+file1 <- file1 %>% dplyr::select(name,AMRGenes, everything())
+file2 <- file2 %>% dplyr::select(name,VFGenes, everything())
 
 cmd_df <- dplyr::full_join(file1, file2, by='name')
 
