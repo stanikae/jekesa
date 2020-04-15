@@ -119,6 +119,9 @@ cd $HOME/poppunk_db
 tar -jxf GAS_query_v2.tar.bz2
 tar -jxf GPS_query.tar.bz2
 ln -s $HOME/poppunk_db jekesa/db/kraken_db
+
+## ConFindr databases
+To set up ConFindr databases kindly follow instructions here: https://olc-bioinformatics.github.io/ConFindr/install/ as this requires registration on PubMLST.
 `````
 #### Setting-up environment for srst2 and its dependencies
 
