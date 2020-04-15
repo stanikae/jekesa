@@ -7,7 +7,7 @@ Jekesa (Illuminate) currently runs on a server (single compute node), and the fo
 #### _De novo_ genome assembly and classification
 * QC and read filtering using [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) and [trim_galore](https://github.com/FelixKrueger/TrimGalore).
 * Species identification and closest reference detection using [Bactinspector](https://gitlab.com/antunderwood/bactinspector). 
-* Check for contamination using [kraken2](https://ccb.jhu.edu/software/kraken2/index.shtml) and [MiniKraken2_v2_8GB](https://ccb.jhu.edu/software/kraken2/index.shtml?t=downloads)
+* Check for contamination using [ConFindr](https://github.com/OLC-Bioinformatics/ConFindr), [kraken2](https://ccb.jhu.edu/software/kraken2/index.shtml) and [MiniKraken2_v2_8GB](https://ccb.jhu.edu/software/kraken2/index.shtml?t=downloads)
 * De novo assembly using either [SKESA](https://github.com/ncbi/SKESA), [SPAdes](http://cab.spbu.ru/software/spades/), [MEGAHIT](https://github.com/voutcn/megahit), or [velvet](https://github.com/dzerbino/velvet) as implemented in [Shovill](https://github.com/tseemann/shovill).
 
 #### MLST typing
@@ -17,7 +17,7 @@ Jekesa (Illuminate) currently runs on a server (single compute node), and the fo
 - Anti-microbial resistance gene predicition from clean reads using [ariba](https://github.com/sanger-pathogens/ariba) and either [CARD](https://card.mcmaster.ca/) (The Comprehensive Antibiotic Resistance Database) or [resfinder database](https://bitbucket.org/genomicepidemiology/resfinder_db/src/master/).
 
 #### Virulence gene predicition
-- Coming soon
+- Virulence fatcor detection from cleaned reads using [ariba](https://github.com/sanger-pathogens/ariba) and the [VFDB](http://www.mgc.ac.cn/VFs/).
 
 #### Plasmid detection
 - Coming soon
