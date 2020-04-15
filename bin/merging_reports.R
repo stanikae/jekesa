@@ -20,12 +20,6 @@ library(readxl)
 # get input using arguments
 args <- commandArgs(TRUE)
 
-#print(args[1]) # path denovo assembly reports directory
-#print(args[2]) # assembly metrics file
-#print(args[3]) # mlst results file
-#print(args[4]) # seroba results file
-#print(args[5]) # combined results output file
-
 #getwd()
 dir <- file.path(args[1])
 print(dir)
@@ -38,24 +32,6 @@ ariba <- read_excel(paste(dir, args[4], sep = "/"), col_names = TRUE)
 kraken <- read_excel(paste(dir, args[5], sep = "/"), col_names = TRUE)
 #pili <- read_excel(paste(dir, args[8], sep = "/"), col_names = TRUE)
 #pbp <- read_excel(paste(dir, args[9], sep = "/"), col_names = TRUE)
-
-# read.delim(file, header = TRUE, sep = "\t", quote = "\"", dec = ".", fill = TRUE, comment.char = "", ...)
-
-
-# metrics to get
-# "# contigs (>= 200 bp)"
-# "# contigs"
-# "Total length"
-# "GC (%)"
-# "N50"
-# "Complete BUSCO (%)"
-# "Coverage >= 10x (%)"
-#head(metricsQC);nrow(metricsQC)
-#metricsQC <- metricsQC %>% dplyr::filter(Assembly %in% c("# contigs (>= 200 bp)", "Largest contig", "Total length","GC (%)", "N50","Coverage >= 10x (%)",
-#					"# total reads", "# properly paired", "Avg. coverage depth", "# predicted genes (unique)", "# predicted rRNA genes"))
-# check metricsQC
-#metricsQC <- metricsQC %>% dplyr::filter(Assembly %in% c("# contigs (>= 200 bp)", "Largest contig", "Total length","GC (%)", "N50"))
-#head(metricsQC);nrow(metricsQC)
 
 #metrics1 <- metrics %>% dplyr::filter(Assembly %in% c("# contigs (>= 200 bp)", "Largest contig", "Total length","GC (%)", "N50","Coverage >= 10x (%)"))
 metrics1 <- metrics %>% dplyr::filter(Assembly %in% c("# contigs (>= 200 bp)", "Largest contig", "Total length","GC (%)", "N50"))
@@ -136,12 +112,6 @@ if (length(args) == 9) {
 	names(pili)[1] <- "SampleID"
 	names(pbp)[1] <- "SampleID"
 	# Merging the three data sets, metrics, mlst, and serotyping
-	#head(metricsQC); nrow(metricsQC)
-	#head(metrics2); nrow(metrics2)
-	#head(mlst); nrow(mlst)
-	#head(ariba);nrow(ariba)
-	#head(seroba); nrow(seroba)
-	#library(plyr)
 	cmd_df <- plyr::join_all(list(kraken,metrics2,pili,seroba,mlst,ariba,pbp), by='SampleID', type='full')
 	#nrow(cmd_df)
 	head(cmd_df);tail(cmd_df);nrow(cmd_df)
@@ -177,51 +147,6 @@ if (length(args) == 9) {
 
         # write results to xlsx file
         openxlsx::write.xlsx(cmd_df, paste(dir, args[6], sep = "/"), overwrite = T)
-#	/home/stanford
-#	openxlsx::write.xlsx(cmd_df, paste("/home/stanford", args[6], sep = "/"))
 }
 
-# metrics to get
-# "# contigs (>= 200 bp)"
-# "# contigs"
-# "Total length"
-# "GC (%)"
-# "N50"
-# "Complete BUSCO (%)"
-# "Coverage >= 10x (%)"
-
-#metrics1 <- metrics %>% dplyr::filter(Assembly %in% c("# contigs","# contigs (>= 200 bp)","Total length",
-#                                          "GC (%)", "N50","Complete BUSCO (%)","Coverage >= 10x (%)"))
-# remove additional strings to remain with only sample ID
-#colnames(metrics1) <- str_remove(colnames(metrics1), "_scaffolds|_assembly")
-
-# transpose data using dplyr and tidyr
-#metrics2 <- metrics1 %>%
-#                gather(assembly, metrics, -Assembly) %>%
-#                spread(names(metrics1)[1], "metrics")
-
-################
-# mlst data
-#head(mlst)
-#mlst$FILE <- str_remove(mlst$FILE, "_scaffolds.fasta|_assembly.fasta")
-#names(mlst)[1] <- "assembly"
-###############
-# serotyping
-#head(seroba)
-#names(seroba)[1] <- "assembly"
-
-##############
-# Merging the three data sets, metrics, mlst, and serotyping
-
-#head(metrics2); nrow(metrics2)
-#head(mlst); nrow(mlst)
-#head(seroba); nrow(seroba)
-
-#library(plyr)
-#cmd_df <- plyr::join_all(list(metrics2,mlst,seroba), by='assembly', type='full')
-#nrow(cmd_df)
-#head(cmd_df);tail(cmd_df);nrow(cmd_df)
-
-# write results to xlsx file
-#openxlsx::write.xlsx(cmd_df, paste(dir, args[5], sep = "/"))
 

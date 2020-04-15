@@ -20,7 +20,7 @@ fq1=$aribaDir/${sample}_1.fastq.gz
 fq2=$aribaDir/${sample}_2.fastq.gz
 
 
-ariba run $ariba_ref $fq1 $fq2 $aribaDir/${sample}.run
+ariba run --threads $threads $ariba_ref $fq1 $fq2 $aribaDir/${sample}.run
 #rm $aribaDir/${sample}_1.fastq.gz $aribaDir/${sample}_2.fastq.gz
 rm $fq1 $fq2
 mv $aribaDir/${sample}.run/report.tsv $aribaDir/${sample}.run/${sample}-report.tsv

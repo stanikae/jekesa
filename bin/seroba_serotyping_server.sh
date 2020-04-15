@@ -38,8 +38,8 @@ cd $workDir
 echo $sample
 	#file1=$serobaDir/f1_1.fq
 	#file2=$serobaDir/f2_2.fq 
-fq1=$(find $indir -maxdepth 1 -name "${sample}*val_1*.gz") #*val_1*.gz #_*val_1*fq.gz
-fq2=$(find $indir -maxdepth 1 -name "${sample}*val_2*.gz")
+fq1=$(find $indir -maxdepth 1 -name "${sample}_S*val_1*.gz") #*val_1*.gz #_*val_1*fq.gz
+fq2=$(find $indir -maxdepth 1 -name "${sample}_S*val_2*.gz")
 name=$(basename $fq1 | cut -d_ -f1)
 echo -e "$fq1\t$fq2"
 file1=$serobaDir/$name\_1.fq

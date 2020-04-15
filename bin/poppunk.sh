@@ -1,21 +1,14 @@
 #!/bin/bash
-#/media/60tb/nicd/crdm/bacteriology/sibusisiwe/Repeated-Analyis/190823_M02621
+
 run_id=$(basename $1)
-#sampleList=$2
-spadesDir=$(find $1 -type d -name "spades_*") #~/kedibone/35B-Isolates/spades_11_Sep_2019
-poppunk_dir=$1/poppunk-analysis #~/kedibone/35B-Isolates/poppunk
+spadesDir=$(find $1 -type d -name "spades_*")
+poppunk_dir=$1/poppunk-analysis
 reports_dir=$(find $1 -type d -name "Reports_${run_id}_*")
 echo -e "\n$spadesDir"
 echo -e "\n$reports_dir\n"
-#spadesDir=~/kedibone/35B-Isolates/spades_11_Sep_2019
-#poppunk_dir=~/kedibone/35B-Isolates/poppunk-03
-#poppunk_report=/media/60tb/nicd/crdm/bacteriology/kedibone/35B-Isolates/Reports_35B-Isolates_11_Sep_2019/poppunk
 threads=8 #$threads
-refDB_dir=/media/60tb/Databases/PopPunk-Databases
-#refDB_dir=$DATABASES_DIR/poppunk_db
-#MLSTscheme="spyogenes"
-#MLSTscheme="spneumoniae"
-echo $MLSTscheme
+refDB_dir=$DATABASES_DIR/poppunk_db #/media/60tb/Databases/PopPunk-Databases
+# echo $MLSTscheme
 MLSTscheme=$MLSTscheme
 
 # create poppunk work directory
@@ -30,14 +23,23 @@ if [ -d "$reports_dir" ]; then
 fi
 
 # create list of assemblies to analyze
+while read -r line; do 
+  if [[ "$line" =~ "$MLSTscheme" ]]; then 
+     name=$(echo $line | cut -d ' ' -f1)
+     #ls ~/kedibone/35B-Isolates/spades*/${name}/${name}*_assembly.fasta
+     ls $spadesDir/${name}/${name}*_assembly.fasta >> $poppunk_dir/reference_list.txt
+  fi
+done < $mlstDir/mlst_merged.tsv
+
 #ls $spadesDir/*/*.fasta | grep -f $sampleList > $poppunk_dir/reference_list.txt
-ls $spadesDir/*/*_assembly.fasta > $poppunk_dir/reference_list.txt
+#ls $spadesDir/*/*_assembly.fasta > $poppunk_dir/reference_list.txt
 
 # create grep list of IDs
 cat $poppunk_dir/reference_list.txt | awk -F '/' '{print $NF}' > $poppunk_dir/grep_list.txt
 
+if [[ $(wc -l < $poppunk_dir/reference_list.txt) -ge 4 ]]; then
 # run poppunk
-echo -e "\nBeginning PopPunk run"; date
+echo -e "\t[`date +"%d-%b-%Y %T"`]\tBeginning PopPunk run for project $projectName"
 cd $poppunk_dir
 #poppunk --create-db --r-files $poppunk_dir/reference_list.txt --output strain_db --threads $threads --plot-fit 5
 #poppunk --easy-run --r-files reference_list.txt --output spn_db --threads $threads --plot-fit 5 --min-k 13 --full-db --microreact --phandango
@@ -50,16 +52,16 @@ if [[ "$MLSTscheme" == "spyogenes" ]]; then
 	--model-dir $refDB_dir/GAS_query_v2 \
 	--q-files reference_list.txt \
 	--output gas_db --threads $threads --ignore-length \
-	--update-db --microreact --phandango
+	--update-db --microreact --phandango >> $project/tmp/poppunk.log
 elif [[ "$MLSTscheme" == "spneumoniae" ]]; then 
    poppunk --assign-query --ref-db $refDB_dir/GPS_query \
 	--distances $refDB_dir/GPS_query/GPS_query.dists \
 	--model-dir $refDB_dir/GPS_query \
 	--q-files reference_list.txt \
 	--output spn_db --threads $threads --full-db \
-	--external-clustering $refDB_dir/gpsc_definitive.csv --update-db --microreact --phandango --cytoscape
+	--external-clustering $refDB_dir/gpsc_definitive.csv --update-db --microreact --phandango --cytoscape >> $project/tmp/poppunk.log
 else
-   poppunk --create-db --r-files $poppunk_dir/reference_list.txt --output strain_db --threads $threads --plot-fit 5
+   poppunk --create-db --r-files $poppunk_dir/reference_list.txt --output strain_db --threads $threads --plot-fit 5 >> $project/tmp/poppunk.log
    #poppunk --easy-run --r-files reference_list.txt --output spn_db --threads $threads --plot-fit 5 --min-k 13 --full-db --microreact --phandango
    # --cytoscape
 fi
@@ -70,7 +72,8 @@ fi
 	# A high density suggests the fit was not specific enough
 	# and too many points in the core-accessory plot have been included as within strain
 # re-fitting model (using DBSCAN)
-echo -e "\nRe-fitting model"; date
+#echo -e "\nRe-fitting model"; date
+echo -e "\t[`date +"%d-%b-%Y %T"`]\tBeginning PopPunk run for project $projectName"
 #poppunk --fit-model --distances spn_db/*.dists --ref-db spn_db --output spn_db --full-db --dbscan
 #poppunk --easy-run --r-files $poppunk_dir/reference_list.txt --output spn_db --threads $threads --full-db --microreact --cytoscape --phandango
 
@@ -78,31 +81,45 @@ echo -e "\nRe-fitting model"; date
 
 # creating GPSC output file
 if [[ "$MLSTscheme" == "spyogenes" ]]; then
+	echo -e "\t[`date +"%d-%b-%Y %T"`]\tCreating PopPunk output file for $MLSTscheme"
 	head -n1 $poppunk_dir/gas_db/gas_db_clusters.csv > $poppunk_dir/assigned_gpscs.csv
         grep -F -f $poppunk_dir/grep_list.txt $poppunk_dir/gas_db/gas_db_clusters.csv | sed 's|/.*/||g' >> $poppunk_dir/assigned_gpscs.csv
-	Rscript ~/repos/jekesa/bin/converting_csv_2_xlsx.R $poppunk_dir/assigned_gpscs.csv $reports_dir/assigned_gpscs.xlsx
+	Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
+		$poppunk_dir/assigned_gpscs.csv $reports_dir/assigned_gpscs.xlsx >> $project/tmp/poppunk_converting_csv.log
 	# determine if the novel (NA) files are the same or not using the clusters.csv file
 	head -n1 $poppunk_dir/gas_db/gas_db_clusters.csv > $poppunk_dir/assigned_clusters.csv
         grep -F -f $poppunk_dir/grep_list.txt $poppunk_dir/gas_db/gas_db_clusters.csv | sed 's|/.*/||g' >> $poppunk_dir/assigned_clusters.csv
-	Rscript ~/repos/jekesa/bin/converting_csv_2_xlsx.R $poppunk_dir/assigned_clusters.csv $reports_dir/assigned_clusters.xlsx	
+	Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
+		$poppunk_dir/assigned_clusters.csv $reports_dir/assigned_clusters.xlsx >> $project/tmp/poppunk_converting_csv.log
 elif [[ "$MLSTscheme" == "spneumoniae" ]]; then
+	echo -e "\t[`date +"%d-%b-%Y %T"`]\tCreating PopPunk GPSC output file for $MLSTscheme" 
 	head -n1 $poppunk_dir/spn_db/spn_db_external_clusters.csv > $poppunk_dir/assigned_gpscs.csv
 	grep -F -f $poppunk_dir/grep_list.txt $poppunk_dir/spn_db/spn_db_external_clusters.csv | sed 's|/.*/||g' >> $poppunk_dir/assigned_gpscs.csv
-	Rscript ~/repos/jekesa/bin/converting_csv_2_xlsx.R $poppunk_dir/assigned_gpscs.csv $reports_dir/assigned_gpscs.xlsx
+	Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
+		$poppunk_dir/assigned_gpscs.csv $reports_dir/assigned_gpscs.xlsx >> $project/tmp/poppunk_converting_csv.log
 	# determine if the novel (NA) files are the same or not using the clusters.csv file
 	head -n1 $poppunk_dir/spn_db/spn_db_clusters.csv > $poppunk_dir/assigned_clusters.csv
         grep -F -f $poppunk_dir/grep_list.txt $poppunk_dir/spn_db/spn_db_clusters.csv | sed 's|/.*/||g' >> $poppunk_dir/assigned_clusters.csv
-	Rscript ~/repos/jekesa/bin/converting_csv_2_xlsx.R $poppunk_dir/assigned_clusters.csv $reports_dir/assigned_clusters.xlsx
+	Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
+		$poppunk_dir/assigned_clusters.csv $reports_dir/assigned_clusters.xlsx >> $project/tmp/poppunk_converting_csv.log
 else
 	head -n1 $poppunk_dir/strain_db/strain_db_external_clusters.csv > $poppunk_dir/assigned_gpscs.csv
         grep -F -f $poppunk_dir/grep_list.txt $poppunk_dir/strain_db/strain_db_external_clusters.csv | sed 's|/.*/||g' >> $poppunk_dir/assigned_gpscs.csv
-	Rscript ~/repos/jekesa/bin/converting_csv_2_xlsx.R $poppunk_dir/assigned_gpscs.csv $reports_dir/assigned_gpscs.xlsx
+	Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
+		$poppunk_dir/assigned_gpscs.csv $reports_dir/assigned_gpscs.xlsx >> $project/tmp/poppunk_converting_csv.log
 	# determine if the novel (NA) files are the same or not using the clusters.csv file
 	head -n1 $poppunk_dir/strain_db/strain_db_clusters.csv > $poppunk_dir/assigned_clusters.csv
         grep -F -f $poppunk_dir/grep_list.txt $poppunk_dir/strain_db/strain_db_clusters.csv | sed 's|/.*/||g' >> $poppunk_dir/assigned_clusters.csv	
-	Rscript ~/repos/jekesa/bin/converting_csv_2_xlsx.R $poppunk_dir/assigned_clusters.csv $reports_dir/assigned_clusters.xlsx
+	Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
+		$poppunk_dir/assigned_clusters.csv $reports_dir/assigned_clusters.xlsx >> $project/tmp/poppunk_converting_csv.log
 fi
 # Save results in the Reports directory
-echo -e "\ncopy final poppunk results to Reports directory"; date
+echo -e "\t[`date +"%d-%b-%Y %T"`]\tCopy final PopPunk results to the Reports directory"
 cp $poppunk_dir/*/*.{csv,nwk,dot} $poppunk_report/
-#Rscript bin/adding_poppunk_results.R ~/kedibone/35B-Isolates/Reports_35B-Isolates_11_Sep_2019 35B-Isolates_WGS-typing-report.xlsx assigned_gpscs.xlsx assigned_clusters.xlsx WGS-typing-poppunk-report.xlsx
+
+else
+    echo -e "\t[`date +"%d-%b-%Y %T"`]\tNumber of samples too low to run PopPunk for ${projectName} ...... provide at least 3 samples"
+fi
+#Rscript bin/adding_poppunk_results.R \
+#~/kedibone/35B-Isolates/Reports_35B-Isolates_11_Sep_2019 35B-Isolates_WGS-typing-report.xlsx \
+#assigned_gpscs.xlsx assigned_clusters.xlsx WGS-typing-poppunk-report.xlsx
