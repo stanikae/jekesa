@@ -17,7 +17,7 @@ Jekesa (Illuminate) currently runs on a server (single compute node), and the fo
 - Anti-microbial resistance gene predicition from clean reads using [ariba](https://github.com/sanger-pathogens/ariba) and either [CARD](https://card.mcmaster.ca/) (The Comprehensive Antibiotic Resistance Database) or [resfinder database](https://bitbucket.org/genomicepidemiology/resfinder_db/src/master/).
 
 #### Virulence gene predicition
-- Virulence fatcor detection from cleaned reads using [ariba](https://github.com/sanger-pathogens/ariba) and the [VFDB](http://www.mgc.ac.cn/VFs/).
+- Virulence factor detection from cleaned reads using [ariba](https://github.com/sanger-pathogens/ariba) and the [VFDB](http://www.mgc.ac.cn/VFs/).
 
 #### Plasmid detection
 - Coming soon
