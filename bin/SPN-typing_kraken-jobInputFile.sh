@@ -2,7 +2,7 @@
 
 
 #now=$(date +"%d_%b_%Y")
-
+# S_R2_val_2.fq.gz
 ###Will search thru every file in the batch directory and check if it matches the following regexs: _L.*_R1_001.fastq and _L.*_R2_001.fastq###
 ###If both paired end fastq files are found then the full paths of each file will be written to the 'job-control.txt' file###
 
@@ -17,12 +17,12 @@ do
     sampl_out=$out_analysis/$sampl_name
     eval sampl_out=$sampl_out
 
-    if [[ $sample =~ _S_val_1 ]]
+    if [[ $sample =~ _S_R1_val_1 ]]
     then
         readPair_1=$(echo "$sample") # | sed 's/_S/_S1_S/') #sed 's/_L\([0-9]\+\)_R1/_S1_L\1_R1/g')
     fi
 
-    if [[ $sample =~ _S_val_2 ]]
+    if [[ $sample =~ _S_R2_val_2 ]]
     then
         readPair_2=$(echo "$sample") # | sed 's/_S/_S2_S/') #sed 's/_L\([0-9]\+\)_R2/_S1_L\1_R2/g')
     fi

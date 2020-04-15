@@ -1,0 +1,3 @@
+input fasta file:	/home/stanford/repos/jekesa/db/ariba_DBs/out.vfdb_full.fa
+input tsv file:	/home/stanford/repos/jekesa/db/ariba_DBs/out.vfdb_full.tsv
+genetic_code	11
