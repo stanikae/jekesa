@@ -73,12 +73,24 @@ fi
 	# and too many points in the core-accessory plot have been included as within strain
 # re-fitting model (using DBSCAN)
 #echo -e "\nRe-fitting model"; date
-echo -e "\t[`date +"%d-%b-%Y %T"`]\tBeginning PopPunk run for project $projectName"
+#echo -e "\t[`date +"%d-%b-%Y %T"`]\tBeginning PopPunk run for project $projectName"
 #poppunk --fit-model --distances spn_db/*.dists --ref-db spn_db --output spn_db --full-db --dbscan
 #poppunk --easy-run --r-files $poppunk_dir/reference_list.txt --output spn_db --threads $threads --full-db --microreact --cytoscape --phandango
 
-# crating interactive output
+#score=$(cat ${tmp}/ppk-${now}.log | grep "Score" | awk '{print $NF}')
+#echo $score
+## score – a value of at least 0.8 would be expected for a good fit
+#if (( $(echo "$score < 0.8" | bc -l) )); then
+#echo -e "$score is less than 0.9, now running refitting model using dbscan"
+#poppunk --fit-model \
+#--distances ${db_name}_${now}/${db_name}_${now}.dists \
+#--ref-db ${db_name}_${now} --output ${db_name}_${now} \
+#--full-db --dbscan \
+#--info-csv $epi_info \
+#--microreact --phandango --cytoscape --grapetree > ${tmp}/ppk-dbscan-${now}.log 2>&1
+#fi
 
+# crating interactive output
 # creating GPSC output file
 if [[ "$MLSTscheme" == "spyogenes" ]]; then
 	echo -e "\t[`date +"%d-%b-%Y %T"`]\tCreating PopPunk output file for $MLSTscheme"

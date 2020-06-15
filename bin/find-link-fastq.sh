@@ -18,21 +18,32 @@ if [ -d $project ];
 	if ls -l $project | egrep -q "fastq|fq"; then 
 	 	echo -e "\n*** $project *** contains fastq files already"
 	else 
-		echo -e "\n*** $project *** exists and no fastq files present... exiting.."
-		exit
+		echo -e "\n*** $project *** exists and no fastq files present"
+		#exit
 	fi 
-     
+        echo -e "Now adding additional fastq files to ${project}\n"
+        for sample in `cat $filename`
+         do
+                found=`find $fastqDir -maxdepth 2 -name "${sample}_*.gz" -print`
+                if [ -z "$found" ]; then
+                        echo -e "$sample not found"
+                else
+                        find $fastqDir -maxdepth 2 -name "${sample}_*.gz" -exec ln -s {} $project \;
+                        #ln -s "$found" "$project"
+                        echo "$sample linked"
+                fi
+        done 
 #if not exists, make $project directory:
  elif [ ! -d $project ]
   then
 	mkdir -p $project
 	for sample in `cat $filename`
 	 do
-		found=`find $fastqDir -maxdepth 1 -name "${sample}_S*.gz" -print`
+		found=`find $fastqDir -maxdepth 2 -name "${sample}_*.gz" -print`
 		if [ -z "$found" ]; then
-    			echo -e "\n$sample not found"
+    			echo -e "$sample not found"
  		else
-			find $fastqDir -maxdepth 1 -name "${sample}_S*.gz" -exec ln -s {} $project \;
+			find $fastqDir -maxdepth 2 -name "${sample}_*.gz" -exec ln -s {} $project \;
 			#ln -s "$found" "$project"
 			echo "$sample linked"
  		fi

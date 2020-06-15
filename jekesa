@@ -122,6 +122,7 @@ declare -x aribaDir=$project/ariba_${now}
 declare -x confindrDir=$project/confindr_${now}
 declare -x bactInspectorDir=$project/bactInspector
 declare -x aribaVF_Dir=$project/aribaVF_${now}
+declare -x readsDir=$project/total_reads
 
 if [[ "$MLSTscheme" == "spneumoniae" ]]
  then
@@ -175,6 +176,7 @@ mkdir -p $mlstDir
 mkdir -p $aribaDir
 mkdir -p $confindrDir
 mkdir -p $bactInspectorDir
+mkdir -p $readsDir
 
 if ! [ -d $aribaVF_Dir ]; then
  mkdir -p $aribaVF_Dir
@@ -182,9 +184,10 @@ fi
 # output directory for bactInspector
 #declare -x bact_out=$project/bactInspector
 
-#if ! [ -d $bact_out ]; then
-# mkdir -p $bact_out
-#fi
+# create tmp directory
+if ! [ -d $project/tmp ]; then
+ mkdir -p $project/tmp
+fi
 
 # check if MLST scheme is present in the mlst database
 mlst --longlist > $project/schemeList.txt
@@ -210,7 +213,7 @@ declare -x confindrDB=$DATABASES_DIR/confindr_db
 ###################################################################################################################
 
 echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting quality control of sequencing reads for project: $projectName"
-nohup $SCRIPTS_DIR/fastqc_check_server.sh > $fastqc_out/fastqc_check.log 2>&1 &
+#nohup $SCRIPTS_DIR/fastqc_check_server.sh > $fastqc_out/fastqc_check.log 2>&1 &
 
 for sampleID in $(cat $filename)
  do 
@@ -221,7 +224,7 @@ for sampleID in $(cat $filename)
    nohup $SCRIPTS_DIR/trim-reads.sh >> $trimgaloreDir/trimGalore.log 2>&1 &
    nohup $SCRIPTS_DIR/get_coverageDepth.sh &
    wait
-	
+  	
    fileTest=$(find $trimmedReads -name "${samples}_*val_1*fq.gz")
    fileTest2=$(find $trimmedReads -name "${samples}_*val_2*fq.gz")
 
@@ -230,6 +233,11 @@ for sampleID in $(cat $filename)
 
           mv $fileTest $trimmedReads/${samples}_S_R1_val_1.fq.gz
 	  mv $fileTest2 $trimmedReads/${samples}_S_R2_val_2.fq.gz
+	  
+          echo -e "\t[`date +"%d-%b-%Y %T"`]\tCount raw and cleaned reads for sample: $samples"
+	  declare -x countsTrimmed=$trimmedReads
+	  declare -x countsRaw=$project
+          nohup $SCRIPTS_DIR/count_reads.sh >> $readsDir/count_reads.log 2>&1 &
        
 	  echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting species identification using kraken2 and bactInspector"
 	  declare -x filteredReads=$krakenDir/$samples
@@ -243,7 +251,7 @@ for sampleID in $(cat $filename)
 	  nohup $SCRIPTS_DIR/confindr_rvsd.sh >> $confindrDir/confindr.log 2>&1 &
 
 	  # delete linked input fastq files
-	  rm $project/*${sampleID}*.f*q.gz
+	  rm $project/*${sampleID}_*.f*q.gz
 		
 	  #fileTest=`find $ -maxdepth 1 -name "${samples}*val_1*.gz"`
 	  #fileTest2=`find $ -maxdepth 1 -name "${samples}*val_2*.gz"`
@@ -286,10 +294,11 @@ done
 
 # Compiling post filtering reports
 #date
-#nohup multiqc -o $reportsDir/${projectName}-postQC $qcReports --pdf --export --filename ${projectName}_post_qc &
+echo -e "\t[`date +"%d-%b-%Y %T"`]\tGenerating reports QC and assembly metrics reports using multiQC"
+nohup multiqc -o $reportsDir/${projectName}-postQC $qcReports --pdf --export --filename ${projectName}_post_qc &
 
 # QUAST multiqc reports
-echo -e "\t[`date +"%d-%b-%Y %T"`]\tGenerating reports QC and assembly metrics reports using multiQC"
+#echo -e "\t[`date +"%d-%b-%Y %T"`]\tGenerating reports QC and assembly metrics reports using multiQC"
 nohup multiqc -o $reportsDir/${projectName}-quast-post-kraken $quastDir \
 	      --pdf --export --filename $projectName\_quast >> $project/tmp/quast_post-qc.log 2>&1&
 
@@ -315,6 +324,16 @@ awk -v OFS='\t' '{gsub(/_.*/,"",$1);print}' $mlstDir/mlst_allele.tsv >> $mlstDir
 ###################################################################################################################################
 ### Saving MLST results, AMR predictions, Serotyping results, kraken2 results, confindr and bactInspector results to excel (.xlsx) files ###
 ###################################################################################################################################
+echo -e "\t[`date +"%d-%b-%Y %T"`]\tSaving Read count data in MS excel format"
+echo -e "SampleID\tTotal_reads\tTotal_yield\tClean_reads\tClean_bases" > $readsDir/${projectName}-total_reads.tsv
+cat $readsDir/total_reads.tsv >> $readsDir/${projectName}-total_reads.tsv
+
+if [ -e $readsDir/${projectName}-total_reads.tsv ]; then
+Rscript $SCRIPTS_DIR/converting_tsv_2_xlsx.R \
+        $readsDir/${projectName}-total_reads.tsv \
+        $reportsDir/${projectName}-total_reads.xlsx >> $project/tmp/converting_tsv.log 2>&1
+fi
+
 echo -e "\t[`date +"%d-%b-%Y %T"`]\tSaving WGS typing results in MS excel format"
 # saving mlst typing .csv results to xlsx format
 if [ -e $mlstDir/mlst_merged.tsv ]; then
@@ -564,7 +583,20 @@ Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
 # add coverage results results to the final report
 Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
         ${projectName}_WGS-typing-bactInsp-03.xlsx ${projectName}-coverage-final.xlsx \
-        ${projectName}_WGS-typing-final-report.xlsx >> $project/tmp/add_coverage.log 2>&1
+        ${projectName}_WGS-typing-04.xlsx >> $project/tmp/add_coverage.log 2>&1
+# add raw and cleaned reads totals
+Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
+        ${projectName}_WGS-typing-04.xlsx ${projectName}-total_reads.xlsx \
+        ${projectName}_WGS-typing-final-report.xlsx >> $project/tmp/add_total-reads.log 2>&1
+
+# construct phylogenetic tree of samples in this analysis
+#Rscript -e 'library(readr);library(readxl);library(tidyverse); 
+#tab=read_excel("Reports_191031_M02621_26_May_2020/191031_M02621_WGS-typing-final-report.xlsx"); write_csv(tab, "spn_db/info_csv.csv")'
+#Rscript -e 'library(readr);library(readxl);library(tidyverse); tab=read_excel("Reports_191031_M02621_26_May_2020/191031_M02621_WGS-typing-final-report.xlsx"); tab=dplyr::select(tab,SampleID,GPSC,Pili,serotype,SCHEME,ST,PBP1A,PBP2B,PBP2X);write_csv(tab, "spn_db/info_csv.csv")'
+
+# edit info.csv file to match sampleID name with assembly fasta output e.g. for sample_assembly.fasta ==> sample_assembly
+# run poppunk
+#nohup bash ../poppunk-launcher.sh poppunk-analysis/reference_list.txt spn_db/info_csv.csv /media/60tb/uct/felix/191025_M02143_rpt/spn_db > spn_db/spn_db.log 2>&1
 
 value=$(wc -l $filename | awk '{print $1}')
 echo -e "\t[`date +"%d-%b-%Y %T"`]\tAnalysis of ${value} samples completed"

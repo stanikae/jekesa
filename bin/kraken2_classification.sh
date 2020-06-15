@@ -1,15 +1,5 @@
 #!/bin/bash
 
-#krakenDB=/media/60tb/Databases/minikraken2_v2_8GB_201904_UPDATE #/media/60tb/src/kraken/NCBI
-#trimmedReads=/media/60tb/nicd/crdm/bacteriology/kedibone/35B-Isolates/trimGalore_11_Sep_2019/clean_reads
-#samples=11741
-#filteredReads=/home/stanford/tmp/kraken2
-#threads=16
-
-#if ! [ -d $outdir ]; then
-# mkdir -p $outdir
-#fi
-
 name=$samples
 outdir=$filteredReads
 
@@ -18,8 +8,6 @@ read2=$(find $trimmedReads -name "${name}_S*val_2*fq.gz")
 
 echo $read1
 echo $read2
-
-#cat $read1 $read2 > $outdir/${name}_combined.fq.gz
 
 # classify
 echo -e "\nRunning Kraken2 classification `date`"
@@ -38,8 +26,6 @@ reportTopHits=$outdir/${name}.kraken.report-top-4.txt
 
 cat $reportFile | sort -k1,1nr | egrep -v "root|cellular organisms|group" | awk '$4 !~ /K|D|P|C|O|F|G/' | tr '\t' ',' > $firstEdit
 
-#cat $firstEdit | head -n1
-#echo
 firstLine=$(cat $firstEdit | head -n1)
 echo $firstLine
 # awk '{if($4=="-")print} NR==5{exit}'
