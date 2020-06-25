@@ -78,6 +78,12 @@ To activate JEKESA environment run:
 `````
 conda activate jekesa 
 `````
+If you already have jekesa installed, you can upgrade as follows:
+`````
+cd jekesa
+git pull
+conda env update -n jekesa --file ./lib/jekesa.yml --prune
+`````
 #### Setting up required databases
 `````
 ## ARIBA database set-up
