@@ -1,3 +1,0 @@
-input fasta file:	/home/stan/repos/jekesa/db/ariba_DBs/nu.resfinder.fa
-input tsv file:	/home/stan/repos/jekesa/db/ariba_DBs/nu.resfinder.tsv
-genetic_code	11
