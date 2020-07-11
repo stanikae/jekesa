@@ -1,0 +1,48 @@
+Package: Biostrings
+Title: Efficient manipulation of biological strings
+Description: Memory efficient string containers, string matching
+	algorithms, and other utilities, for fast manipulation of large
+	biological sequences or sets of sequences.
+Version: 2.52.0
+Encoding: UTF-8
+Author: H. Pagès, P. Aboyoun, R. Gentleman, and S. DebRoy
+Maintainer: H. Pagès <hpages@fredhutch.org>
+biocViews: SequenceMatching, Alignment, Sequencing, Genetics,
+        DataImport, DataRepresentation, Infrastructure
+Depends: R (>= 3.5.0), methods, BiocGenerics, S4Vectors (>= 0.21.13),
+        IRanges, XVector (>= 0.23.2)
+Imports: graphics, methods, stats, utils
+LinkingTo: S4Vectors, IRanges, XVector
+Enhances: Rmpi
+Suggests: BSgenome (>= 1.13.14), BSgenome.Celegans.UCSC.ce2 (>=
+        1.3.11), BSgenome.Dmelanogaster.UCSC.dm3 (>= 1.3.11),
+        BSgenome.Hsapiens.UCSC.hg18, drosophila2probe, hgu95av2probe,
+        hgu133aprobe, GenomicFeatures (>= 1.3.14), hgu95av2cdf, affy
+        (>= 1.41.3), affydata (>= 1.11.5), RUnit
+License: Artistic-2.0
+LazyLoad: yes
+Collate: 00datacache.R utils.R IUPAC_CODE_MAP.R AMINO_ACID_CODE.R
+        GENETIC_CODE.R XStringCodec-class.R seqtype.R XString-class.R
+        XStringSet-class.R XStringSet-comparison.R XStringViews-class.R
+        MaskedXString-class.R XStringSetList-class.R xscat.R
+        XStringSet-io.R letter.R getSeq.R letterFrequency.R
+        dinucleotideFrequencyTest.R chartr.R reverseComplement.R
+        translate.R toComplex.R replaceAt.R replaceLetterAt.R
+        injectHardMask.R padAndClip.R strsplit-methods.R misc.R
+        SparseList-class.R MIndex-class.R lowlevel-matching.R
+        match-utils.R matchPattern.R maskMotif.R matchLRPatterns.R
+        trimLRPatterns.R matchProbePair.R matchPWM.R findPalindromes.R
+        PDict-class.R matchPDict.R XStringPartialMatches-class.R
+        XStringQuality-class.R QualityScaledXStringSet.R InDel-class.R
+        AlignedXStringSet-class.R PairwiseAlignments-class.R
+        PairwiseAlignmentsSingleSubject-class.R PairwiseAlignments-io.R
+        align-utils.R pmatchPattern.R pairwiseAlignment.R stringDist.R
+        needwunsQS.R MultipleAlignment.R matchprobes.R zzz.R
+git_url: https://git.bioconductor.org/packages/Biostrings
+git_branch: RELEASE_3_9
+git_last_commit: b78fe7c
+git_last_commit_date: 2019-05-02
+Date/Publication: 2019-05-02
+NeedsCompilation: yes
+Packaged: 2019-05-02 23:37:48 UTC; biocbuild
+Built: R 3.6.1; x86_64-pc-linux-gnu; 2019-09-03 09:45:54 UTC; unix

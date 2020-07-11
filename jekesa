@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version="0.2"
+version="1.0"
 
 usage () {
 cat << EOF
@@ -14,12 +14,12 @@ usage: $0 <options>
 
 OPTIONS:
         -p      Path to output directory or project name
-        -f      Path to file with list of sample IDs (one ID per line)
         -a      Select the assembler to use. Options available: 'spades', 'skesa', 'velvet', 'megahit'
         -s      Species scheme name to use for mlst typing.
-		Use: 'spneumoniae' or 'spyogenes', for streptococcus pneumoniae or  streptococcus pyogenes detailed analysis.
-		Otherwise for any other schema use: 'other'. To check other available schema names use: mlst --longList.
+		Use: 'spneumoniae' or 'spyogenes' or 'senterica', for streptococcus pneumoniae or streptococcus pyogenes or salmonella 
+                detailed analysis. Otherwise for any other schema use: 'other'. To check other available schema names use: mlst --longList.
         -t      Number of threads to use <integer>, (minimum value should be: 6)
+	-g	Only perform de novo assembly
         -h      Show this help
         -v      Show version
 
@@ -29,14 +29,14 @@ For more information, please visit: https://github.com/stanikae/jekesa
 EOF
 }
 
-while getopts ":hvp:f:t:a:s:" opt; do
+while getopts ":hvp:t:a:s:g" opt; do
   case ${opt} in
     p )
       declare -x project=${OPTARG}
       ;;
-    f )
-      declare -x filename=${OPTARG}
-      ;;
+#    f )
+#      declare -x filename=${OPTARG}
+#      ;;
     a )
       declare -x assembler=${OPTARG}
       ;;
@@ -50,6 +50,9 @@ while getopts ":hvp:f:t:a:s:" opt; do
         echo "Use [$0 -h] to see minimum thread value"
         exit
       fi
+      ;;
+    g )
+      declare -x assemOnly=${OPTARG}
       ;;
     h )
       usage
@@ -85,114 +88,37 @@ fi
 
 # cretae global variables
 echo -e "\t[`date +"%d-%b-%Y %T"`]\tParameters supplied by the User:"
-echo -e "\t\tProject name: $project\n\t\tSample list: $filename\n\t\tAssembler: $assembler\n\t\tThreads: $threads\n\t\tMLSTscheme: $MLSTscheme"
+echo -e "\t\tProject name: $project\n\t\tAssembler: $assembler\n\t\tThreads: $threads\n\t\tMLSTscheme: $MLSTscheme"
 declare -x projectName=$(basename $project)
 declare -x SCRIPTS_DIR=${BASH_SOURCE%/*}/bin
 declare -x DATABASES_DIR=${BASH_SOURCE%/*}/db
 declare -x SPN_SCRIPTS_DIR=${BASH_SOURCE%/*}/spn_scripts
 declare -x GAS_SCRIPTS_DIR=${BASH_SOURCE%/*}/GAS_scripts
 
-## Export paths to srst2 and R conda enviroments
-#declare -x srst2=$HOME/anaconda3/envs/srst2/bin/srst2
-#export PATH="$HOME/anaconda3/envs/srst2/bin/srst2:$PATH"
+## Export path to R conda enviroments
 export PATH="$HOME/anaconda3/envs/r_env/bin:$PATH"
 
-# create working directory if it's not already available
-now=$(date +"%d_%b_%Y")
+# create results directory
+declare -x now=$(date +"%d_%b_%Y")
 if ! [ -d "$project" ]
  then
-	echo -e "$project doesn't exist ....... exiting\n"
+	echo -e "\n\tError: $project doesn't exist ......."
+        echo -e "\tFirst run [${BASH_SOURCE%/*}/bin/find-link-fastq.sh] and link your fastq files to the work directory"
+        echo -e "\t[`date +"%d-%b-%Y %T"`]\tExiting........\n"
 	exit
 
  else
-        declare -x reportsDir=$project/Reports_${projectName}_${now}
-        mkdir -p $reportsDir
+        declare -x reportsDir=$project/Results-${projectName}
+	# create tmp directory
+ 	if ! [ -d $project/tmp ]; then
+	  mkdir -p $project/tmp
+        fi
+	# create results directory
+	if ! [ -d $reportsDir ]; then
+	 mkdir -p $reportsDir
+      	fi
 fi
 
-# Beginning bacterial typing steps
-
-declare -x now=$(date +"%d_%b_%Y")
-declare -x trimgaloreDir=$(find $project -name "trimGalore*" -type d )
-declare -x krakenDir=$(find $project -name "kraken*" -type d )
-declare -x spadesDir=$project/spades\_$now
-declare -x statsDir=$project/assemblyMetrics\_$now
-declare -x quastDir=$statsDir/quast_$now
-declare -x mlstDir=$project/mlst_output\_$now
-declare -x aribaDir=$project/ariba_${now}
-declare -x confindrDir=$project/confindr_${now}
-declare -x bactInspectorDir=$project/bactInspector
-declare -x aribaVF_Dir=$project/aribaVF_${now}
-declare -x readsDir=$project/total_reads
-
-if [[ "$MLSTscheme" == "spneumoniae" ]]
- then
-	declare -x serobaDir=$project/seroba_${now}
-	declare -x pilusDir=$project/pili_${now}
-	declare -x pbpDir=$project/pbp-typing_${now}
-	mkdir -p $serobaDir
-	mkdir -p $pilusDir
-	mkdir -p $pbpDir
-fi
-
-if [[ "$MLSTscheme" == "spyogenes" ]]
- then
-        declare -x pbpDir=$project/pbp-typing_${now}
-        mkdir -p $pbpDir
-fi
-
-# kraken directory
-if ! [ -d "$krakenDir" ]
- then
-        declare -x krakenDir=$project/kraken\_$now
-        mkdir -p $krakenDir
-fi
-
-# directory for QC before quality filtering
-if ! [ -d "$fastqc_out" ]
- then
-	declare -x fastqc_out=$project/fastqcReports\_$now
-	mkdir -p $fastqc_out
-fi
-
-# mkdir for trimgalore
-if ! [ -d "$trimgaloreDir" ]
- then
-	declare -x trimgaloreDir=$project/trimGalore\_$now
-	declare -x qcReports=$trimgaloreDir/fastqcReports_filtered
-	declare -x trimmedReads=$trimgaloreDir/clean_reads
-	mkdir -p $trimgaloreDir
-	mkdir -p $qcReports
-	mkdir -p $trimmedReads
-	#$SCRIPTS_DIR/fastq_trimming_trmGalore.sh
- else
-	declare -x trimgaloreDir=$(find $project -name "trimGalore*" -type d ) #$project/trimGalore*
-        declare -x qcReports=$(find $trimgaloreDir -name "fastqcReports_filtered*" -type d ) #$trimgaloreDir/fastqcReports_filtered
-        declare -x trimmedReads=$(find $trimgaloreDir -name "clean_reads" -type d )
-fi
-
-mkdir -p $spadesDir
-mkdir -p $quastDir
-mkdir -p $mlstDir
-mkdir -p $aribaDir
-mkdir -p $confindrDir
-mkdir -p $bactInspectorDir
-mkdir -p $readsDir
-
-if ! [ -d $aribaVF_Dir ]; then
- mkdir -p $aribaVF_Dir
-fi
-# output directory for bactInspector
-#declare -x bact_out=$project/bactInspector
-
-# create tmp directory
-if ! [ -d $project/tmp ]; then
- mkdir -p $project/tmp
-fi
-
-# check if MLST scheme is present in the mlst database
-mlst --longlist > $project/schemeList.txt
-declare -x schemeList=$project/schemeList.txt
-##############################################################################################################
 
 ## databases ##
 # ariba reference database
@@ -208,331 +134,203 @@ declare -x db_dir=$DATABASES_DIR/seroba_db
 # rMLST database
 declare -x confindrDB=$DATABASES_DIR/confindr_db
 
-###################################################################################################################
-### Read trimming, species identification, contamination check, de novo assembly, AMR prediction and serotyping ###
-###################################################################################################################
 
-echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting quality control of sequencing reads for project: $projectName"
-#nohup $SCRIPTS_DIR/fastqc_check_server.sh > $fastqc_out/fastqc_check.log 2>&1 &
-
-for sampleID in $(cat $filename)
- do 
-   # performing bacterial de novo genome assembly
-   declare -x samples=$sampleID
-   echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting quality filtering of sequencing reads using trimGalore for sample: $samples"
-   #nohup $SCRIPTS_DIR/get_average_read_length.sh >> ${projectName}_read-avg-length.csv &
-   nohup $SCRIPTS_DIR/trim-reads.sh >> $trimgaloreDir/trimGalore.log 2>&1 &
-   nohup $SCRIPTS_DIR/get_coverageDepth.sh &
-   wait
-  	
-   fileTest=$(find $trimmedReads -name "${samples}_*val_1*fq.gz")
-   fileTest2=$(find $trimmedReads -name "${samples}_*val_2*fq.gz")
-
-   if [ -s "$fileTest" ]; then
-      if [ -s "$fileTest2" ]; then
-
-          mv $fileTest $trimmedReads/${samples}_S_R1_val_1.fq.gz
-	  mv $fileTest2 $trimmedReads/${samples}_S_R2_val_2.fq.gz
-	  
-          echo -e "\t[`date +"%d-%b-%Y %T"`]\tCount raw and cleaned reads for sample: $samples"
-	  declare -x countsTrimmed=$trimmedReads
-	  declare -x countsRaw=$project
-          nohup $SCRIPTS_DIR/count_reads.sh >> $readsDir/count_reads.log 2>&1 &
-       
-	  echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting species identification using kraken2 and bactInspector"
-	  declare -x filteredReads=$krakenDir/$samples
-	  mkdir -p $filteredReads
-          #nohup $SCRIPTS_DIR/kraken_classification_step.sh &
-	  nohup $SCRIPTS_DIR/kraken2_classification.sh >> $krakenDir/kraken2.log 2>&1 &
-	  
-	  nohup $SCRIPTS_DIR/bactInspector.sh >> $bactInspectorDir/bactinspector.log 2>&1 &
-          #wait
-	  echo -e "\t[`date +"%d-%b-%Y %T"`]\tChecking inter- and intra-species contamination"
-	  nohup $SCRIPTS_DIR/confindr_rvsd.sh >> $confindrDir/confindr.log 2>&1 &
-
-	  # delete linked input fastq files
-	  rm $project/*${sampleID}_*.f*q.gz
-		
-	  #fileTest=`find $ -maxdepth 1 -name "${samples}*val_1*.gz"`
-	  #fileTest2=`find $ -maxdepth 1 -name "${samples}*val_2*.gz"`
-			
-	  filteredReads=$trimmedReads
-
-	  echo -e "\t[`date +"%d-%b-%Y %T"`]\tPerforming bacterial de novo genome assembly using spades and MLST typing"
-	  nohup $SCRIPTS_DIR/shovill_assembly.sh >> $spadesDir/shovill_assembly.log 2>&1 &
-	  
-	  # Detection of resistance genes, virulence factors and plasmid detection
-          echo -e "\t[`date +"%d-%b-%Y %T"`]\tPerforming detection of resistance genes and virulence factors using ARIBA"
-	  nohup $SCRIPTS_DIR/ariba_typing_server.sh >> $aribaDir/ariba_AMRtyping.log 2>&1 & 
-          nohup $SCRIPTS_DIR/ariba_vf_detection.sh >> $project/tmp/ariba_VFtyping.log 2>&1 &
-
-	  # serotyping of S. pneumon using seroBA
-	  if [[ "$MLSTscheme" == "spneumoniae" ]]; then
-	     echo -e "\t[`date +"%d-%b-%Y %T"`]\tMLST scheme is $MLSTscheme, now performing in silico serotyping"
-	     nohup $SCRIPTS_DIR/seroba_serotyping_server.sh >> $serobaDir/seroba_serotying.log 2>&1 & 
-	  fi
-
-	  wait
-	  echo -e "\t[`date +"%d-%b-%Y %T"`]\tTyping of $sampleID completed, moving to next sample"
-
-       else
-          echo -e "\t[`date +"%d-%b-%Y %T"`]\t$samples did not pass the trimming step, skipping ..............."
-       fi
-     else
-       echo -e "\t[`date +"%d-%b-%Y %T"`]\t$fileTest has not been found, moving to next ID"
-  fi
-
-done
-
-#########################################################################################################################
-			##### Report generation using MultiQC, QUAST, #######
-#########################################################################################################################
-
-# combine all fastqc reports using mulitQC
-#date
-#nohup multiqc -o $reportsDir/${projectName}-beforeQC $fastqc_out --pdf --export --filename ${projectName}_b4_qc &
-
-# Compiling post filtering reports
-#date
-echo -e "\t[`date +"%d-%b-%Y %T"`]\tGenerating reports QC and assembly metrics reports using multiQC"
-nohup multiqc -o $reportsDir/${projectName}-postQC $qcReports --pdf --export --filename ${projectName}_post_qc &
-
-# QUAST multiqc reports
-#echo -e "\t[`date +"%d-%b-%Y %T"`]\tGenerating reports QC and assembly metrics reports using multiQC"
-nohup multiqc -o $reportsDir/${projectName}-quast-post-kraken $quastDir \
-	      --pdf --export --filename $projectName\_quast >> $project/tmp/quast_post-qc.log 2>&1&
-
-# combining all assembly metrics using custom R script
-Rscript $SCRIPTS_DIR/combining_quast_output.R $quastDir \
-	$reportsDir/${projectName}_quastResults.xlsx >> $project/tmp/combining_quast.log 2>&1
-
-# saving mlst typing .csv results to xlsx format
-#if [[ "$MLSTscheme" == "noScheme" ]]; then
-names1=$(echo -e "FILE\tSCHEME\tST")
-num1=$(cat $mlstDir/mlst_allele.tsv | awk '{print NF}' | sort -nr -u | head -n1)
-#num1=$(cat $mlstDir/mlst_allele.tsv | head -n1 | awk '{print NF}')
-num="$(($num1-3))"
-names2=$(yes "gene" | head -n $num | paste -s -d '\t' -)
-names=$(echo -e "$names1\t$names2")
-(echo $names | tr ' ' '\t') > $mlstDir/mlst_merged.tsv && \
-awk -v OFS='\t' '{gsub(/_.*/,"",$1);print}' $mlstDir/mlst_allele.tsv >> $mlstDir/mlst_merged.tsv
-#else
-#  (head -n1 $mlstDir/mlst_allele.tsv) > $mlstDir/mlst_merged.tsv && \
-#  grep -v "^FILE" $mlstDir/mlst_allele.tsv  | awk -v OFS='\t' '{gsub(/_.*/,"",$1);print}' >> $mlstDir/mlst_merged.tsv
-#fi
-
-###################################################################################################################################
-### Saving MLST results, AMR predictions, Serotyping results, kraken2 results, confindr and bactInspector results to excel (.xlsx) files ###
-###################################################################################################################################
-echo -e "\t[`date +"%d-%b-%Y %T"`]\tSaving Read count data in MS excel format"
-echo -e "SampleID\tTotal_reads\tTotal_yield\tClean_reads\tClean_bases" > $readsDir/${projectName}-total_reads.tsv
-cat $readsDir/total_reads.tsv >> $readsDir/${projectName}-total_reads.tsv
-
-if [ -e $readsDir/${projectName}-total_reads.tsv ]; then
-Rscript $SCRIPTS_DIR/converting_tsv_2_xlsx.R \
-        $readsDir/${projectName}-total_reads.tsv \
-        $reportsDir/${projectName}-total_reads.xlsx >> $project/tmp/converting_tsv.log 2>&1
+# check if progress file exists
+if [ ! -f $project/progress ]; then
+ touch $project/progress
 fi
 
-echo -e "\t[`date +"%d-%b-%Y %T"`]\tSaving WGS typing results in MS excel format"
-# saving mlst typing .csv results to xlsx format
-if [ -e $mlstDir/mlst_merged.tsv ]; then
-Rscript $SCRIPTS_DIR/converting_tsv_2_xlsx.R \
-	$mlstDir/mlst_merged.tsv \
-	$reportsDir/${projectName}_mlstResults.xlsx >> $project/tmp/converting_tsv.log 2>&1
+###################################################################################
+###                          Begin bacterial WGS typing                         ###
+###################################################################################
+
+# STEP 01: Perform QC or raw reads
+stage=$(grep "fastqc-step01" "$project/progress")
+if [ -z "$stage" ]; then
+  echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting quality control of sequencing reads for project: $projectName"
+  declare -x fastqc_out=$project/fastqcReports
+  mkdir -p $fastqc_out
+  nohup $SCRIPTS_DIR/01.fastq_qc.sh > $fastqc_out/fastqc_check.log 2>&1 &
+  echo "fastqc-step01" >> $project/progress
+else
+ echo -e "\t[`date +"%d-%b-%Y %T"`]\tQuality control of raw reads for project: $projectName already completed, moving to next step"
 fi
 
-# summarizing the identified resistance genes
-# get known variants
-ariba summary --known_variants $aribaDir/${projectName}-aribaAMR_known_variants.summary `find $aribaDir -name "*-report.tsv"`
-# get novel variants
-ariba summary --novel_variants $aribaDir/${projectName}-aribaAMR_novel_variants.summary `find $aribaDir -name "*-report.tsv"`
-# ariba cluster all
-ariba summary --preset cluster_all $aribaDir/${projectName}-aribaAMR_cluster_all.summary `find $aribaDir -name "*-report.tsv"`
-# editing the report summary
-#if [[ "$MLSTscheme" == "spneumoniae" ]]; then
-#  for var in $(echo -e "known_variants\nnovel_variants\ncluster_all"); do
-#    cat $aribaDir/${projectName}-aribaAMR_${var}.summary.csv | \
-#    sed 's|.*\.run/||' | sed 's|-report.tsv||' \
-#    sed 's|Streptococcus_pneumoniae|SPN|g' > $aribaDir/${projectName}-aribaAMR-${var}-final.csv
-#  done
-#else
-  for var in $(echo -e "known_variants\nnovel_variants\ncluster_all"); do
-    cat $aribaDir/${projectName}-aribaAMR_${var}.summary.csv | \
-    sed 's|.*\.run/||' | sed 's|-report.tsv||' > $aribaDir/${projectName}-aribaAMR-${var}-final.csv
-  done
-#fi
-# writing ariba report to xlsx
-for var in $(echo -e "known_variants\nnovel_variants\ncluster_all"); do
-    Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
-	$aribaDir/${projectName}-aribaAMR-${var}-final.csv \
-	$reportsDir/${projectName}-aribaAMR-${var}-final.xlsx >> $project/tmp/converting_csv.log 2>&1
-done
-
-# copy ariba AMR .tre and .csv files to reports directory
-rsync -a $aribaDir/*{tre,csv} $reportsDir/ariba-AMR/
-
-# summarizing the identified virulence factors
-# get known variants
-ariba summary --known_variants $aribaVF_Dir/${projectName}-aribaVF_known_variants.summary `find $aribaVF_Dir -name "*-report.tsv"`
-# get novel variants
-ariba summary --novel_variants $aribaVF_Dir/${projectName}-aribaVF_novel_variants.summary `find $aribaVF_Dir -name "*-report.tsv"`
-# ariba cluster all
-ariba summary --preset cluster_all $aribaVF_Dir/${projectName}-aribaVF_cluster_all.summary `find $aribaVF_Dir -name "*-report.tsv"`
-# editing the know_variats report summary
-for var in $(echo -e "known_variants\nnovel_variants\ncluster_all"); do
-    cat $aribaVF_Dir/${projectName}-aribaVF_${var}.summary.csv | \
-    sed 's|.*\.run/||' | sed 's|-report.tsv||' > $aribaVF_Dir/${projectName}-aribaVFs-${var}-final.csv
-    # convert .csv to .xlsx
-    Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
-    $aribaVF_Dir/${projectName}-aribaVFs-${var}-final.csv \
-    $reportsDir/${projectName}-aribaVFs-${var}-final.xlsx >> $project/tmp/converting_csv.log 2>&1
-done
-
-# merge and write ariba AMR and VF reports to xlsx
-Rscript $SCRIPTS_DIR/merge_files.R \
-	$reportsDir \
-	${projectName}-aribaAMR-known_variants-final.xlsx \
-	${projectName}-aribaVFs-known_variants-final.xlsx \
-	${projectName}-ariba_final.xlsx >> $project/tmp/merge_files.log 2>&1
-
-# copy ariba VF .tre and .csv files to reports directory
-rsync -a $aribaVF_Dir/*{tre,csv} $reportsDir/ariba-VFs/
-###########################################################################################
-
-# seroba output compilation
-if [[ "$MLSTscheme" == "spneumoniae" ]]; then
-  cd $serobaDir
-  seroba summary  $serobaDir
-  (echo -e "sample_Id\tserotype\tcomments\t" && cat summary.tsv) | \
-  tr '\t' ',' | awk -F, '{gsub("/.*/","",$1)}1' OFS=, > $serobaDir/summary_header.csv
-  # save seroba results to xlsx excel workbook
-  Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R  \
-	$serobaDir/summary_header.csv \
-	$reportsDir/${projectName}_serobaResults.xlsx >> $project/tmp/converting_csv.log 2>&1
-  cd $HOME
+# STEP 02: Perform read filtering and QC of clean reads
+stage=$(grep "trimGalore-step02" "$project/progress")
+if [ -z "$stage" ]; then
+  echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting quality filtering of sequencing reads using trimGalore for project: $projectName"
+  declare -x trimgaloreDir=$project/trimGalore
+  declare -x qcReports=$trimgaloreDir/fastqcReports_filtered
+  declare -x trimmedReads=$trimgaloreDir/clean_reads
+  mkdir -p $trimgaloreDir
+  mkdir -p $qcReports
+  mkdir -p $trimmedReads
+  $SCRIPTS_DIR/02.trimReads.sh >> $trimgaloreDir/trimGalore.log 2>&1
+  echo "trimGalore-step02" >> $project/progress
+else
+  echo -e "\t[`date +"%d-%b-%Y %T"`]\tRead filtering for project: $projectName already completed, moving to next step"
 fi
 
-# save kraken report to csv and convert to .xlsx
-#reportTopHits=$filteredReads/${name}.kraken.report-top-4.txt
-
-inDir=$krakenDir #$project/kraken
-outDir=$krakenDir #$project/kraken
-
-# if [[ "$MLSTscheme" == "spneumoniae" ]]; then
-	# echo "assembly,kraken_(%),kraken_unclassified(%)" > $outDir/${projectName}-kraken_combinedReports.csv
-echo "assembly,kraken_match_#1,kraken_match_#2,kraken_match_#3,kraken_unclassified," > $outDir/${projectName}-kraken_combinedReports.csv	
-
-for file in $(find $inDir -name "*.kraken.report-top-4.txt"); do
-  name=$(basename -s .kraken.report-top-4.txt $file)
-  report1=$(cat $file | sed 's/,[[:space:]]\+/,/' | sort -t ',' -k1,1nr | awk -F ',' '{print $NF, "("$1"%)"}' | tr '\n' ',')
-  echo -e "$name,$report1" >> $outDir/${projectName}-kraken_combinedReports.csv
-done
-
-# convert kraken .csv to .xlsx
-Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
-	$outDir/${projectName}-kraken_combinedReports.csv \
-	$reportsDir/${projectName}-kraken_combinedReports.xlsx >> $project/tmp/converting_csv.log 2>&1
-
-# save bactInspector results to xlsx
-echo -e "sampleID,Species_Identification,refseq_closest_match" > $project/bactInspector/bactInspector_results.csv
-for file in $(find $project/bactInspector -name "*_bactInspector.csv"); do
-  cat $file >> $project/bactInspector/bactInspector_results.csv
-done
-
-# convert bactInspector .csv to .xlsx
-Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
-	$project/bactInspector/bactInspector_results.csv \
-	$reportsDir/${projectName}-bactInspector.xlsx >> $project/tmp/converting_csv.log 2>&1
-
-# Save confindr results in one .csv file
-cat ${confindrDir}/*/*_report.csv > ${confindrDir}/confindr_merged.csv
-echo "Sample,Genera_present,ContaminationPresent" > ${confindrDir}/${projectName}-confindr-final.csv
-grep -v '^Sample' ${confindrDir}/confindr_merged.csv | \
-sed 's/_.*1,/,/g' | \
-cut -d "," -f1,2,4,5 | \
-awk -F ',' '{print $1,$2,$3" ("$4"%)"}' OFS="," >> ${confindrDir}/${projectName}-confindr-final.csv
-# Convert confindr results to .xlsx file
-Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
-        $confindrDir/${projectName}-confindr-final.csv \
-        $reportsDir/${projectName}-confindr-final.xlsx >> $project/tmp/converting_csv.log 2>&1
-
-# save coverage results to xlsx
-cat ${project}/coverageDepth/*/*.csv > ${project}/coverageDepth/coverage_merged.csv
-echo "Sample,Est.GenomeSize,CoverageDepth" > ${project}/coverageDepth/${projectName}-coverage-final.csv
-grep -v '^Sample' ${project}/coverageDepth/coverage_merged.csv >> ${project}/coverageDepth/${projectName}-coverage-final.csv
-# convert coverage results to .xlsx file
-Rscript $SCRIPTS_DIR/converting_csv_2_xlsx.R \
-        ${project}/coverageDepth/${projectName}-coverage-final.csv \
-        $reportsDir/${projectName}-coverage-final.xlsx >> $project/tmp/converting_csv.log 2>&1
-
-################################################################################################################
-### PBP typing, EMM typing, and MIC predicitions using scripts adapted from CDC StrepLab and PoPunk analysis ###
-################################################################################################################
-
-# Perform SPN pili detection analysis
-if [[ "$MLSTscheme" == "spneumoniae" ]]; then
-  echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting S. pneumoniae pili detection"
-  $SCRIPTS_DIR/SPN-pili-detection.sh 
+# STEP 03: Count both raw and cleaned reads
+stage=$(grep "countReads-step03" "$project/progress")
+if [ -z "$stage" ]; then
+  echo -e "\t[`date +"%d-%b-%Y %T"`]\tCount raw and cleaned reads for sample: $samples"
+  declare -x readsDir=$project/total_reads
+  mkdir -p $readsDir
+  nohup $SCRIPTS_DIR/03.get_coverageDepth.sh >> $project/tmp/get_coverageDepth.log 2>&1 &
+  nohup $SCRIPTS_DIR/03.countReads.sh >> $readsDir/count_reads.log 2>&1 &
+  echo "countReads-step03" >> $project/progress
+else
+  echo -e "\t[`date +"%d-%b-%Y %T"`]\tRead counting for project: $projectName already completed, moving to next step"
 fi
 
+# delete linked input fastq files
+counter=0
+for fq1 in $project/*R1*f*q*
+ do
+  fq2=$(echo $fq1 | awk -F "R1" '{print $1 "R2" $2}')
+  counter=counter+1
+  rm ${fq1} ${fq2}
+done
 
-# Perform PBP typing using scripts adapted from Ben Metcalf at CDC, USA
-if [[ "$MLSTscheme" == "spneumoniae" ]]; then
-  echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting S. pneumoniae PBP typing using CDC StrepLab scripts"
-  # PBP typing using CDC Strep Lab scripts and database
-  declare -x allDB_dir=$DATABASES_DIR/SPN_Reference_DB	
-  declare -x batch_dir=$trimmedReads #krakenDir #/home/stanford/kedibone/CRDM-08r/kraken #/41467
-  declare -x out_dir=$project
-  declare -x batch_name=$projectName  #$(basename $project)
-  declare -x out_analysis=$pbpDir
-        
-  #bash /home/stanford/repos/bacteria_denovo_assembly/SPN-typing_jobInputFile.sh
-  $SCRIPTS_DIR/SPN-typing_kraken-jobInputFile.sh
-
-  # Perform SPN typing for each sample
-  if [ -s "$out_analysis/job-control.txt" ]; then
-    while read -r line; do
-      $SCRIPTS_DIR/SPN-Typer_stan.sh "$line"
-    done < $out_analysis/job-control.txt
-  fi
-
-  # convert output file to xlsx
-  Rscript $SCRIPTS_DIR/convert_SPN-PBP-Typing-Results_2_xlsx.R \
-	$out_analysis/TABLE_SPN_"$batch_name"_Typing_Results.txt \
-	$reportsDir/${projectName}_pbp-typing.xlsx >> $project/tmp/convert_SPN-PBP-Typing.log 2>&1
-
-  # Run PopPunk analysi for S. pneumoniae
-  bash $SCRIPTS_DIR/poppunk.sh $project
-
+# STEP 04: Species identification
+stage=$(grep "speciesID-step04" "$project/progress")
+if [ -z "$stage" ]; then
+  echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting species identification using kraken2 and bactInspector"
+#  declare -x filteredReads=$krakenDir/$samples
+  declare -x krakenDir=$project/kraken
+  declare -x confindrDir=$project/confindr
+  declare -x bactInspectorDir=$project/bactInspector
+  mkdir -p $krakenDir; mkdir -p $confindrDir; mkdir -p $bactInspectorDir
+  nohup $SCRIPTS_DIR/04.kraken2_classification.sh >> $krakenDir/kraken2.log 2>&1 &
+  nohup $SCRIPTS_DIR/04.bactInspector.sh >> $bactInspectorDir/bactinspector.log 2>&1 &
+  echo -e "\t[`date +"%d-%b-%Y %T"`]\tChecking inter- and intra-species contamination"
+  nohup $SCRIPTS_DIR/04.confindr.sh >> $confindrDir/confindr.log 2>&1 &
+  echo "speciesID-step04" >> $project/progress
+else
+ echo -e "\t[`date +"%d-%b-%Y %T"`]\tSpecies identification for project: $projectName already completed, moving to next step"
 fi
 
-# Perform emm typing using scripts adapted from Ben Metcalf at CDC, USA
-if [[ "$MLSTscheme" == "spyogenes" ]]; then
-  echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting S. pyogenes EMM typing using CDC StrepLab scripts"
-  # PBP typing using CDC Strep Lab scripts and database
-  declare -x allDB_dir=$DATABASES_DIR/GAS_Reference_DB
-  declare -x batch_dir=$trimmedReads 
-  declare -x out_dir=$project
-  declare -x batch_name=$projectName  #$(basename $project)
-  declare -x out_analysis=$pbpDir
+# STEP 05: De novo assembly and mlst typing
+stage=$(grep "assembly-step05" "$project/progress")
+if [ -z "$stage" ]; then
+  echo -e "\t[`date +"%d-%b-%Y %T"`]\tPerforming bacterial de novo genome assembly and MLST typing"
+  declare -x spadesDir=$project/assemblies
+  declare -x statsDir=$project/assemblyMetrics
+  declare -x quastDir=$statsDir/quast
+  declare -x mlstDir=$project/mlst_output
+  mkdir -p $spadesDir; mkdir -p $statsDir; mkdir -p $quastDir; mkdir -p $mlstDir
+  $SCRIPTS_DIR/05.shovill.sh >> $spadesDir/shovill_assembly.log 2>&1
+  # check if MLST scheme is present in the mlst database
+  mlst --longlist > $project/schemeList.txt
+  declare -x schemeList=$project/schemeList.txt
+  nohup $SCRIPTS_DIR/05.mlst.sh >> $mlstDir/mlst.log 2>&1
+  echo "assembly-step05" >> $project/progress
+else
+ echo -e "\t[`date +"%d-%b-%Y %T"`]\tDe novo assembly and MLST typing for project: $projectName already completed, moving to next step"
+fi
 
-  $GAS_SCRIPTS_DIR/StrepLab-JanOw_GAS-wrapr.sh
+# STEP 06: AMR, virulence genes and plasmid prediction
+stage=$(grep "amr-step06" "$project/progress")
+if [ -z "$stage" ]; then
+  echo -e "\t[`date +"%d-%b-%Y %T"`]\tPerforming detection of resistance genes and virulence factors using ARIBA"
+  declare -x aribaDir=$project/ariba
+  declare -x aribaVF_Dir=$project/aribaVF
+  declare -x resfinder=$project/resfinder
+  declare -x pointfinder=$project/pointfinder
+  declare -x plasmidDir=$project/plasmids
+  mkdir -p $aribaDir; mkdir -p $aribaVF_Dir; mkdir -p $resfinder; mkdir -p $pointfinder; mkdir -p $plasmidDir
+  # run resfinder and pointfinder
+  nohup $SCRIPTS_DIR/06.cgeAMR.sh >> $project/tmp/cgeAMR.log 2>&1 &
+  # run ariba for AMR and VF detection
+  nohup $SCRIPTS_DIR/06.aribaAMR.sh >> $aribaDir/ariba_AMRtyping.log 2>&1 &
+  nohup $SCRIPTS_DIR/06.aribaVFs.sh >> $project/tmp/ariba_VFtyping.log 2>&1 &
+  wait 
+  # merge and write ariba AMR and VF reports to xlsx
+  Rscript $SCRIPTS_DIR/merge_files.R $reportsDir \
+  ${projectName}-aribaAMR-known_variants-final.xlsx \
+  ${projectName}-aribaVFs-known_variants-final.xlsx \
+  ${projectName}-ariba_final.xlsx >> $project/tmp/merge_files.log 2>&1
+  echo "amr-step06" >> $project/progress
+else
+ echo -e "\t[`date +"%d-%b-%Y %T"`]\tPrediction of AMR, VFs, and plasmids for project: $projectName already completed, moving to next step"
+fi
 
-  # Perform GAS typing for each sample
-  if [ -s "$out_analysis/job-control.txt" ]; then
-    while read -r line; do
-      $GAS_SCRIPTS_DIR/StrepLab-JanOw_GAS-Typer.sh "$line" </dev/null
-    done < $out_analysis/job-control.txt
-  fi
+# STEP 07: Species specific indepth analysis for Salmonella, SPN and GBS
+stage=$(grep "specific-step07" "$project/progress")
+if [ -z "$stage" ]; then
 
-  # convert output file to xlsx
-  Rscript $SCRIPTS_DIR/convert_SPN-PBP-Typing-Results_2_xlsx.R \
-	$out_analysis/TABLE_GAS_"$batch_name"_Typing_Results.txt \
-	$reportsDir/${projectName}_pbp-typing.xlsx >> $project/tmp/convert_GAS-PBP-Typing.log 2>&1
+ if [[ "$MLSTscheme" == "spneumoniae" ]]; then
+   echo -e "\t[`date +"%d-%b-%Y %T"`]\tMLST scheme is $MLSTscheme, now performing Spneumoniae specifc analysis"
+   declare -x serobaDir=$project/seroba
+   declare -x pilusDir=$project/pili
+   declare -x pbpDir=$project/pbp-typing
+   mkdir -p $serobaDir; mkdir -p $pilusDir; mkdir -p $pbpDir
+   echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting S. pneumoniae serotyping"
+   nohup $SCRIPTS_DIR/07.seroba.sh >> $serobaDir/seroba.log 2>&1 &
+   echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting S. pneumoniae pili detection"
+   $SCRIPTS_DIR/07.SPN-pili-detection.sh
+   echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting S. pneumoniae PBP typing using CDC StrepLab scripts"
+   # PBP typing using CDC Strep Lab scripts and database
+   declare -x allDB_dir=$DATABASES_DIR/SPN_Reference_DB
+   declare -x batch_dir=$trimmedReads #krakenDir #/home/stanford/kedibone/CRDM-08r/kraken #/41467
+   declare -x out_dir=$project
+   declare -x batch_name=$projectName  #$(basename $project)
+   declare -x out_analysis=$pbpDir
+   # create SPN-typing job input file
+   $SCRIPTS_DIR/07.SPN-typing-jobInputFile.sh
+   # Perform SPN typing for each sample
+   if [ -s "$out_analysis/job-control.txt" ]; then
+     while read -r line; do
+        $SCRIPTS_DIR/07.SPN-Typer.sh "$line"
+     done < $out_analysis/job-control.txt
+   fi
+   # convert output file to xlsx
+   Rscript $SCRIPTS_DIR/convert_SPN-PBP-Typing-Results_2_xlsx.R \
+           $out_analysis/TABLE_SPN_"$batch_name"_Typing_Results.txt \
+           $reportsDir/${projectName}_pbp-typing.xlsx >> $project/tmp/convert_SPN-PBP-Typing.log 2>&1
+   # Run PopPunk analysis for S. pneumoniae
+   bash $SCRIPTS_DIR/07.poppunk.sh $project
+ 
+ elif [[ "$MLSTscheme" == "spyogenes" ]]; then
+   echo -e "\t[`date +"%d-%b-%Y %T"`]\tMLST scheme is $MLSTscheme, now performing Spyogenes specifc analysis"
+   echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting S. pyogenes EMM typing using CDC StrepLab scripts"
+   declare -x pbpDir=$project/pbp-typing
+   mkdir -p $pbpDir
+   # PBP typing using CDC Strep Lab scripts and database
+   declare -x allDB_dir=$DATABASES_DIR/GAS_Reference_DB
+   declare -x batch_dir=$trimmedReads
+   declare -x out_dir=$project
+   declare -x batch_name=$projectName  #$(basename $project)
+   declare -x out_analysis=$pbpDir
+   # create GAS job input file
+   $GAS_SCRIPTS_DIR/StrepLab-JanOw_GAS-wrapr.sh
+   # Perform GAS typing for each sample
+   if [ -s "$out_analysis/job-control.txt" ]; then
+     while read -r line; do
+        $GAS_SCRIPTS_DIR/StrepLab-JanOw_GAS-Typer.sh "$line" </dev/null
+     done < $out_analysis/job-control.txt
+   fi
+   # convert output file to xlsx
+   Rscript $SCRIPTS_DIR/convert_SPN-PBP-Typing-Results_2_xlsx.R \
+           $out_analysis/TABLE_GAS_"$batch_name"_Typing_Results.txt \
+           $reportsDir/${projectName}_pbp-typing.xlsx >> $project/tmp/convert_GAS-PBP-Typing.log 2>&1
+   # Run PopPunk analysis for S. pyogenes
+   bash $SCRIPTS_DIR/07.poppunk.sh $project
 
-  # Run PopPunk analysi for S. pyogenes
-  bash $SCRIPTS_DIR/poppunk.sh $project
+ elif [[ "$MLSTscheme" == "senterica" ]]; then
+   echo -e "\t[`date +"%d-%b-%Y %T"`]\tMLST scheme is $MLSTscheme, now performing Salmonella specifc analysis"
+   declare -x sistr=$project/sistr
+   declare -x seqsero=$project/seqsero
+   mkdir -p $sistr; mkdir -p $seqsero
+   nohup $SCRIPTS_DIR/07.salmonella.sh >> $project/tmp/07.salmonella.log 2>&1
+ else
+   echo -e "\t[`date +"%d-%b-%Y %T"`]\tIndepth SPN, GAS, and salmonella specific analysis not required for $projectName"
+ fi
+ echo "specific-step07" >> $project/progress
+else
+ echo -e "\t[`date +"%d-%b-%Y %T"`]\tSpecies specific for: $projectName already completed, moving to next step"
 fi
 
 #############################################################################################################
@@ -589,6 +387,10 @@ Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
         ${projectName}_WGS-typing-04.xlsx ${projectName}-total_reads.xlsx \
         ${projectName}_WGS-typing-final-report.xlsx >> $project/tmp/add_total-reads.log 2>&1
 
+
+#############################################################################################################
+###                          Construct phylogenetic tree of samples in this analysis                      ###
+#############################################################################################################
 # construct phylogenetic tree of samples in this analysis
 #Rscript -e 'library(readr);library(readxl);library(tidyverse); 
 #tab=read_excel("Reports_191031_M02621_26_May_2020/191031_M02621_WGS-typing-final-report.xlsx"); write_csv(tab, "spn_db/info_csv.csv")'
@@ -598,7 +400,7 @@ Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
 # run poppunk
 #nohup bash ../poppunk-launcher.sh poppunk-analysis/reference_list.txt spn_db/info_csv.csv /media/60tb/uct/felix/191025_M02143_rpt/spn_db > spn_db/spn_db.log 2>&1
 
-value=$(wc -l $filename | awk '{print $1}')
-echo -e "\t[`date +"%d-%b-%Y %T"`]\tAnalysis of ${value} samples completed"
+#value=$(wc -l $filename | awk '{print $1}')
+echo -e "\t[`date +"%d-%b-%Y %T"`]\tAnalysis of ${counter} samples completed"
 echo -e "\t[`date +"%d-%b-%Y %T"`]\tWGS typing results are in file: $reportsDir/${projectName}_WGS-typing-final-report.xlsx"
 

@@ -1,0 +1,98 @@
+AAString-class          AAString objects
+AMINO_ACID_CODE         The Single-Letter Amino Acid Code
+AlignedXStringSet-class
+                        AlignedXStringSet and QualityAlignedXStringSet
+                        objects
+DNAString-class         DNAString objects
+GENETIC_CODE            The Standard Genetic Code and its known
+                        variants
+HNF4alpha               Known HNF4alpha binding sequences
+IUPAC_CODE_MAP          The IUPAC Extended Genetic Alphabet
+InDel-class             InDel objects
+MIndex-class            MIndex objects
+MaskedXString-class     MaskedXString objects
+MultipleAlignment-class
+                        MultipleAlignment objects
+PDict-class             PDict objects
+PairwiseAlignments-class
+                        PairwiseAlignments,
+                        PairwiseAlignmentsSingleSubject, and
+                        PairwiseAlignmentsSingleSubjectSummary objects
+PairwiseAlignments-io   Write a PairwiseAlignments object to a file
+QualityScaledXStringSet-class
+                        QualityScaledBStringSet,
+                        QualityScaledDNAStringSet,
+                        QualityScaledRNAStringSet and
+                        QualityScaledAAStringSet objects
+RNAString-class         RNAString objects
+XString-class           BString objects
+XStringPartialMatches-class
+                        XStringPartialMatches objects
+XStringQuality-class    PhredQuality, SolexaQuality and IlluminaQuality
+                        objects
+XStringSet-class        XStringSet objects
+XStringSet-comparison   Comparing and ordering the elements in one or
+                        more XStringSet objects
+XStringSet-io           Read/write an XStringSet object from/to a file
+XStringSetList-class    XStringSetList objects
+XStringViews-class      The XStringViews class
+align-utils             Utility functions related to sequence alignment
+chartr                  Replace letters in a sequence or set of
+                        sequences
+detail                  Show (display) detailed object content
+dinucleotideFrequencyTest
+                        Pearson's chi-squared Test and G-tests for
+                        String Position Dependence
+findPalindromes         Searching a sequence for palindromes
+getSeq                  getSeq
+gregexpr2               A replacement for R standard gregexpr function
+injectHardMask          Injecting a hard mask in a sequence
+letter                  Subsetting a string
+letterFrequency         Calculate the frequency of letters in a
+                        biological sequence, or the consensus matrix of
+                        a set of sequences
+longestConsecutive      Obtain the length of the longest substring
+                        containing only 'letter'
+lowlevel-matching       Low-level matching functions
+maskMotif               Masking by content (or by position)
+match-utils             Utility functions operating on the matches
+                        returned by a high-level matching function
+matchLRPatterns         Find paired matches in a sequence
+matchPDict              Matching a dictionary of patterns against a
+                        reference
+matchPDict-inexact      Inexact matching with
+                        matchPDict()/countPDict()/whichPDict()
+matchPWM                PWM creating, matching, and related utilities
+matchPattern            String searching functions
+matchProbePair          Find "theoretical amplicons" mapped to a probe
+                        pair
+matchprobes             A function to match a query sequence to the
+                        sequences of a set of probes.
+misc                    Some miscellaneous stuff
+needwunsQS              (Deprecated) Needleman-Wunsch Global Alignment
+oligonucleotideFrequency
+                        Calculate the frequency of oligonucleotides in
+                        a DNA or RNA sequence (and other related
+                        functions)
+padAndClip              Pad and clip strings
+pairwiseAlignment       Optimal Pairwise Alignment
+phiX174Phage            Versions of bacteriophage phiX174 complete
+                        genome and sample short reads
+pid                     Percent Sequence Identity
+pmatchPattern           Longest Common Prefix/Suffix/Substring
+                        searching functions
+replaceAt               Extract/replace arbitrary substrings from/in a
+                        string or set of strings.
+replaceLetterAt         Replacing letters in a sequence (or set of
+                        sequences) at some specified locations
+reverseComplement       Sequence reversing and complementing
+stringDist              String Distance/Alignment Score Matrix
+substitution.matrices   Scoring matrices
+toComplex               Turning a DNA sequence into a vector of complex
+                        numbers
+translate               Translating DNA/RNA sequences
+trimLRPatterns          Trim Flanking Patterns from Sequences
+xscat                   Concatenate sequences contained in XString,
+                        XStringSet and/or XStringViews objects
+yeastSEQCHR1            An annotation data file for CHR1 in the
+                        yeastSEQ package
