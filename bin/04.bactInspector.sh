@@ -1,8 +1,11 @@
 #!/bin/bash
 
-for fq1 in $trimmedReads/*R1*f*q*
+for fq1 in $trimmedReads/*R1*fq.gz
 do
-  fq2=$(echo $fq1 | awk -F "R1" '{print $1 "R2" $2}')
+  fq=$(echo $fq1 | awk -F "R1" '{print $1 "R2"}')
+  fqfile=$(basename $fq)
+  fq2=$(find $trimmedReads -name "${fqfile}*val_2.fq.gz")
+
   # outdir for each sample
   name=$(basename $fq1 | awk -F '_S' '{print $1}')
   bact_out=$project/bactInspector/$name
@@ -51,7 +54,6 @@ for file in $(find $project/bactInspector -name "*_bactInspector.csv"); do
 done
 
 # convert bactInspector .csv to .xlsx
-Rscript $SCRIPTS_DIR/csv2xlsx.R \
-	$project/bactInspector/bactInspector_results.csv \
-	$reportsDir/${projectName}-bactInspector.xlsx >> $project/tmp/converting_csv.log 2>&1
+Rscript $SCRIPTS_DIR/csv2xlsx.R $project/bactInspector/bactInspector_results.csv \
+$reportsDir/04.bactInspector.xlsx >> $project/tmp/04.bactInspector.csv2xlsx.log 2>&1
 

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export PATH="$HOME/anaconda3/envs/r_env/bin:$PATH"
 CONDA_BASE=$(conda info --base)
 
 # activate the resfinder environment
@@ -65,6 +66,7 @@ done
 sed -i '1!{/^sampleID/d;}' $pointfinder/06.pointfinder.tsv 
 sed -i 's/|/\t/g' $pointfinder/06.pointfinder.tsv
 
+#export PATH="$HOME/anaconda3/envs/r_env/bin:$PATH"
 # convert resfinder .tsv to .xlsx
 Rscript $SCRIPTS_DIR/tsv2xlsx.R $resfinder/06.resfinder.tsv \
 $reportsDir/06.resfinder.xlsx >> $project/tmp/06.resfinder.tsv2xlsx.log 2>&1

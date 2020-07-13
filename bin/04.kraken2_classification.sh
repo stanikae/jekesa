@@ -1,23 +1,25 @@
 #!/bin/bash
 
-for fq1 in $trimmedReads/*R1*f*q*
+for fq1 in $trimmedReads/*R1*.fq.gz
 do
-  fq2=$(echo $fq1 | awk -F "R1" '{print $1 "R2" $2}')
+  fq=$(echo $fq1 | awk -F "R1" '{print $1 "R2"}')
+  fqfile=$(basename $fq)
+  fq2=$(find $trimmedReads -name "${fqfile}*val_2.fq.gz")
   # outdir for each sample
   name=$(basename $fq1 | awk -F '_S' '{print $1}')
   mkdir -p $krakenDir/$name
 
   # classify
   kraken2 --db $krakenDB --threads $threads --paired \
-  --output $outdir/${name}.kraken \
-  --report $outdir/${name}.kraken.report \
+  --output $krakenDir/${name}.kraken \
+  --report $krakenDir/${name}.kraken.report \
   --memory-mapping $fq1 $fq2 --gzip-compressed \
-  --unclassified-out $outdir/${name}#.fq
+  --unclassified-out $krakenDir/${name}#.fq
 
   # Grouping classification report by percentage
-  reportFile=$outdir/${name}.kraken.report
-  firstEdit=$outdir/${name}.kraken.report-downstream.txt
-  reportTopHits=$outdir/${name}.kraken.report-top-4.txt
+  reportFile=$krakenDir/${name}.kraken.report
+  firstEdit=$krakenDir/${name}.kraken.report-downstream.txt
+  reportTopHits=$krakenDir/${name}.kraken.report-top-4.txt
 
   cat $reportFile | sort -k1,1nr | egrep -v "root|cellular organisms|group" | awk '$4 !~ /K|D|P|C|O|F|G/' | tr '\t' ',' > $firstEdit
   firstLine=$(cat $firstEdit | head -n1)
@@ -48,7 +50,6 @@ for file in $(find $inDir -name "*.kraken.report-top-4.txt"); do
 done
 
 # convert kraken .csv to .xlsx
-Rscript $SCRIPTS_DIR/csv2xlsx.R \
-$outDir/${projectName}-kraken_combinedReports.csv \
-$reportsDir/${projectName}-kraken_combinedReports.xlsx >> $project/tmp/converting_csv.log 2>&1
+Rscript $SCRIPTS_DIR/csv2xlsx.R $outDir/${projectName}-kraken_combinedReports.csv \
+$reportsDir/04.kraken.xlsx >> $project/tmp/04.kraken.csv2xlsx.log 2>&1
 

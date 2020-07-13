@@ -1,8 +1,10 @@
 #!/bin/bash
 
-for read1 in $trimmedReads/*R1*f*q*
+for read1 in $trimmedReads/*R1*.fq.gz
 do
-  read2=$(echo $fq1 | awk -F "R1" '{print $1 "R2" $2}')
+  fq=$(echo $read1 | awk -F "R1" '{print $1 "R2"}')
+  fqfile=$(basename $fq)
+  read2=$(find $trimmedReads -name "${fqfile}*val_2.fq.gz")
   # outdir for each name
   name=$(basename $fq1 | awk -F '_S' '{print $1}')
   #mkdir -p $aribaDir/$name
@@ -33,7 +35,7 @@ for var in $(echo -e "known_variants\nnovel_variants\ncluster_all"); do
   # convert .csv to .xlsx
   Rscript $SCRIPTS_DIR/csv2xlsx.R \
   $aribaVF_Dir/${projectName}-aribaVFs-${var}-final.csv \
-  $reportsDir/${projectName}-aribaVFs-${var}-final.xlsx >> $project/tmp/converting_csv.log 2>&1
+  $reportsDir/06.aribaVFs-${var}.xlsx >> $project/tmp/06.aribaVFs-${var}.csv2xlsx.log 2>&1
 done
 
 # merge and write ariba AMR and VF reports to xlsx

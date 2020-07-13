@@ -35,7 +35,7 @@ done
 # Convert .tsv to .xlsx
 if [ -e $seqsero/07.seqsero.tsv ]; then
   Rscript $SCRIPTS_DIR/tsv2xlsx.R $seqsero/07.seqsero.tsv \
-	$reportsDir/07.seqsero.xlsx > $project/tmp/07.seqsero.log 2>&1
+  $reportsDir/07.seqsero.xlsx > $project/tmp/07.seqsero.tsv2xlsx.log 2>&1
 fi
 
 # Edit and compile sistr output file
@@ -45,7 +45,7 @@ for file in $(find $sistr -name "*-sistr-output.tab"); do
   tail -n -1 >> $sistr/07.sistr.tsv
 done
 
-# Convert .csv to .xlsx
+# Convert .tsv to .xlsx
 Rscript $SCRIPTS_DIR/tsv2xlsx.R $sistr/07.sistr.tsv \
-	$reportsDir/07.sistr.xlsx > $project/tmp/07.sistr.log 2>&1
+$reportsDir/07.sistr.xlsx > $project/tmp/07.sistr.tsv2xlsx.log 2>&1
 

@@ -6,7 +6,7 @@ if ! [ -d $tmp ]; then
  mkdir -p $tmp
 fi
 
-for fq1 in $indir/*R1*f*q*
+for fq1 in $project/*R1*f*q*
 do
   #fq2=$(echo $fq1 | awk -F "R1" '{print $1 "R2" $2}')
   name=$(basename $fq1 | awk -F '_S' '{print $1}')
@@ -30,6 +30,5 @@ cat ${project}/coverageDepth/*/*.csv > ${project}/coverageDepth/coverage_merged.
 echo "Sample,Est.GenomeSize,CoverageDepth" > ${project}/coverageDepth/${projectName}-coverage-final.csv
 grep -v '^Sample' ${project}/coverageDepth/coverage_merged.csv >> ${project}/coverageDepth/${projectName}-coverage-final.csv
 # convert coverage results to .xlsx file
-Rscript $SCRIPTS_DIR/csv2xlsx.R \
-${project}/coverageDepth/${projectName}-coverage-final.csv \
-$reportsDir/${projectName}-coverage-final.xlsx >> $project/tmp/converting_csv.log 2>&1
+Rscript $SCRIPTS_DIR/csv2xlsx.R ${project}/coverageDepth/${projectName}-coverage-final.csv \
+$reportsDir/03.coverageDepth.xlsx >> $project/tmp/03.coverageDepth.csv2xlsx.log 2>&1

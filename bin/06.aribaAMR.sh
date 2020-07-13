@@ -1,8 +1,11 @@
 #!/bin/bash
 
-for read1 in $trimmedReads/*R1*f*q*
+for read1 in $trimmedReads/*R1*.fq.gz
 do
-  read2=$(echo $fq1 | awk -F "R1" '{print $1 "R2" $2}')
+  fq=$(echo $read1 | awk -F "R1" '{print $1 "R2"}')
+  fqfile=$(basename $fq)
+  read2=$(find $trimmedReads -name "${fqfile}*val_2.fq.gz")
+  
   # outdir for each name
   name=$(basename $fq1 | awk -F '_S' '{print $1}')
   #mkdir -p $aribaDir/$name
@@ -43,9 +46,8 @@ done
 
 # writing ariba report to xlsx
 for var in $(echo -e "known_variants\nnovel_variants\ncluster_all"); do
-  Rscript $SCRIPTS_DIR/csv2xlsx.R \
-  $aribaDir/${projectName}-aribaAMR-${var}-final.csv \
-  $reportsDir/${projectName}-aribaAMR-${var}-final.xlsx >> $project/tmp/converting_csv.log 2>&1
+  Rscript $SCRIPTS_DIR/csv2xlsx.R $aribaDir/${projectName}-aribaAMR-${var}-final.csv \
+  $reportsDir/06.aribaAMR-${var}.xlsx >> $project/tmp/06.aribaAMR-${var}.csv2xlsx.log 2>&1
 done
 
 # copy ariba AMR .tre and .csv files to reports directory

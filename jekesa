@@ -79,10 +79,10 @@ done
 shift $((OPTIND -1))
 
 # If no parameters are provided, display usage
-if [ $# -eq 0 ]; then
-	usage
-	exit 1
-fi
+#if [ $# -eq 0 ]; then
+#	usage
+#	exit 1
+#fi
 
 if [[ $MLSTscheme == "other" ]]; then
     MLSTscheme="noScheme"
@@ -174,7 +174,7 @@ else
   echo -e "\t[`date +"%d-%b-%Y %T"`]\tRead filtering for project: $projectName already completed, moving to next step"
 fi
 
-# STEP 03: Count both raw and cleaned reads
+# STEP 03: Count both raw and cleaned reads;and estimate coverage depth
 stage=$(grep "countReads-step03" "$project/progress")
 if [ -z "$stage" ]; then
   echo -e "\t[`date +"%d-%b-%Y %T"`]\tCount raw and cleaned reads for sample: $samples"
@@ -182,33 +182,26 @@ if [ -z "$stage" ]; then
   mkdir -p $readsDir
   nohup $SCRIPTS_DIR/03.get_coverageDepth.sh >> $project/tmp/get_coverageDepth.log 2>&1 &
   nohup $SCRIPTS_DIR/03.countReads.sh >> $readsDir/count_reads.log 2>&1 &
+  wait
   echo "countReads-step03" >> $project/progress
 else
   echo -e "\t[`date +"%d-%b-%Y %T"`]\tRead counting for project: $projectName already completed, moving to next step"
 fi
 
-# delete linked input fastq files
-counter=0
-for fq1 in $project/*R1*f*q*
- do
-  fq2=$(echo $fq1 | awk -F "R1" '{print $1 "R2" $2}')
-  counter=counter+1
-  rm ${fq1} ${fq2}
-done
-
 # STEP 04: Species identification
 stage=$(grep "speciesID-step04" "$project/progress")
 if [ -z "$stage" ]; then
   echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting species identification using kraken2 and bactInspector"
-#  declare -x filteredReads=$krakenDir/$samples
   declare -x krakenDir=$project/kraken
   declare -x confindrDir=$project/confindr
   declare -x bactInspectorDir=$project/bactInspector
-  mkdir -p $krakenDir; mkdir -p $confindrDir; mkdir -p $bactInspectorDir
-  nohup $SCRIPTS_DIR/04.kraken2_classification.sh >> $krakenDir/kraken2.log 2>&1 &
-  nohup $SCRIPTS_DIR/04.bactInspector.sh >> $bactInspectorDir/bactinspector.log 2>&1 &
+  mkdir -p $krakenDir
+  mkdir -p $confindrDir
+  mkdir -p $bactInspectorDir
+  nohup $SCRIPTS_DIR/04.kraken2_classification.sh >> $krakenDir/kraken2.log 2>&1
+  nohup $SCRIPTS_DIR/04.bactInspector.sh >> $bactInspectorDir/bactinspector.log 2>&1
   echo -e "\t[`date +"%d-%b-%Y %T"`]\tChecking inter- and intra-species contamination"
-  nohup $SCRIPTS_DIR/04.confindr.sh >> $confindrDir/confindr.log 2>&1 &
+  nohup $SCRIPTS_DIR/04.confindr.sh >> $confindrDir/confindr.log 2>&1
   echo "speciesID-step04" >> $project/progress
 else
  echo -e "\t[`date +"%d-%b-%Y %T"`]\tSpecies identification for project: $projectName already completed, moving to next step"
@@ -244,10 +237,10 @@ if [ -z "$stage" ]; then
   declare -x plasmidDir=$project/plasmids
   mkdir -p $aribaDir; mkdir -p $aribaVF_Dir; mkdir -p $resfinder; mkdir -p $pointfinder; mkdir -p $plasmidDir
   # run resfinder and pointfinder
-  nohup $SCRIPTS_DIR/06.cgeAMR.sh >> $project/tmp/cgeAMR.log 2>&1 &
+  nohup $SCRIPTS_DIR/06.cgeAMR.sh >> $project/tmp/cgeAMR.log 2>&1
   # run ariba for AMR and VF detection
-  nohup $SCRIPTS_DIR/06.aribaAMR.sh >> $aribaDir/ariba_AMRtyping.log 2>&1 &
-  nohup $SCRIPTS_DIR/06.aribaVFs.sh >> $project/tmp/ariba_VFtyping.log 2>&1 &
+  nohup $SCRIPTS_DIR/06.aribaAMR.sh >> $aribaDir/ariba_AMRtyping.log 2>&1
+  nohup $SCRIPTS_DIR/06.aribaVFs.sh >> $project/tmp/ariba_VFtyping.log 2>&1
   wait 
   # merge and write ariba AMR and VF reports to xlsx
   Rscript $SCRIPTS_DIR/merge_files.R $reportsDir \
@@ -270,7 +263,7 @@ if [ -z "$stage" ]; then
    declare -x pbpDir=$project/pbp-typing
    mkdir -p $serobaDir; mkdir -p $pilusDir; mkdir -p $pbpDir
    echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting S. pneumoniae serotyping"
-   nohup $SCRIPTS_DIR/07.seroba.sh >> $serobaDir/seroba.log 2>&1 &
+   nohup $SCRIPTS_DIR/07.seroba.sh >> $serobaDir/seroba.log 2>&1
    echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting S. pneumoniae pili detection"
    $SCRIPTS_DIR/07.SPN-pili-detection.sh
    echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting S. pneumoniae PBP typing using CDC StrepLab scripts"
@@ -334,6 +327,20 @@ if [ -z "$stage" ]; then
 else
  echo -e "\t[`date +"%d-%b-%Y %T"`]\tSpecies specific for: $projectName already completed, moving to next step"
 fi
+
+
+# delete linked input fastq files
+counter=0
+for fq1 in $project/*R1*f*q*
+ do
+  fq2=$(echo $fq1 | awk -F "R1" '{print $1 "R2" $2}')
+  counter=counter+1
+  if [ -h $fq1 ]; then
+    if [ -h $fq2 ]; then
+      rm ${fq1} ${fq2}
+    fi
+  fi
+done
 
 #############################################################################################################
 ###                          Save results to the final results excel (.xlsx) file                         ###

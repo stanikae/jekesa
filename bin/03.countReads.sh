@@ -32,7 +32,6 @@ echo -e "SampleID\tTotal_reads\tTotal_yield\tClean_reads\tClean_bases" > $readsD
 cat $readsDir/total_reads.tsv >> $readsDir/${projectName}-total_reads.tsv
 
 if [ -e $readsDir/${projectName}-total_reads.tsv ]; then
-  Rscript $SCRIPTS_DIR/tsv2xlsx.R \
-	$readsDir/${projectName}-total_reads.tsv \
-	$reportsDir/${projectName}-total_reads.xlsx >> $project/tmp/converting_tsv.log 2>&1
+  Rscript $SCRIPTS_DIR/tsv2xlsx.R $readsDir/${projectName}-total_reads.tsv \
+  $reportsDir/03.countReads.xlsx >> $project/tmp/03.countReads.tsv2xlsx.log 2>&1
 fi

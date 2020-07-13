@@ -79,6 +79,7 @@ cat $workdir/Pili-combined-results.txt >> $workdir/Pili-combined-results.tsv
 
 # Step 7: Convert tsv xlsx file
 if [ -s $workdir/Pili-combined-results.tsv ]; then
-	Rscript ~/repos/bacteria_denovo_assembly/csv2xlsx.R $workdir/Pili-combined-results.tsv $reportsDir/${projectName}_pili-results.xlsx
+   Rscript $SCRIPTS_DIR/csv2xlsx.R $workdir/Pili-combined-results.tsv \
+   $reportsDir/07.SPN-pili.xlsx >> $project/tmp/07.SPN-pili.tsv2xlsx.log 2>&1
 fi
 

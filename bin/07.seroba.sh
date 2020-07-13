@@ -2,7 +2,9 @@
 
 for fq1 in $trimmedReads/*R1*f*q*
  do
-  fq2=$(echo $fq1 | awk -F "R1" '{print $1 "R2" $2}')
+  fq=$(echo $fq1 | awk -F "R1" '{print $1 "R2"}')
+  fqfile=$(basename $fq)
+  fq2=$(find $trimmedReads -name "${fqfile}*val_2.fq.gz")
   # outdir for each name
   name=$(basename $fq1 | awk -F '_S' '{print $1}')
 
@@ -22,4 +24,4 @@ tr '\t' ',' | awk -F ',' '{gsub("/.*/","",$1)}1' OFS=',' > $serobaDir/summary_he
 
 # save seroba results to xlsx excel workbook
 Rscript $SCRIPTS_DIR/csv2xlsx.R $serobaDir/summary_header.csv \
-	$reportsDir/${projectName}_serobaResults.xlsx >> $project/tmp/converting_csv.log 2>&1
+$reportsDir/07.seroba.xlsx >> $project/tmp/07.seroba.csv2xlsx.log 2>&1
