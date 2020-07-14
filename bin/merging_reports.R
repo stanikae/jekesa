@@ -53,7 +53,7 @@ col_order <- c("assembly","# contigs (>= 200 bp)", "GC (%)", "N50", "Largest con
 metrics2 <- metrics2 %>% select(col_order)
 
 # rename metrics column names
-colnames(metrics2) <- c("SampleID","Contig_num", "GC_content", "N50_value", "Longest_contig", "Total_bases")
+colnames(metrics2) <- c("SampleID","Contig.num", "Contigs.GC.content", "N50.value", "Longest.contig", "Total.bases.assembly")
 #colnames(metricsQC) <- c("assembly","Contigs (>=200bp)","CDS","Properly_paired_reads", "rRNA","Total_reads",
 #                         "Avg_Coverage_Depth","Coverage (>=10x)", "GC%", "Largest_contig", "N50", "Total_length")
 
@@ -66,6 +66,7 @@ colnames(metrics2) <- c("SampleID","Contig_num", "GC_content", "N50_value", "Lon
 #head(mlst)
 mlst$FILE <- str_remove(mlst$FILE, "_scaffolds.fasta|_assembly.fasta")
 names(mlst)[1] <- "SampleID"
+names(mlst)[2] <- "Scheme.MLST"
 # ariba data
 names(ariba)[1] <- "SampleID"
 #names(pili)[1] <- "SampleID"

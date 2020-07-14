@@ -26,7 +26,7 @@ done
 conda deactivate
 
 # Edit and merge SeqSero output file
-echo -e "SampleID\tO.antigen\tH1.antigen.fliC\tH2.antigen.fljB\tPredicted.subspecies\tAntigenic.profile\tSerotype\tNote" > $seqsero/07.seqsero.tsv
+echo -e "SampleID\tseqsero2.o.antigen\tseqsero2.H1.antigen.fliC\tseqsero2.H2.antigen.fljB\tseqsero2.predicted.subsp\tseqsero2.antigenic.profile\tseqsero2.serotype\tseqsero2.note" > $seqsero/07.seqsero.tsv
 for file in $(find $seqsero -name "*SeqSero_result.tsv"); do 
   cat $file | tail -n -1 | \
   awk -v OFS='\t' '{print $1,$4,$5,$6,$7,$8,$9,$10}' >> $seqsero/07.seqsero.tsv
@@ -39,10 +39,11 @@ if [ -e $seqsero/07.seqsero.tsv ]; then
 fi
 
 # Edit and compile sistr output file
-echo -e "cgmlst.ST\tcgmlst.distance\tcgmlst.genome.match\tcgmlst.matching.alleles\tcgmlst.subspecies\th1\th2\to.antigen\tqc.status\tserogroup\tserovar\tserovar.antigen\tserovar.cgmlst" > $sistr/07.sistr.tsv 
+echo -e "sampleID\tsistr.cgmlst.subsp\tsistr.h1\tsistr.h2\tsistr.o.antigen\tsistr.qc.status\tsistr.serogroup\tsistr.serovar\tsistr.serovar.antigen\tsistr.serovar.cgmlst" > $sistr/07.sistr.tsv 
 for file in $(find $sistr -name "*-sistr-output.tab"); do
-  cat $file | awk -v OFS='\t' -F '\t' '{print $1,$2,$3,$4,$5,$8,$9,$10,$12,$13,$14,$15,$16}' |\
-  tail -n -1 >> $sistr/07.sistr.tsv
+  sampleID=$(basename -s -sistr-output.tab $file)
+  seroInfo=$(cat $file | awk -v OFS='\t' -F '\t' '{print $5,$8,$9,$10,$12,$13,$14,$15,$16}' | tail -n -1)
+  echo -e "$sampleID\t$seroInfo" >> $sistr/07.sistr.tsv
 done
 
 # Convert .tsv to .xlsx

@@ -18,7 +18,7 @@ do
   bactinspector check_species -i $trimmedReads -o $bact_out -fq $fq1
 
   # edit check_species output
-  sed -i 's/_S_R1_val_1//' $bact_out/species_investigation*.tsv
+  sed -i 's/_S.*_val_1//' $bact_out/species_investigation*.tsv
   if [[ $(wc -l $bact_out/species_investigation_*.tsv | awk '{ print $1 }' ) -gt 2 ]]; then
 	#cat $bact_out/species_investigation_*.tsv | head -n2 > $bact_out/species_investigation-top1.tsv
 	(head -n1 $bact_out/species_investigation_*.tsv) && (tail -n -1 $bact_out/species_investigation_*.tsv | \

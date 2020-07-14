@@ -28,7 +28,7 @@ do
 done
 
 echo -e "\t[`date +"%d-%b-%Y %T"`]\tSaving Read count data in MS excel format"
-echo -e "SampleID\tTotal_reads\tTotal_yield\tClean_reads\tClean_bases" > $readsDir/${projectName}-total_reads.tsv
+echo -e "SampleID\tTotal.reads\tTotal.bases\tClean.reads\tClean.bases" > $readsDir/${projectName}-total_reads.tsv
 cat $readsDir/total_reads.tsv >> $readsDir/${projectName}-total_reads.tsv
 
 if [ -e $readsDir/${projectName}-total_reads.tsv ]; then

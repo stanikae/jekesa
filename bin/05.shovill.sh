@@ -18,7 +18,7 @@ do
     do
         echo $i
         pathName=$(dirname $i)
-        pathName2=$(basename $name)
+        pathName2=$(basename $pathName)
        # echo $name2
         #rename "s/contigs.fa/${name2}_assembly.fasta/" $i
         if [[ "$i" =~ "contigs.fa" ]]
@@ -47,5 +47,5 @@ $reportsDir/05.quast.xlsx >> $project/tmp/05.quast2xlsx.log 2>&1
 
 # rsync assembled contigs to results directory
 mkdir -p $reportsDir/assembled-contigs
-find $spadesDir/$name -maxdepth 1 -type f -name "*_assembly.fasta" -exec rsync -c {} $reportsDir/assembled-contigs/ \;
+find $spadesDir -maxdepth 2 -type f -name "*_assembly.fasta" -exec rsync -c {} $reportsDir/assembled-contigs/ \;
 

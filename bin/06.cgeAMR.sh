@@ -1,10 +1,12 @@
 #!/bin/bash
 
 export PATH="$HOME/anaconda3/envs/r_env/bin:$PATH"
+#export PATH="$HOME/anaconda3/envs/resfinder/bin:$PATH"
 CONDA_BASE=$(conda info --base)
 
 # activate the resfinder environment
-#source ${CONDA_BASE}/etc/profile.d/conda.sh
+source ${CONDA_BASE}/etc/profile.d/conda.sh
+conda deactivate
 eval "$(conda shell.bash hook)"
 conda activate resfinder
 
@@ -22,31 +24,36 @@ for contigs in $(find $spadesDir -name "*_assembly.fasta")
   $resfinder/$name/${name}.resfindr.tsv >> $project/tmp/06.json2tsv.log 2>&1
 
   # point mutation detection using assembled contigs
-  mkdir -p $pointfinder/$name
-  python3 $SCRIPTS_DIR/PointFinder.py -i $contigs \
-  -o $pointfinder/$name -p $DATABASES_DIR/pointfinder_db \
-  -s salmonella -m blastn -m_p ${CONDA_BASE}/envs/resfinder/bin/blastn \
-  -t 0.90 -l 0.60 >> $project/tmp/06.pointfinder.log 2>&1
-  # prepare output file for each sample
-  #sed -i -n '/Known Mutations/,$p' $pointfinder/$name/${name}_blastn_HTMLtable.txt
-  # echo $name | cat - $pointfinder/$name/${name}_blastn_HTMLtable.txt | \
-  # sed '/^[[:space:]]*$/d' | tr '\t' ';' > $pointfinder/${name}_pointfinder.txt
-   # add line with gene IDs
-  sed -i -n '/Known Mutations/,$p' $pointfinder/$name/${name}_blastn_HTMLtable.txt
-  sed -i '1d' $pointfinder/$name/${name}_blastn_HTMLtable.txt
-  header=$(cat $pointfinder/$name/${name}_blastn_HTMLtable.txt | \
-  sed 's/^[[:space:]]*$/:/' | sed '/^Mutation/d' | sed 's/\t/;/g' | \
-  awk 'BEGIN{FS="\n";ORS="|"} {print $1}' | awk 'BEGIN{FS="|";RS=":"} {print $2}' | \
-  sed '/^$/d' | awk -v RS="\n" -v ORS="|" '1' | sed 's/|$/\n/g')
-  # 
-  printf "sampleID|$header\n" > $pointfinder/${name}_pointfinder.txt
-  # add mutations line
-  info=$(cat $pointfinder/$name/${name}_blastn_HTMLtable.txt | \
-  sed 's/^[[:space:]]*$/:/' | sed '/^Mutation/d' | sed 's/\t/;/g' | \
-  awk 'BEGIN{FS="\n";ORS="|"} {print $1}' | awk 'BEGIN{FS="|";RS=":"} {print $3}' | \
-  sed '/^$/d' | awk -v RS="\n" -v ORS="|" '1' | sed 's/|$/\n/g')
-  #
-  printf "$name|$info\n" >> $pointfinder/${name}_pointfinder.txt
+  if grep -Fq "$MLSTscheme" $DATABASES_DIR/pointfinder_mlst_matches.csv; then 
+     line=$(grep "$MLSTscheme" "$DATABASES_DIR"/pointfinder_mlst_matches.csv)
+     pointID=$(echo $line | awk -F',' '{print $2}')
+     mkdir -p $pointfinder/$name
+     # run pointfinder
+     python3 $SCRIPTS_DIR/PointFinder.py -i $contigs \
+     -o $pointfinder/$name -p $DATABASES_DIR/pointfinder_db \
+     -s $pointID -m blastn -m_p ${CONDA_BASE}/envs/resfinder/bin/blastn \
+     -t 0.90 -l 0.60 >> $project/tmp/06.pointfinder.log 2>&1
+     # prepare output file for each sample
+     #sed -i -n '/Known Mutations/,$p' $pointfinder/$name/${name}_blastn_HTMLtable.txt
+     # echo $name | cat - $pointfinder/$name/${name}_blastn_HTMLtable.txt | \
+     # sed '/^[[:space:]]*$/d' | tr '\t' ';' > $pointfinder/${name}_pointfinder.txt
+     # add line with gene IDs
+     sed -i -n '/Known Mutations/,$p' $pointfinder/$name/${name}_blastn_HTMLtable.txt
+     sed -i '1d' $pointfinder/$name/${name}_blastn_HTMLtable.txt
+     header=$(cat $pointfinder/$name/${name}_blastn_HTMLtable.txt | \
+     sed 's/^[[:space:]]*$/:/' | sed '/^Mutation/d' | sed 's/\t/;/g' | \
+     awk 'BEGIN{FS="\n";ORS="|"} {print $1}' | awk 'BEGIN{FS="|";RS=":"} {print $2}' | \
+     sed '/^$/d' | awk -v RS="\n" -v ORS="|" '1' | sed 's/|$/\n/g')
+     # 
+     printf "sampleID|$header\n" > $pointfinder/${name}_pointfinder.txt
+     # add mutations line
+     info=$(cat $pointfinder/$name/${name}_blastn_HTMLtable.txt | \
+     sed 's/^[[:space:]]*$/:/' | sed '/^Mutation/d' | sed 's/\t/;/g' | \
+     awk 'BEGIN{FS="\n";ORS="|"} {print $1}' | awk 'BEGIN{FS="|";RS=":"} {print $3}' | \
+     sed '/^$/d' | awk -v RS="\n" -v ORS="|" '1' | sed 's/|$/\n/g')
+     #
+     printf "$name|$info\n" >> $pointfinder/${name}_pointfinder.txt
+  fi
 done
 # deactivate resfinder environment
 conda deactivate
@@ -60,7 +67,9 @@ sed -i '1!{/^sampleID/d;}' $resfinder/06.resfinder.tsv
 
 # combine pointfinder results
 for file in $(find $pointfinder -name "*_pointfinder.txt"); do
-  cat $file >> $pointfinder/06.pointfinder.tsv
+#  if [[ -s "$file" ]]; then
+     cat $file >> $pointfinder/06.pointfinder.tsv
+#  fi
 done
 # remove multiple headers
 sed -i '1!{/^sampleID/d;}' $pointfinder/06.pointfinder.tsv 

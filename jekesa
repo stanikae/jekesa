@@ -79,10 +79,10 @@ done
 shift $((OPTIND -1))
 
 # If no parameters are provided, display usage
-#if [ $# -eq 0 ]; then
-#	usage
-#	exit 1
-#fi
+if [ -z $project ]; then
+	usage
+	exit 1
+fi
 
 if [[ $MLSTscheme == "other" ]]; then
     MLSTscheme="noScheme"

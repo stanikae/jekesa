@@ -14,7 +14,7 @@ do
   read2=$(find $trimmedReads -name "${fqfile}*val_2.fq.gz")
   #read2=$(echo $fq1 | awk -F "R1" '{print $1 "R2" $2}')
   #outdir for each name
-  name=$(basename $fq1 | awk -F '_S' '{print $1}')
+  name=$(basename $read1 | awk -F '_S' '{print $1}')
 
   ln -s $read1 $confindrDir/${name}_R1.fastq.gz
   ln -s $read2 $confindrDir/${name}_R2.fastq.gz

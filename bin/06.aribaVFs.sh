@@ -6,7 +6,7 @@ do
   fqfile=$(basename $fq)
   read2=$(find $trimmedReads -name "${fqfile}*val_2.fq.gz")
   # outdir for each name
-  name=$(basename $fq1 | awk -F '_S' '{print $1}')
+  name=$(basename $read1 | awk -F '_S' '{print $1}')
   #mkdir -p $aribaDir/$name
 
   ln -s $read1 $aribaVF_Dir/${name}_1.fastq.gz
