@@ -151,7 +151,12 @@ stage=$(grep "fastqc-step01" "$project/progress")
 if [ -z "$stage" ]; then
   echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting quality control of sequencing reads for project: $projectName"
   declare -x fastqc_out=$project/fastqcReports
-  mkdir -p $fastqc_out
+  if [ -d $fastqc_out ]; then
+    rm -r $fastqc_out
+    mkdir -p $fastqc_out
+  else
+    mkdir -p $fastqc_out
+  fi
   nohup $SCRIPTS_DIR/01.fastq_qc.sh > $fastqc_out/fastqc_check.log 2>&1 &
   echo "fastqc-step01" >> $project/progress
 else
@@ -334,7 +339,7 @@ counter=0
 for fq1 in $project/*R1*f*q*
  do
   fq2=$(echo $fq1 | awk -F "R1" '{print $1 "R2" $2}')
-  counter=counter+1
+  counter=$((counter+1))
   if [ -h $fq1 ]; then
     if [ -h $fq2 ]; then
       rm ${fq1} ${fq2}
@@ -359,7 +364,7 @@ done
 ###                          Save results to the final results excel (.xlsx) file                         ###
 #############################################################################################################
 echo -e "\t[`date +"%d-%b-%Y %T"`]\tSaving final bacterial WGS typing report to MS Excel for project $projectName"
-Rscript $SCRIPTS_DIR/09.merge_results.R $MLSTscheme $reportsDir ${projectName}-WGS-typing-report.xlsx
+Rscript $SCRIPTS_DIR/09.merge_results.R $MLSTscheme $reportsDir ${projectName}-WGS-typing-report.xlsx > $project/tmp/09.merge.results.log 2>&1 
 
 #value=$(wc -l $filename | awk '{print $1}')
 echo -e "\t[`date +"%d-%b-%Y %T"`]\tAnalysis of ${counter} samples completed"

@@ -59,11 +59,17 @@ done
 conda deactivate
 
 # merge resfinder output from multiple samples
-for file in $(find $resfinder -name "*.resfindr.tsv"); do 
-  cat $file >> $resfinder/06.resfinder.tsv
-done
+#for file in $(find $resfinder -name "*.resfindr.tsv"); do 
+#  cat $file >> $resfinder/06.resfinder.tsv
+#done
 # remove multiple headers
-sed -i '1!{/^sampleID/d;}' $resfinder/06.resfinder.tsv
+#sed -i '1!{/^sampleID/d;}' $resfinder/06.resfinder.tsv
+
+# copy *.tsv files to the same folder
+mkdir -p $resfinder/TSVs
+find $resfinder -name "*resfindr.tsv" -exec rsync {} $resfinder/TSVs/ \;
+# merge resfinder output from multiple samples
+$SCRIPTS_DIR/06.resfinder2tsv.R $resfinder/TSVs $resfinder/06.resfinder.tsv > $project/tmp/06.resfinder2tsv.log 2>&1
 
 # combine pointfinder results
 for file in $(find $pointfinder -name "*_pointfinder.txt"); do
