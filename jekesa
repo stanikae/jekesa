@@ -284,7 +284,7 @@ if [ -z "$stage" ]; then
    # convert output file to xlsx
    Rscript $SCRIPTS_DIR/convert_SPN-PBP-Typing-Results_2_xlsx.R \
            $out_analysis/TABLE_SPN_"$batch_name"_Typing_Results.txt \
-           $reportsDir/${projectName}_pbp-typing.xlsx >> $project/tmp/convert_SPN-PBP-Typing.log 2>&1
+           $reportsDir/07.SPN-pbp-typing.xlsx >> $project/tmp/convert_SPN-PBP-Typing.log 2>&1
    # Run PopPunk analysis for S. pneumoniae
    bash $SCRIPTS_DIR/07.poppunk.sh $project
  
@@ -310,7 +310,7 @@ if [ -z "$stage" ]; then
    # convert output file to xlsx
    Rscript $SCRIPTS_DIR/convert_SPN-PBP-Typing-Results_2_xlsx.R \
            $out_analysis/TABLE_GAS_"$batch_name"_Typing_Results.txt \
-           $reportsDir/${projectName}_pbp-typing.xlsx >> $project/tmp/convert_GAS-PBP-Typing.log 2>&1
+           $reportsDir/07.GAS-typing.xlsx >> $project/tmp/convert_GAS-PBP-Typing.log 2>&1
    # Run PopPunk analysis for S. pyogenes
    bash $SCRIPTS_DIR/07.poppunk.sh $project
 
@@ -343,61 +343,6 @@ for fq1 in $project/*R1*f*q*
 done
 
 #############################################################################################################
-###                          Save results to the final results excel (.xlsx) file                         ###
-#############################################################################################################
-echo -e "\t[`date +"%d-%b-%Y %T"`]\tSaving final bacterial WGS typing report to MS Excel for project $projectName"
-if [[ "$MLSTscheme" == "spneumoniae" ]]; then
-  Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir \
-	${projectName}_quastResults.xlsx ${projectName}_mlstResults.xlsx \
-	${projectName}-ariba_final.xlsx ${projectName}-kraken_combinedReports.xlsx \
-	${projectName}_serobaResults.xlsx ${projectName}_WGS-typing-00.xlsx \
-	${projectName}_pili-results.xlsx ${projectName}_pbp-typing.xlsx >> $project/tmp/merge_reports.log 2>&1
-  	# add PopPunk results
-  	Rscript $SCRIPTS_DIR/adding_poppunk_results.R \
-	$reportsDir ${projectName}_WGS-typing-00.xlsx \
-	assigned_gpscs.xlsx \
-	assigned_clusters.xlsx \
-	${projectName}_WGS-typing-01.xlsx >> $project/tmp/add_poppunk.log 2>&1
-
-elif [[ "$MLSTscheme" == "spyogenes" ]]; then
- 	Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir \
-	${projectName}_quastResults.xlsx \
-	${projectName}_mlstResults.xlsx \
-	${projectName}-ariba_final.xlsx \
-	${projectName}-kraken_combinedReports.xlsx \
-	${projectName}_WGS-typing-00.xlsx ${projectName}_pbp-typing.xlsx >> $project/tmp/merge_reports.log 2>&1
-	# add PopPunk results
-	Rscript $SCRIPTS_DIR/adding_poppunk_results.R $reportsDir \
-	${projectName}_WGS-typing-00.xlsx \
-	assigned_gpscs.xlsx \
-	assigned_clusters.xlsx \
-	${projectName}_WGS-typing-01.xlsx >> $project/tmp/add_poppunk.log 2>&1
-else
- 	Rscript $SCRIPTS_DIR/merging_reports.R $reportsDir \
-	${projectName}_quastResults.xlsx ${projectName}_mlstResults.xlsx \
-	${projectName}-ariba_final.xlsx ${projectName}-kraken_combinedReports.xlsx \
-	${projectName}_WGS-typing-01.xlsx >> $project/tmp/merge_reports.log 2>&1
-fi
-
-# add confindr results to the final report
-Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-        ${projectName}_WGS-typing-01.xlsx ${projectName}-confindr-final.xlsx \
-        ${projectName}_WGS-typing-conf-02.xlsx >> $project/tmp/add_confindr.log 2>&1
-# add bactInspector results to the final report
-Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-        ${projectName}_WGS-typing-conf-02.xlsx ${projectName}-bactInspector.xlsx \
-        ${projectName}_WGS-typing-bactInsp-03.xlsx >> $project/tmp/add_bactInspector.log 2>&1
-# add coverage results results to the final report
-Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-        ${projectName}_WGS-typing-bactInsp-03.xlsx ${projectName}-coverage-final.xlsx \
-        ${projectName}_WGS-typing-04.xlsx >> $project/tmp/add_coverage.log 2>&1
-# add raw and cleaned reads totals
-Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
-        ${projectName}_WGS-typing-04.xlsx ${projectName}-total_reads.xlsx \
-        ${projectName}_WGS-typing-final-report.xlsx >> $project/tmp/add_total-reads.log 2>&1
-
-
-#############################################################################################################
 ###                          Construct phylogenetic tree of samples in this analysis                      ###
 #############################################################################################################
 # construct phylogenetic tree of samples in this analysis
@@ -408,6 +353,13 @@ Rscript $SCRIPTS_DIR/add_bactInspector_results.R $reportsDir \
 # edit info.csv file to match sampleID name with assembly fasta output e.g. for sample_assembly.fasta ==> sample_assembly
 # run poppunk
 #nohup bash ../poppunk-launcher.sh poppunk-analysis/reference_list.txt spn_db/info_csv.csv /media/60tb/uct/felix/191025_M02143_rpt/spn_db > spn_db/spn_db.log 2>&1
+
+
+#############################################################################################################
+###                          Save results to the final results excel (.xlsx) file                         ###
+#############################################################################################################
+echo -e "\t[`date +"%d-%b-%Y %T"`]\tSaving final bacterial WGS typing report to MS Excel for project $projectName"
+Rscript $SCRIPTS_DIR/09.merge_results.R $MLSTscheme $reportsDir ${projectName}-WGS-typing-report.xlsx
 
 #value=$(wc -l $filename | awk '{print $1}')
 echo -e "\t[`date +"%d-%b-%Y %T"`]\tAnalysis of ${counter} samples completed"

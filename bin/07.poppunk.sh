@@ -97,40 +97,40 @@ if [[ "$MLSTscheme" == "spyogenes" ]]; then
 	head -n1 $poppunk_dir/gas_db/gas_db_clusters.csv > $poppunk_dir/assigned_gpscs.csv
         grep -F -f $poppunk_dir/grep_list.txt $poppunk_dir/gas_db/gas_db_clusters.csv | sed 's|/.*/||g' >> $poppunk_dir/assigned_gpscs.csv
 	Rscript $SCRIPTS_DIR/csv2xlsx.R \
-		$poppunk_dir/assigned_gpscs.csv $reports_dir/assigned_gpscs.xlsx >> $project/tmp/poppunk_converting_csv.log
+		$poppunk_dir/assigned_gpscs.csv $reports_dir/07.GAS.assigned-gpscs.xlsx >> $project/tmp/07.GAS.gpscs.poppunk.csv2xlsx.log
 	# determine if the novel (NA) files are the same or not using the clusters.csv file
 	head -n1 $poppunk_dir/gas_db/gas_db_clusters.csv > $poppunk_dir/assigned_clusters.csv
         grep -F -f $poppunk_dir/grep_list.txt $poppunk_dir/gas_db/gas_db_clusters.csv | sed 's|/.*/||g' >> $poppunk_dir/assigned_clusters.csv
 	Rscript $SCRIPTS_DIR/csv2xlsx.R \
-		$poppunk_dir/assigned_clusters.csv $reports_dir/assigned_clusters.xlsx >> $project/tmp/poppunk_converting_csv.log
+		$poppunk_dir/assigned_clusters.csv $reports_dir/07.GAS.assigned-clusters.xlsx >> $project/tmp/07.GAS.clusters.poppunk.csv2xlsx.log
 elif [[ "$MLSTscheme" == "spneumoniae" ]]; then
 	echo -e "\t[`date +"%d-%b-%Y %T"`]\tCreating PopPunk GPSC output file for $MLSTscheme" 
 	head -n1 $poppunk_dir/spn_db/spn_db_external_clusters.csv > $poppunk_dir/assigned_gpscs.csv
 	grep -F -f $poppunk_dir/grep_list.txt $poppunk_dir/spn_db/spn_db_external_clusters.csv | sed 's|/.*/||g' >> $poppunk_dir/assigned_gpscs.csv
 	Rscript $SCRIPTS_DIR/csv2xlsx.R \
-		$poppunk_dir/assigned_gpscs.csv $reports_dir/assigned_gpscs.xlsx >> $project/tmp/poppunk_converting_csv.log
+		$poppunk_dir/assigned_gpscs.csv $reports_dir/07.SPN.assigned-gpscs.xlsx >> $project/tmp/07.SPN.gpsc.poppunk.csv2xlsx.log
 	# determine if the novel (NA) files are the same or not using the clusters.csv file
 	head -n1 $poppunk_dir/spn_db/spn_db_clusters.csv > $poppunk_dir/assigned_clusters.csv
         grep -F -f $poppunk_dir/grep_list.txt $poppunk_dir/spn_db/spn_db_clusters.csv | sed 's|/.*/||g' >> $poppunk_dir/assigned_clusters.csv
 	Rscript $SCRIPTS_DIR/csv2xlsx.R \
-		$poppunk_dir/assigned_clusters.csv $reports_dir/assigned_clusters.xlsx >> $project/tmp/poppunk_converting_csv.log
+		$poppunk_dir/assigned_clusters.csv $reports_dir/07.SPN.assigned-clusters.xlsx >> $project/tmp/07.SPN.clusters.poppunk.csv2xlsx.log
 else
 	head -n1 $poppunk_dir/strain_db/strain_db_external_clusters.csv > $poppunk_dir/assigned_gpscs.csv
         grep -F -f $poppunk_dir/grep_list.txt $poppunk_dir/strain_db/strain_db_external_clusters.csv | sed 's|/.*/||g' >> $poppunk_dir/assigned_gpscs.csv
 	Rscript $SCRIPTS_DIR/csv2xlsx.R \
-		$poppunk_dir/assigned_gpscs.csv $reports_dir/assigned_gpscs.xlsx >> $project/tmp/poppunk_converting_csv.log
+		$poppunk_dir/assigned_gpscs.csv $reports_dir/07.other.assigned-gpscs.xlsx >> $project/tmp/07.other.gpsc.poppunk.csv2xlsx.log
 	# determine if the novel (NA) files are the same or not using the clusters.csv file
 	head -n1 $poppunk_dir/strain_db/strain_db_clusters.csv > $poppunk_dir/assigned_clusters.csv
         grep -F -f $poppunk_dir/grep_list.txt $poppunk_dir/strain_db/strain_db_clusters.csv | sed 's|/.*/||g' >> $poppunk_dir/assigned_clusters.csv	
 	Rscript $SCRIPTS_DIR/csv2xlsx.R \
-		$poppunk_dir/assigned_clusters.csv $reports_dir/assigned_clusters.xlsx >> $project/tmp/poppunk_converting_csv.log
+		$poppunk_dir/assigned_clusters.csv $reports_dir/07.other.assigned-clusters.xlsx >> $project/tmp/07.other.poppunk.csv2xlsx.log
 fi
 # Save results in the Reports directory
 echo -e "\t[`date +"%d-%b-%Y %T"`]\tCopy final PopPunk results to the Reports directory"
 cp $poppunk_dir/*/*.{csv,nwk,dot} $poppunk_report/
 
 else
-    echo -e "\t[`date +"%d-%b-%Y %T"`]\tNumber of samples too low to run PopPunk for ${projectName} ...... provide at least 3 samples"
+    echo -e "\t[`date +"%d-%b-%Y %T"`]\tNumber of samples too low to run PopPunk for ${projectName} ...... provide at least 4 samples"
 fi
 #Rscript bin/adding_poppunk_results.R \
 #~/kedibone/35B-Isolates/Reports_35B-Isolates_11_Sep_2019 35B-Isolates_WGS-typing-report.xlsx \
