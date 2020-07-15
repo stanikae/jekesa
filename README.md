@@ -43,11 +43,10 @@ All results will be strored in `Results-ProjectName` including:
 * Results from each step of the analysis in .xlsx format
 * Neighbor joining tree file (and associated files) generated using [PopPUNK](https://github.com/johnlees/PopPUNK).
 * Subfolders contatining:
-        - assembled-contigsa
-        - additional reports from ARIBA, including files for generating trees showing clustering of samples based on detected variants
-        - [MultiQC](https://github.com/ewels/MultiQC) reports for visualization of quality control reports, pre- and post- filtering of sequence reads.
+  * assembled-contigsa
+  * additional reports from ARIBA, including files for generating trees showing clustering of samples based on detected variants
+  * [MultiQC](https://github.com/ewels/MultiQC) reports for visualization of quality control reports, pre- and post- filtering of sequence reads.
 * Detailed HTML report generated using `rmarkdown`
-
 
 ## Usage
 ```
