@@ -69,7 +69,7 @@ conda deactivate
 mkdir -p $resfinder/TSVs
 find $resfinder -name "*resfindr.tsv" -exec rsync {} $resfinder/TSVs/ \;
 # merge resfinder output from multiple samples
-$SCRIPTS_DIR/06.resfinder2tsv.R $resfinder/TSVs $resfinder/06.resfinder.tsv > $project/tmp/06.resfinder2tsv.log 2>&1
+$SCRIPTS_DIR/06.resfinder2tsv.R $resfinder/TSVs $reportsDir/06.resfinder.xlsx > $project/tmp/06.resfinder2tsv.log 2>&1
 
 # combine pointfinder results
 for file in $(find $pointfinder -name "*_pointfinder.txt"); do
@@ -83,8 +83,8 @@ sed -i 's/|/\t/g' $pointfinder/06.pointfinder.tsv
 
 #export PATH="$HOME/anaconda3/envs/r_env/bin:$PATH"
 # convert resfinder .tsv to .xlsx
-Rscript $SCRIPTS_DIR/tsv2xlsx.R $resfinder/06.resfinder.tsv \
-$reportsDir/06.resfinder.xlsx >> $project/tmp/06.resfinder.tsv2xlsx.log 2>&1
+#Rscript $SCRIPTS_DIR/tsv2xlsx.R $resfinder/06.resfinder.tsv \
+#$reportsDir/06.resfinder.xlsx >> $project/tmp/06.resfinder.tsv2xlsx.log 2>&1
 
 # convert pointfinder .tsv to .xlsx
 Rscript $SCRIPTS_DIR/tsv2xlsx.R $pointfinder/06.pointfinder.tsv \

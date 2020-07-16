@@ -13,5 +13,7 @@ indir = file.path(args[1])
 tbl <- list.files(path = indir,pattern = "*.tsv", full.names = T) %>% 
        map_df(~read_delim(., delim = "\t"))
 # write tsvs to one tsv file
+#write_delim(tbl,args[2],delim = "\t")
+# write tsv to .xlsx
 write.xlsx(tbl, args[2], overwrite=T)
 
