@@ -29,11 +29,20 @@ kraken <- read_excel(paste(dir, "04.kraken.xlsx", sep = "/"), col_names = TRUE)
 metrics <- read_excel(paste(dir,"05.quast.xlsx", sep = "/"), col_names = TRUE)
 mlst <- read_excel(paste(dir, "05.mlst.xlsx", sep = "/"), col_names = TRUE)
 resFin <- read_excel(paste(dir, "06.resfinder.xlsx", sep = "/"), col_names = TRUE)
-pointFin <- read_excel(paste(dir, "06.pointfinder.xlsx", sep = "/"), col_names = TRUE)
+#pointFin <- read_excel(paste(dir, "06.pointfinder.xlsx", sep = "/"), col_names = TRUE)
 aribaAMR <- read_excel(paste(dir, "06.aribaAMR-known_variants.xlsx", sep = "/"), col_names = TRUE)
 aribaVF <- read_excel(paste(dir, "06.aribaVFs-known_variants.xlsx", sep = "/"), col_names = TRUE)
 aribaAMRn <- read_excel(paste(dir, "06.aribaAMR-novel_variants.xlsx", sep = "/"), col_names = TRUE)
 aribaVFn <- read_excel(paste(dir, "06.aribaVFs-novel_variants.xlsx", sep = "/"), col_names = TRUE)
+
+if(file.exists(paste(dir, "06.pointfinder.xlsx", sep = "/"))){
+  pointFin <- read_excel(paste(dir, "06.pointfinder.xlsx", sep = "/"), col_names = TRUE)
+}else{
+  pointFin <- data.frame(matrix(ncol = 2, nrow = 0))
+  colnames(pointFin) <- c("SampleID","PointFinder")
+}
+print("ALL data sets are loaded")
+
 ############# filter quast results ####################################
 metrics1 <- metrics %>% dplyr::filter(Assembly %in% c("# contigs (>= 200 bp)", "Largest contig", "Total length","GC (%)", "N50"))
 # remove additional strings to remain with only sample ID
@@ -65,6 +74,8 @@ aribaVFn$aribaVFsnovel <- rep("VF-novel-variants", nrow(aribaVFn))
 aribaAMRn <- aribaAMRn %>% dplyr::select(name,aribaAMRnovel, everything())
 aribaVFn <- aribaVFn %>% dplyr::select(name,aribaVFsnovel, everything())
 aribaNovel_df <- dplyr::full_join(aribaAMRn, aribaVFn, by='name')
+
+print("FORMATS FOR ALL FILES NOW REPORT READY")
 ################# rename colnames ######################################
 names(countReads)[1] <- "SampleID"
 names(covDepth)[1] <- "SampleID"
@@ -75,10 +86,11 @@ colnames(metrics2) <- c("SampleID","Contig.num", "Contigs.GC.content", "N50.valu
 names(mlst)[1] <- "SampleID"
 names(mlst)[2] <- "Scheme.MLST"
 names(resFin)[1] <- "SampleID"
-names(pointFin)[1] <- "SampleID"
+#names(pointFin)[1] <- "SampleID"
 names(ariba_df)[1] <- "SampleID"
 names(aribaNovel_df)[1] <- "SampleID"
 
+print("All sample IDs now uniform")
 ################# remove unwanted columns ###############################
 covDepth <- select(covDepth, -Est.GenomeSize)
 kraken <- dplyr::select(kraken, -kraken2_X)
@@ -89,9 +101,14 @@ metric_df <- plyr::join_all(list(countReads,covDepth,metrics2,mlst), by='SampleI
 # contamination check
 contam_df <- plyr::join_all(list(bactIns,conFin,kraken), by='SampleID', type='full')
 # CGE AMR and mutations
-cge_df <- dplyr::full_join(resFin,pointFin, by='SampleID')
+if (nrow(pointFin) >= 1){
+  names(pointFin)[1] <- "SampleID"
+  cge_df <- dplyr::full_join(resFin,pointFin, by='SampleID')
+}else{
+  cge_df <- resFin
+}
 
-
+print("All dfs now combined")
 ################ Join and write results to .xlsx file ###################
 if (args[1] == "spneumoniae") {
   # serotyping

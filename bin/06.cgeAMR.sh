@@ -53,6 +53,10 @@ for contigs in $(find $spadesDir -name "*_assembly.fasta")
      sed '/^$/d' | awk -v RS="\n" -v ORS="|" '1' | sed 's/|$/\n/g')
      #
      printf "$name|$info\n" >> $pointfinder/${name}_pointfinder.txt
+ # else
+ #    mkdir -p $pointfinder/$name
+ #    printf "sampleID|$header\n" > $pointfinder/${name}_pointfinder.txt
+ #    printf "$name|NA|NA" >> $pointfinder/${name}_pointfinder.txt
   fi
 done
 # deactivate resfinder environment

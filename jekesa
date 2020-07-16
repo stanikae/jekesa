@@ -170,9 +170,13 @@ if [ -z "$stage" ]; then
   declare -x trimgaloreDir=$project/trimGalore
   declare -x qcReports=$trimgaloreDir/fastqcReports_filtered
   declare -x trimmedReads=$trimgaloreDir/clean_reads
-  mkdir -p $trimgaloreDir
-  mkdir -p $qcReports
-  mkdir -p $trimmedReads
+  if [ -d $trimgaloreDir ]; then
+    rm -r $trimgaloreDir
+    mkdir -p $trimgaloreDir; mkdir -p $qcReports; mkdir -p $trimmedReads
+  else
+    mkdir -p $trimgaloreDir; mkdir -p $qcReports; mkdir -p $trimmedReads
+  fi
+
   $SCRIPTS_DIR/02.trimReads.sh >> $trimgaloreDir/trimGalore.log 2>&1
   echo "trimGalore-step02" >> $project/progress
 else
@@ -184,7 +188,12 @@ stage=$(grep "countReads-step03" "$project/progress")
 if [ -z "$stage" ]; then
   echo -e "\t[`date +"%d-%b-%Y %T"`]\tCount raw and cleaned reads for sample: $samples"
   declare -x readsDir=$project/total_reads
-  mkdir -p $readsDir
+  if [ -d $readsDir ]; then
+    rm -r $readsDir
+    mkdir -p $readsDir
+  else
+    mkdir -p $readsDir
+  fi
   nohup $SCRIPTS_DIR/03.get_coverageDepth.sh >> $project/tmp/get_coverageDepth.log 2>&1 &
   nohup $SCRIPTS_DIR/03.countReads.sh >> $readsDir/count_reads.log 2>&1 &
   wait
@@ -200,9 +209,12 @@ if [ -z "$stage" ]; then
   declare -x krakenDir=$project/kraken
   declare -x confindrDir=$project/confindr
   declare -x bactInspectorDir=$project/bactInspector
-  mkdir -p $krakenDir
-  mkdir -p $confindrDir
-  mkdir -p $bactInspectorDir
+  if [ -d $krakenDir ]; then
+    rm -r "$krakenDir" "$krakenDir" "$confindrDir"
+    mkdir -p $krakenDir; mkdir -p $confindrDir; mkdir -p $bactInspectorDir
+  else
+    mkdir -p $krakenDir; mkdir -p $confindrDir; mkdir -p $bactInspectorDir
+  fi
   nohup $SCRIPTS_DIR/04.kraken2_classification.sh >> $krakenDir/kraken2.log 2>&1
   nohup $SCRIPTS_DIR/04.bactInspector.sh >> $bactInspectorDir/bactinspector.log 2>&1
   echo -e "\t[`date +"%d-%b-%Y %T"`]\tChecking inter- and intra-species contamination"
@@ -220,7 +232,12 @@ if [ -z "$stage" ]; then
   declare -x statsDir=$project/assemblyMetrics
   declare -x quastDir=$statsDir/quast
   declare -x mlstDir=$project/mlst_output
-  mkdir -p $spadesDir; mkdir -p $statsDir; mkdir -p $quastDir; mkdir -p $mlstDir
+  if [ -d $spadesDir ]; then
+    rm -r "$spadesDir" "$statsDir" "$quastDir" "$mlstDir"
+    mkdir -p $spadesDir; mkdir -p $statsDir; mkdir -p $quastDir; mkdir -p $mlstDir
+  else
+   mkdir -p $spadesDir; mkdir -p $statsDir; mkdir -p $quastDir; mkdir -p $mlstDir
+  fi
   $SCRIPTS_DIR/05.shovill.sh >> $spadesDir/shovill_assembly.log 2>&1
   # check if MLST scheme is present in the mlst database
   mlst --longlist > $project/schemeList.txt
@@ -240,7 +257,12 @@ if [ -z "$stage" ]; then
   declare -x resfinder=$project/resfinder
   declare -x pointfinder=$project/pointfinder
   declare -x plasmidDir=$project/plasmids
-  mkdir -p $aribaDir; mkdir -p $aribaVF_Dir; mkdir -p $resfinder; mkdir -p $pointfinder; mkdir -p $plasmidDir
+  if [ -d $aribaDir ]; then
+    rm -r "$aribaDir" "$aribaVF_Dir" "$resfinder" "$pointfinder" "$plasmidDir"
+    mkdir -p $aribaDir; mkdir -p $aribaVF_Dir; mkdir -p $resfinder; mkdir -p $pointfinder; mkdir -p $plasmidDir
+  else
+    mkdir -p $aribaDir; mkdir -p $aribaVF_Dir; mkdir -p $resfinder; mkdir -p $pointfinder; mkdir -p $plasmidDir
+  fi
   # run resfinder and pointfinder
   nohup $SCRIPTS_DIR/06.cgeAMR.sh >> $project/tmp/cgeAMR.log 2>&1
   # run ariba for AMR and VF detection
@@ -266,7 +288,12 @@ if [ -z "$stage" ]; then
    declare -x serobaDir=$project/seroba
    declare -x pilusDir=$project/pili
    declare -x pbpDir=$project/pbp-typing
-   mkdir -p $serobaDir; mkdir -p $pilusDir; mkdir -p $pbpDir
+   if [ -d $serobaDir ]; then
+     rm -r "$serobaDir" "$pilusDir" "$pbpDir"
+     mkdir -p $serobaDir; mkdir -p $pilusDir; mkdir -p $pbpDir
+   else
+     mkdir -p $serobaDir; mkdir -p $pilusDir; mkdir -p $pbpDir
+   fi
    echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting S. pneumoniae serotyping"
    nohup $SCRIPTS_DIR/07.seroba.sh >> $serobaDir/seroba.log 2>&1
    echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting S. pneumoniae pili detection"
@@ -297,7 +324,12 @@ if [ -z "$stage" ]; then
    echo -e "\t[`date +"%d-%b-%Y %T"`]\tMLST scheme is $MLSTscheme, now performing Spyogenes specifc analysis"
    echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting S. pyogenes EMM typing using CDC StrepLab scripts"
    declare -x pbpDir=$project/pbp-typing
-   mkdir -p $pbpDir
+   if [ -d $pbpDir ]; then
+     rm -r "$pbpDir"
+     mkdir -p $pbpDir
+   else
+     mkdir -p $pbpDir
+   fi
    # PBP typing using CDC Strep Lab scripts and database
    declare -x allDB_dir=$DATABASES_DIR/GAS_Reference_DB
    declare -x batch_dir=$trimmedReads
@@ -323,7 +355,12 @@ if [ -z "$stage" ]; then
    echo -e "\t[`date +"%d-%b-%Y %T"`]\tMLST scheme is $MLSTscheme, now performing Salmonella specifc analysis"
    declare -x sistr=$project/sistr
    declare -x seqsero=$project/seqsero
-   mkdir -p $sistr; mkdir -p $seqsero
+   if [ -d $sistr ]; then
+     rm -r "$sistr" "$seqsero"
+     mkdir -p $sistr; mkdir -p $seqsero
+   else
+     mkdir -p $sistr; mkdir -p $seqsero
+   fi
    nohup $SCRIPTS_DIR/07.salmonella.sh >> $project/tmp/07.salmonella.log 2>&1
  else
    echo -e "\t[`date +"%d-%b-%Y %T"`]\tIndepth SPN, GAS, and salmonella specific analysis not required for $projectName"
