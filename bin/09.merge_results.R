@@ -111,7 +111,7 @@ if (nrow(pointFin) >= 1){
 print("All dfs now combined")
 ################ Join and write results to .xlsx file ###################
 
-sheetNames <- c("WGS-Typing-Report","AMR_VF_variants")
+sheetNames <- c("WGS-Typing-Report","AMR-and-VrulenceGene_variants")
 brack <- openxlsx::createWorkbook()
 ## create and add a style to the column headers
 headerStyle <- createStyle(fontName ="Times New Roman",fontSize =11, textDecoration ="bold") #, halign = "center")
