@@ -142,6 +142,13 @@ if [ ! -f $project/progress ]; then
  touch $project/progress
 fi
 
+##################################################################################
+###			Define variables 				   #######
+##################################################################################
+declare -x trimgaloreDir=$project/trimGalore
+declare -x qcReports=$trimgaloreDir/fastqcReports_filtered
+declare -x trimmedReads=$trimgaloreDir/clean_reads
+declare -x spadesDir=$project/assemblies
 ###################################################################################
 ###                          Begin bacterial WGS typing                         ###
 ###################################################################################
@@ -167,9 +174,9 @@ fi
 stage=$(grep "trimGalore-step02" "$project/progress")
 if [ -z "$stage" ]; then
   echo -e "\t[`date +"%d-%b-%Y %T"`]\tStarting quality filtering of sequencing reads using trimGalore for project: $projectName"
-  declare -x trimgaloreDir=$project/trimGalore
-  declare -x qcReports=$trimgaloreDir/fastqcReports_filtered
-  declare -x trimmedReads=$trimgaloreDir/clean_reads
+  #declare -x trimgaloreDir=$project/trimGalore
+  #declare -x qcReports=$trimgaloreDir/fastqcReports_filtered
+  #declare -x trimmedReads=$trimgaloreDir/clean_reads
   if [ -d $trimgaloreDir ]; then
     rm -r $trimgaloreDir
     mkdir -p $trimgaloreDir; mkdir -p $qcReports; mkdir -p $trimmedReads
@@ -228,7 +235,7 @@ fi
 stage=$(grep "assembly-step05" "$project/progress")
 if [ -z "$stage" ]; then
   echo -e "\t[`date +"%d-%b-%Y %T"`]\tPerforming bacterial de novo genome assembly and MLST typing"
-  declare -x spadesDir=$project/assemblies
+  #declare -x spadesDir=$project/assemblies
   declare -x statsDir=$project/assemblyMetrics
   declare -x quastDir=$statsDir/quast
   declare -x mlstDir=$project/mlst_output

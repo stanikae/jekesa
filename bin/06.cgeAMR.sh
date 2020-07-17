@@ -18,7 +18,7 @@ for contigs in $(find $spadesDir -name "*_assembly.fasta")
   mkdir -p $resfinder/$name
   python3 $SCRIPTS_DIR/resfinder.py -i $contigs \
   -o $resfinder/$name -p $DATABASES_DIR/resfinder_db \
-  -t 0.90 -l 0.60 >> $project/tmp/06.resfinder.log 2>&1
+  -t 0.90 -l 0.60 >> $resfinder/06.resfinder.log 2>&1
   # convert json to tsv
   Rscript $SCRIPTS_DIR/json2tsv.R $resfinder/$name/data_resfinder.json \
   $resfinder/$name/${name}.resfindr.tsv >> $project/tmp/06.json2tsv.log 2>&1
@@ -32,7 +32,7 @@ for contigs in $(find $spadesDir -name "*_assembly.fasta")
      python3 $SCRIPTS_DIR/PointFinder.py -i $contigs \
      -o $pointfinder/$name -p $DATABASES_DIR/pointfinder_db \
      -s $pointID -m blastn -m_p ${CONDA_BASE}/envs/resfinder/bin/blastn \
-     -t 0.90 -l 0.60 >> $project/tmp/06.pointfinder.log 2>&1
+     -t 0.90 -l 0.60 >> $pointfinder/06.pointfinder.log 2>&1
      # prepare output file for each sample
      #sed -i -n '/Known Mutations/,$p' $pointfinder/$name/${name}_blastn_HTMLtable.txt
      # echo $name | cat - $pointfinder/$name/${name}_blastn_HTMLtable.txt | \

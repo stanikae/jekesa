@@ -110,6 +110,14 @@ if (nrow(pointFin) >= 1){
 
 print("All dfs now combined")
 ################ Join and write results to .xlsx file ###################
+
+sheetNames <- c("WGS-Typing-Report","AMR_VF_variants")
+brack <- openxlsx::createWorkbook()
+## create and add a style to the column headers
+headerStyle <- createStyle(fontName ="Times New Roman",fontSize =11, textDecoration ="bold") #, halign = "center")
+bodyStyle <- createStyle(fontName ="Times New Roman",fontSize =11,)
+
+
 if (args[1] == "spneumoniae") {
   # serotyping
   seroba <- read_excel(paste(dir, "07.seroba.xlsx", sep = "/"), col_names = TRUE)
@@ -130,9 +138,23 @@ if (args[1] == "spneumoniae") {
   names(clusters)[1] <- "SampleID"
 
   # Merging the data sets
-  cmd_df <- plyr::join_all(list(gpsc,cluster,contam_df,metric_df,seroba,cge_df,pbp,ariba_df), by='SampleID', type='full')
+  cmd_df <- plyr::join_all(list(gpsc,cluster,contam_df,metric_df,seroba,cge_df,pbp), by='SampleID', type='full')
+  data_lst <- list(cmd_df,ariba_df)
+  
+  for(i in seq_along(data_lst)){
+     sh_name <- sheetNames[i]
+     row_n <- nrow(data_lst[[i]]) + 1
+     col_n <- ncol(data_lst[[i]])
+     openxlsx::addWorksheet(brack, sheetName = sh_name)
+     openxlsx::writeData(brack, sheet = sh_name, data_lst[[i]])
+     openxlsx::freezePane(brack, sheet = sh_name, firstRow = T)
+     #openxlsx::freezePane(brack, sheet = sh_name, firstActiveCol = "H")
+     openxlsx::addStyle(brack, sheet = sh_name, headerStyle, rows = 1, cols = 1:col_n,gridExpand = TRUE)
+     openxlsx::addStyle(brack, sheet = sh_name, bodyStyle, rows = 2:row_n, cols = 1:col_n,gridExpand = TRUE)
+  }
   # write results to xlsx file
-  openxlsx::write.xlsx(cmd_df, paste(dir, args[3], sep = "/"), overwrite = T)
+  #openxlsx::write.xlsx(cmd_df, paste(dir, args[3], sep = "/"), overwrite = T)
+  openxlsx::saveWorkbook(brack, paste(dir,args[3], sep = "/"), overwrite = T)
 
 } else if (args[1] == "spyogenes") {
   pbp <- read_excel(paste(dir, "07.GAS-typing.xlsx07.GAS.assigned-gpscs.xlsx", sep = "/"), col_names = TRUE)
@@ -146,25 +168,66 @@ if (args[1] == "spneumoniae") {
   names(gpsc)[1] <- "SampleID"
   names(clusters)[1] <- "SampleID"
   # Merging the data sets
-  cmd_df <- plyr::join_all(list(gpsc,cluster,contam_df,metric_df,cge_df,pbp,ariba_df), by='SampleID', type='full')
+  cmd_df <- plyr::join_all(list(gpsc,cluster,contam_df,metric_df,cge_df,pbp), by='SampleID', type='full')
+  data_lst <- list(cmd_df,ariba_df)
+  
+  for(i in seq_along(data_lst)){
+     sh_name <- sheetNames[i]
+     row_n <- nrow(data_lst[[i]]) + 1
+     col_n <- ncol(data_lst[[i]])
+     openxlsx::addWorksheet(brack, sheetName = sh_name)
+     openxlsx::writeData(brack, sheet = sh_name, data_lst[[i]])
+     openxlsx::freezePane(brack, sheet = sh_name, firstRow = T)
+     #openxlsx::freezePane(brack, sheet = sh_name, firstActiveCol = "H")
+     openxlsx::addStyle(brack, sheet = sh_name, headerStyle, rows = 1, cols = 1:col_n,gridExpand = TRUE)
+     openxlsx::addStyle(brack, sheet = sh_name, bodyStyle, rows = 2:row_n, cols = 1:col_n,gridExpand = TRUE)
+   }
   # write results to xlsx file
-  openxlsx::write.xlsx(cmd_df, paste(dir, args[3], sep = "/"), overwrite = T)
+  #openxlsx::write.xlsx(cmd_df, paste(dir, args[3], sep = "/"), overwrite = T)
+  openxlsx::saveWorkbook(brack, paste(dir,args[3], sep = "/"), overwrite = T)
+
 } else if (args[1] == "senterica") {
   sistrDF <- read_excel(paste(dir, "07.sistr.xlsx", sep = "/"), col_names = TRUE)
   seqseroDF <- read_excel(paste(dir, "07.seqsero.xlsx", sep = "/"), col_names = TRUE)
   names(sistrDF)[1] <- "SampleID"
   names(seqseroDF)[1] <- "SampleID" 
   # Merging the data sets
-  cmd_df <- plyr::join_all(list(contam_df,metric_df,seqseroDF,sistrDF,cge_df,ariba_df), by='SampleID', type='full')
+  cmd_df <- plyr::join_all(list(contam_df,metric_df,seqseroDF,sistrDF,cge_df), by='SampleID', type='full')
+  cmd_df <- cmd_df %>% arrange(SampleID)
+  data_lst <- list(cmd_df,ariba_df)
+
+  for(i in seq_along(data_lst)){
+     sh_name <- sheetNames[i]
+     row_n <- nrow(data_lst[[i]]) + 1
+     col_n <- ncol(data_lst[[i]])
+     openxlsx::addWorksheet(brack, sheetName = sh_name)
+     openxlsx::writeData(brack, sheet = sh_name, data_lst[[i]])
+     openxlsx::freezePane(brack, sheet = sh_name, firstRow = T)
+     openxlsx::addStyle(brack, sheet = sh_name, headerStyle, rows = 1, cols = 1:col_n,gridExpand = TRUE)
+     openxlsx::addStyle(brack, sheet = sh_name, bodyStyle, rows = 2:row_n, cols = 1:col_n,gridExpand = TRUE)
+  }
   # write results to xlsx file
-  openxlsx::write.xlsx(cmd_df, paste(dir, args[3], sep = "/"), overwrite = T)
+  #openxlsx::write.xlsx(cmd_df, paste(dir, args[3], sep = "/"), overwrite = T)
+  openxlsx::saveWorkbook(brack, paste(dir,args[3], sep = "/"), overwrite = T)
 
 } else {
   # Merging the three data sets, metrics, mlst, and serotyping
-  cmd_df <- plyr::join_all(list(contam_df,metric_df,cge_df,ariba_df), by='SampleID', type='full')
+  cmd_df <- plyr::join_all(list(contam_df,metric_df,cge_df), by='SampleID', type='full')
+  data_lst <- list(cmd_df,ariba_df)
 
+  for(i in seq_along(data_lst)){
+     sh_name <- sheetNames[i]
+     row_n <- nrow(data_lst[[i]]) + 1
+     col_n <- ncol(data_lst[[i]])
+     openxlsx::addWorksheet(brack, sheetName = sh_name)
+     openxlsx::writeData(brack, sheet = sh_name, data_lst[[i]])
+     openxlsx::freezePane(brack, sheet = sh_name, firstRow = T)
+     openxlsx::addStyle(brack, sheet = sh_name, headerStyle, rows = 1, cols = 1:col_n,gridExpand = TRUE)
+     openxlsx::addStyle(brack, sheet = sh_name, bodyStyle, rows = 2:row_n, cols = 1:col_n,gridExpand = TRUE)
+}
   # write results to xlsx file
-  openxlsx::write.xlsx(cmd_df, paste(dir, args[3], sep = "/"), overwrite = T)
+  #openxlsx::write.xlsx(cmd_df, paste(dir, args[3], sep = "/"), overwrite = T)
+  openxlsx::saveWorkbook(brack, paste(dir,args[3], sep = "/"), overwrite = T)
 }
 
 
