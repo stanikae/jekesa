@@ -125,7 +125,7 @@ fi
 ## 			Set-up paths to databases 			       ##
 #################################################################################
 # ariba reference database
-declare -x ariba_ref=$DATABASES_DIR/ariba_DBs/out.card.prepareref
+declare -x ariba_ref=$DATABASES_DIR/ariba_DBs/nu.resfinder.prepareref  #out.card.prepareref
 declare -x ariba_VFref=$DATABASES_DIR/ariba_DBs/out.vfdb_core.prepareref
 # minikraken database
 declare -x krakenDB=$DATABASES_DIR/kraken_db
