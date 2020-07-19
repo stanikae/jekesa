@@ -49,7 +49,7 @@ while getopts ":hvp:t:a:s:g" opt; do
       fi
       ;;
     g )
-      declare -x assemOnly=${OPTARG}
+      declare -x assemOnly="yes"
       if [ $# -lt 4 ]; then
       echo "Additional arguments missing needed for option: ${OPTARG}"
       echo "Use [$0 -h] to see full arguments"
@@ -58,7 +58,7 @@ while getopts ":hvp:t:a:s:g" opt; do
       ;;
     h )
       usage
-      exit 1
+      exit
       ;;
     v )
       echo "Version: $version"
@@ -250,7 +250,20 @@ if [ -z "$stage" ]; then
   mlst --longlist > $project/schemeList.txt
   declare -x schemeList=$project/schemeList.txt
   nohup $SCRIPTS_DIR/05.mlst.sh >> $mlstDir/mlst.log 2>&1
+  wait
   echo "assembly-step05" >> $project/progress
+
+  # check assembly only variable
+  if [[ -n $assemOnly ]]; then
+    $SCRIPTS_DIR/05.merge-assemblyOnly-results.R $reportsDir \
+    ${projectName}-denovo-assembly-report.xlsx > $project/tmp/05.merge.assemblyOnly.results.log 2>&1
+    # soft link assembled contigs to results directory
+    #mkdir -p $reportsDir/assembled-contigs
+    #find $spadesDir -maxdepth 2 -type f -name "*_assembly.fasta" -exec ln -s {} $reportsDir/assembled-contigs/ \;
+    echo -e "\t[`date +"%d-%b-%Y %T"`]\tCompleted de novo assembly for project: $projectName .... now exiting"
+    exit
+  fi
+
 else
  echo -e "\t[`date +"%d-%b-%Y %T"`]\tDe novo assembly and MLST typing for project: $projectName already completed, moving to next step"
 fi
@@ -412,5 +425,5 @@ Rscript $SCRIPTS_DIR/09.merge_results.R $MLSTscheme $reportsDir ${projectName}-W
 
 #value=$(wc -l $filename | awk '{print $1}')
 echo -e "\t[`date +"%d-%b-%Y %T"`]\tAnalysis of ${counter} samples completed"
-echo -e "\t[`date +"%d-%b-%Y %T"`]\tWGS typing results are in file: $reportsDir/${projectName}_WGS-typing-final-report.xlsx"
+echo -e "\t[`date +"%d-%b-%Y %T"`]\tWGS typing results are in file: $reportsDir/${projectName}-WGS-typing-report.xlsx"
 

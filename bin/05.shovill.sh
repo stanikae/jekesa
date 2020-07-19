@@ -45,7 +45,7 @@ nohup multiqc -o $reportsDir/${projectName}-quast $quastDir \
 Rscript $SCRIPTS_DIR/combining_quast_output.R $quastDir \
 $reportsDir/05.quast.xlsx >> $project/tmp/05.quast2xlsx.log 2>&1
 
-# rsync assembled contigs to results directory
+# soft link assembled contigs to results directory
 mkdir -p $reportsDir/assembled-contigs
 find $spadesDir -maxdepth 2 -type f -name "*_assembly.fasta" -exec rsync -c {} $reportsDir/assembled-contigs/ \;
 
