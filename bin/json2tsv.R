@@ -35,7 +35,7 @@ for(i in seq_along(dat1)){
   nRow <- nrow(df)
   if(nRow == 1){
     if(is.null(df$X1)){
-      g1 <- NULL
+      g1 <- "No hit found"
     }else{
     g1 <- paste(df$X1,
                 paste0("(",round(as.numeric(as.character(df$X2)),1),"%",")"),
