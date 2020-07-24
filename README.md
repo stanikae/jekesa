@@ -60,7 +60,7 @@ OPTIONS:
                 detailed analysis. Otherwise for any other schema use: 'other'. To check other available schema names use: mlst --longList.
         -t      Number of threads to use <integer>, (minimum value should be: 6)
         -g      Only perform de novo assembly
-        -c      Path to assembled contigs to include in the typing analysis.
+        -c      Path to assembled contigs to include in the typing analysis (only mlst and resistance profiling).
         -h      Show this help
         -v      Show version
 
