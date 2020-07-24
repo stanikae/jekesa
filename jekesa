@@ -20,6 +20,7 @@ OPTIONS:
                 detailed analysis. Otherwise for any other schema use: 'other'. To check other available schema names use: mlst --longList.
         -t      Number of threads to use <integer>, (minimum value should be: 6)
 	-g	Only perform de novo assembly
+	-c	Path to assembled contigs to include in the typing analysis. 
         -h      Show this help
         -v      Show version
 
@@ -29,7 +30,7 @@ For more information, please visit: https://github.com/stanikae/jekesa
 EOF
 }
 
-while getopts ":hvp:t:a:s:g" opt; do
+while getopts ":hvp:t:a:s:c:g" opt; do
   case ${opt} in
     p )
       declare -x project=${OPTARG}
@@ -55,6 +56,9 @@ while getopts ":hvp:t:a:s:g" opt; do
       echo "Use [$0 -h] to see full arguments"
       exit 1
       fi
+      ;;
+    c )
+      declare -x contigsPath=${OPTARG}
       ;;
     h )
       usage
@@ -245,13 +249,31 @@ if [ -z "$stage" ]; then
   else
    mkdir -p $spadesDir; mkdir -p $statsDir; mkdir -p $quastDir; mkdir -p $mlstDir
   fi
+  # perform de novo assembly
   $SCRIPTS_DIR/05.shovill.sh >> $spadesDir/shovill_assembly.log 2>&1
+  # check if MLST scheme is present in the mlst database
+  #mlst --longlist > $project/schemeList.txt
+  #declare -x schemeList=$project/schemeList.txt
+  #nohup $SCRIPTS_DIR/05.mlst.sh >> $mlstDir/mlst.log 2>&1
+  #wait
+  #echo "assembly-step05" >> $project/progress
+
+  # check if contigs directory path is provided
+  if [[ -d $contigsPath ]]; then
+    mkdir -p $spadesDir/previousContigs
+    for contFile in $contigsPath/*.f*a
+      do
+        pref=$(echo $contFile | awk -F "." '{print $NF}')
+        id=$(basename -s .${pref} $contFile)
+        rsync -c $contFile $spadesDir/previousContigs/${id}_assembly.fasta
+        echo -e "\t[`date +"%d-%b-%Y %T"`]\tAdded previously assembled contigs to project: $projectName"
+    done
+  fi
   # check if MLST scheme is present in the mlst database
   mlst --longlist > $project/schemeList.txt
   declare -x schemeList=$project/schemeList.txt
   nohup $SCRIPTS_DIR/05.mlst.sh >> $mlstDir/mlst.log 2>&1
   wait
-  echo "assembly-step05" >> $project/progress
 
   # check assembly only variable
   if [[ -n $assemOnly ]]; then
@@ -263,7 +285,7 @@ if [ -z "$stage" ]; then
     echo -e "\t[`date +"%d-%b-%Y %T"`]\tCompleted de novo assembly for project: $projectName .... now exiting"
     exit
   fi
-
+  echo "assembly-step05" >> $project/progress
 else
  echo -e "\t[`date +"%d-%b-%Y %T"`]\tDe novo assembly and MLST typing for project: $projectName already completed, moving to next step"
 fi
