@@ -171,5 +171,5 @@ Stanford Kwenda
 ## License
 [GPL 3.0](https://github.com/stanikae/jekesa/blob/master/LICENSE)
 ## Citation
-Kwenda S., Allam M., Khumalo Z.T.H., Mtshali S., Mnyameni F., Ismail A. _Jekesa_ **Github** [https://github.com/stanikae/jekesa](https://github.com/stanikae/jekesa)
+Kwenda S., Allam M., Khumalo Z.T.H., Mtshali S., Mnyameni F., Ismail A. _Jekesa: an automated easy-to-use pipeline for bacterial whole genome typing_ **Github** [https://github.com/stanikae/jekesa](https://github.com/stanikae/jekesa)
 
