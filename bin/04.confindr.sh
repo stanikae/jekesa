@@ -31,7 +31,7 @@ done
 # Save confindr results in one .csv file
 cat ${confindrDir}/*/*_report.csv > ${confindrDir}/confindr_merged.csv
 echo "Sample,Genera_present,ContaminationPresent" > ${confindrDir}/${projectName}-confindr-final.csv
-grep -v '^Sample' ${confindrDir}/confindr_merged.csv | \
+grep -v "^Sample,Genus,NumContamSNVs" ${confindrDir}/confindr_merged.csv | \
 sed 's/_.*1,/,/g' | cut -d "," -f1,2,4,5 | \
 awk -F ',' '{print $1,$2,$3" ("$4"%)"}' OFS="," >> ${confindrDir}/${projectName}-confindr-final.csv
 

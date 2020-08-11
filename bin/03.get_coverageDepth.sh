@@ -28,7 +28,7 @@ done
 # save coverage results to xlsx
 cat ${project}/coverageDepth/*/*.csv > ${project}/coverageDepth/coverage_merged.csv
 echo "Sample,Est.GenomeSize,CoverageDepth" > ${project}/coverageDepth/${projectName}-coverage-final.csv
-grep -v '^Sample' ${project}/coverageDepth/coverage_merged.csv >> ${project}/coverageDepth/${projectName}-coverage-final.csv
+grep -v "^Sample,Est.GenomeSize,CoverageDepth" ${project}/coverageDepth/coverage_merged.csv >> ${project}/coverageDepth/${projectName}-coverage-final.csv
 # convert coverage results to .xlsx file
 Rscript $SCRIPTS_DIR/csv2xlsx.R ${project}/coverageDepth/${projectName}-coverage-final.csv \
 $reportsDir/03.coverageDepth.xlsx >> $project/tmp/03.coverageDepth.csv2xlsx.log 2>&1
