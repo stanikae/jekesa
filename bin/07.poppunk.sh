@@ -1,14 +1,10 @@
 #!/bin/bash
 
 run_id=$(basename $1)
-#spadesDir=$(find $1 -type d -name "spades_*")
 poppunk_dir=$1/poppunk-analysis
-reports_dir=$reportsDir #$(find $1 -type d -name "Reports_${run_id}_*")
-#echo -e "\n$spadesDir"
-#echo -e "\n$reports_dir\n"
+reports_dir=$reportsDir 
 threads=$threads
 refDB_dir=$DATABASES_DIR/poppunk_db #/media/60tb/Databases/PopPunk-Databases
-# echo $MLSTscheme
 MLSTscheme=$MLSTscheme
 
 # create poppunk work directory
@@ -31,6 +27,10 @@ while read -r line; do
   fi
 done < $mlstDir/mlst_merged.tsv
 
+# check if previously assembled contigs/genomes are provided, including reference seq files
+if [[ -d $spadesDir/previousContigs ]]; then
+   ls $spadesDir/previousContigs/*_assembly.fasta >> $poppunk_dir/reference_list.txt
+fi
 #ls $spadesDir/*/*.fasta | grep -f $sampleList > $poppunk_dir/reference_list.txt
 #ls $spadesDir/*/*_assembly.fasta > $poppunk_dir/reference_list.txt
 
