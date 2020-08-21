@@ -1,8 +1,8 @@
 #!/bin/bash
 
-for fq1 in $trimmedReads/*R1*.fq.gz
+for fq1 in $trimmedReads/*_R1_*.fq.gz
 do
-  fq=$(echo $fq1 | awk -F "R1" '{print $1 "R2"}')
+  fq=$(echo $fq1 | awk -F "_R1" '{print $1 "_R2"}')
   fqfile=$(basename $fq)
   fq2=$(find $trimmedReads -name "${fqfile}*val_2.fq.gz")
   
@@ -11,7 +11,9 @@ do
   mkdir -p $spadesDir/$name
   #echo $threads
   ram=$(expr ${threads} \* 3)	
-  shovill --force --depth 0 --cpus $threads --ram $ram --assembler $assembler --outdir $spadesDir/$name --R1 $fq1 --R2 $fq2 
+  shovill --force --depth 100 --minlen 200 \
+  --cpus $threads --ram $ram --assembler $assembler \
+  --outdir $spadesDir/$name --R1 $fq1 --R2 $fq2 
 
   # rename contigs files using nameID
   for i in `find $spadesDir/$name -maxdepth 1 -type f -name "contigs.fa"`
@@ -42,7 +44,7 @@ nohup multiqc -o $reportsDir/${projectName}-quast $quastDir \
 --pdf --export --filename $projectName\_quast >> $project/tmp/quast_post-qc.log 2>&1&
 
 # Combine quast reports and save in excel
-Rscript $SCRIPTS_DIR/combining_quast_output.R $quastDir \
+Rscript $SCRIPTS_DIR/05.combine_quast_output.R $quastDir \
 $reportsDir/05.quast.xlsx >> $project/tmp/05.quast2xlsx.log 2>&1
 
 # soft link assembled contigs to results directory

@@ -15,14 +15,14 @@ adapters=$CONDA_BASE/envs/jekesa/opt/fastqc*/Configuration/adapter_list.txt
 #fq1=$(find $indir -name "${samples}_*R1*f*q.gz")
 #fq2=$(find $indir -name "${samples}_*R2*f*q.gz")
 
-for fq1 in $indir/*R1*f*q*
+for fq1 in $indir/*_R1_*f*q*
 do
-  fq2=$(echo $fq1 | awk -F "R1" '{print $1 "R2" $2}')
+  fq2=$(echo $fq1 | awk -F "_R1" '{print $1 "_R2" $2}')
 	
   trim_galore -q 20 \
   --length 50 --trim-n -o $trimmedReads --gzip \
   --paired $fq1 $fq2 \
-  --cores 4 \
+  --cores 4 --no_report_file \
   --fastqc_args "-o $qcReports --contaminants $contaminants --adapters $adapters --threads $threads"
   #--retain_unpaired -r1 85 -r2 85
 done

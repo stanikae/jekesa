@@ -11,17 +11,12 @@ library(tidyr)
 library(dplyr)
 library(purrr)
 library(openxlsx)
-#library(rJava)
-#library(XLConnectJars)
-#options(java.parameters = "-Xmx4g" )
-#library(XLConnect)
 library(stringr)
 
 
 args <- commandArgs(TRUE)
 print(args[1])
 
-#setwd(args[1])
 getwd()
 #list.dirs(args)
 

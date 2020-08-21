@@ -1,8 +1,8 @@
 #!/bin/bash
 
-for fq1 in $trimmedReads/*R1*fq.gz
+for fq1 in $trimmedReads/*_R1_*fq.gz
 do
-  fq=$(echo $fq1 | awk -F "R1" '{print $1 "R2"}')
+  fq=$(echo $fq1 | awk -F "_R1" '{print $1 "_R2"}')
   fqfile=$(basename $fq)
   fq2=$(find $trimmedReads -name "${fqfile}*val_2.fq.gz")
 
@@ -15,7 +15,7 @@ do
   fi
 
   #echo -e "`date` \tRunning bactInspector check_species"
-  bactinspector check_species -i $trimmedReads -o $bact_out -fq $fq1
+  bactinspector check_species -p $threads -i $trimmedReads -o $bact_out -fq $fq1
 
   # edit check_species output
   sed -i 's/_S.*_val_1//' $bact_out/species_investigation*.tsv
@@ -34,7 +34,7 @@ do
   #Rscript $SCRIPTS_DIR/converting_tsv_2_xlsx.R $bact_out/species_investigation-top1.tsv $reportsDir/${projectName}_species_investigation.xlsx
 
   echo -e "`date`\tRunning bactInspector closest_match"
-  bactinspector closest_match -i $bact_out -o $bact_out -r -m ${name}*.msh
+  bactinspector closest_match -p $threads -i $bact_out -o $bact_out -r -m ${name}*.msh
   # edit closet_species output
   echo -e "sampleID\trefseq_closest_match" > $bact_out/closest_refseq.tsv
   refseq=$(cut -f9 $bact_out/closest_matches_*.tsv | tail -n -1)

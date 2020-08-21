@@ -8,9 +8,9 @@ cleanDir=$trimmedReads
 #if ! [ -d $readsDir ]; then
 # mkdir -p $readsDir
 #fi
-for fq1 in $indir/*R1*f*q*
+for fq1 in $indir/*_R1_*f*q*
 do
-  fq2=$(echo $fq1 | awk -F "R1" '{print $1 "R2" $2}')
+  fq2=$(echo $fq1 | awk -F "_R1" '{print $1 "_R2" $2}')
   name=$(basename $fq1 | awk -F '_S' '{print $1}')
   # count raw reads number of reads
   #fq1=$(find $indir -maxdepth 1 -name "${name}_*R1*.f*q.gz")

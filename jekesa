@@ -199,11 +199,12 @@ stage=$(grep "countReads-step03" "$project/progress")
 if [ -z "$stage" ]; then
   echo -e "\t[`date +"%d-%b-%Y %T"`]\tCount raw and cleaned reads for sample: $samples"
   declare -x readsDir=$project/total_reads
+  declare -x covDir=$project/coverageDepth
   if [ -d $readsDir ]; then
-    rm -r $readsDir
-    mkdir -p $readsDir
+    rm -r "$readsDir" "$covDir"
+    mkdir -p $readsDir; mkdir -p $covDir
   else
-    mkdir -p $readsDir
+    mkdir -p $readsDir; mkdir -p $covDir
   fi
   nohup $SCRIPTS_DIR/03.get_coverageDepth.sh >> $project/tmp/get_coverageDepth.log 2>&1 &
   nohup $SCRIPTS_DIR/03.countReads.sh >> $readsDir/count_reads.log 2>&1 &
@@ -221,7 +222,7 @@ if [ -z "$stage" ]; then
   declare -x confindrDir=$project/confindr
   declare -x bactInspectorDir=$project/bactInspector
   if [ -d $krakenDir ]; then
-    rm -r "$krakenDir" "$krakenDir" "$confindrDir"
+    rm -r "$krakenDir" "$bactInspectorDir" "$confindrDir"
     mkdir -p $krakenDir; mkdir -p $confindrDir; mkdir -p $bactInspectorDir
   else
     mkdir -p $krakenDir; mkdir -p $confindrDir; mkdir -p $bactInspectorDir

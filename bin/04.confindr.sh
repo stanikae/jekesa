@@ -7,9 +7,9 @@ if ! [ -d $confindrDir ]; then
 fi
 confindrDB=$DATABASES_DIR/confindr_db
 
-for read1 in $trimmedReads/*R1*.fq.gz
+for read1 in $trimmedReads/*_R1_*.fq.gz
 do
-  fq=$(echo $read1 | awk -F "R1" '{print $1 "R2"}')
+  fq=$(echo $read1 | awk -F "_R1" '{print $1 "_R2"}')
   fqfile=$(basename $fq)
   read2=$(find $trimmedReads -name "${fqfile}*val_2.fq.gz")
   #read2=$(echo $fq1 | awk -F "R1" '{print $1 "R2" $2}')
@@ -24,7 +24,7 @@ do
   mkdir -p $confindrDir/${name}
   echo "$confindrDir/${name}"
 
-  confindr.py -i ${confindrDir}/ -o ${confindrDir}/${name} -d $confindrDB
+  confindr.py -t $threads -i ${confindrDir}/ -o ${confindrDir}/${name} -d $confindrDB
   rm $fq1 $fq2
 done
 
