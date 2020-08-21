@@ -416,9 +416,9 @@ fi
 
 # delete linked input fastq files
 counter=0
-for fq1 in $project/*R1*f*q*
+for fq1 in $project/*_R1_*f*q*
  do
-  fq2=$(echo $fq1 | awk -F "R1" '{print $1 "R2" $2}')
+  fq2=$(echo $fq1 | awk -F "_R1" '{print $1 "_R2" $2}')
   counter=$((counter+1))
   if [ -h $fq1 ]; then
     if [ -h $fq2 ]; then
