@@ -44,7 +44,8 @@ do
   speciesID=$(cat $bact_out/species_investigation-top1.tsv | tail -n -1 )
 
   #echo -e "sampleID,bactInspector_match,refseq_closest_match" > $bact_out/${name}_bactInspector.csv
-  echo -e "$name,$speciesID,$refseq" > $bact_out/${name}_bactInspector.csv
+  #echo -e "$name,$speciesID,$refseq" > $bact_out/${name}_bactInspector.csv
+  echo -e "$speciesID,$refseq" > $bact_out/${name}_bactInspector.csv
 done
 
 # save bactInspector results to xlsx
