@@ -6,15 +6,17 @@ use Data::Dumper;
 use Getopt::Std;
 use File::Basename;
 use File::Spec;
+use File::Basename
 
 ###MODULE LOAD###
-#module load perl/5.12.3
+#module load perl/5.12.3
 #module load ncbi-blast+/2.2.29
 #module load BEDTools/2.17.0
 #module load Python/2.7
 
 #local $ENV{PATH} = "$ENV{HOME}/anaconda3/envs/srst2/bin:$ENV{PATH}";
-my $SPN_SCRIPTS_DIR = "~/repos/jekesa/spn_scripts";
+#my $SPN_SCRIPTS_DIR = "~/repos/jekesa/spn_scripts";
+my $SPN_SCRIPTS_DIR = dirname(__FILE__);
 
 sub checkOptions {
     my %opts;
