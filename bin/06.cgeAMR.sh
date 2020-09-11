@@ -1,8 +1,10 @@
 #!/bin/bash
 
-export PATH="$HOME/anaconda3/envs/r_env/bin:$PATH"
+#export PATH="$HOME/anaconda3/envs/r_env/bin:$PATH"
 #export PATH="$HOME/anaconda3/envs/resfinder/bin:$PATH"
+
 CONDA_BASE=$(conda info --base)
+export PATH="$CONDA_BASE/envs/r_env/bin:$PATH"
 
 # activate the resfinder environment
 source ${CONDA_BASE}/etc/profile.d/conda.sh

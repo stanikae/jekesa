@@ -102,7 +102,9 @@ declare -x SPN_SCRIPTS_DIR=${BASH_SOURCE%/*}/spn_scripts
 declare -x GAS_SCRIPTS_DIR=${BASH_SOURCE%/*}/GAS_scripts
 
 ## Export path to R conda enviroments
-export PATH="$HOME/anaconda3/envs/r_env/bin:$PATH"
+#export PATH="$HOME/anaconda3/envs/r_env/bin:$PATH"
+CONDA_BASE=$(conda info --base)
+export PATH="$CONDA_BASE/envs/r_env/bin:$PATH"
 
 # create results directory
 declare -x now=$(date +"%d_%b_%Y")
@@ -214,6 +216,7 @@ else
   echo -e "\t[`date +"%d-%b-%Y %T"`]\tRead counting for project: $projectName already completed, moving to next step"
 fi
 
+if [[ $assembler != "noshovill" ]]; then
 # STEP 04: Species identification
 stage=$(grep "speciesID-step04" "$project/progress")
 if [ -z "$stage" ]; then
@@ -234,6 +237,7 @@ if [ -z "$stage" ]; then
   echo "speciesID-step04" >> $project/progress
 else
  echo -e "\t[`date +"%d-%b-%Y %T"`]\tSpecies identification for project: $projectName already completed, moving to next step"
+fi
 fi
 
 # STEP 05: De novo assembly and mlst typing
