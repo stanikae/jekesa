@@ -146,7 +146,7 @@ if (args[1] == "spneumoniae") {
      row_n <- nrow(data_lst[[i]]) + 1
      col_n <- ncol(data_lst[[i]])
      openxlsx::addWorksheet(brack, sheetName = sh_name)
-     openxlsx::writeData(brack, sheet = sh_name, data_lst[[i]])
+     openxlsx::writeDataTable(brack, sheet = sh_name, data_lst[[i]])
      openxlsx::freezePane(brack, sheet = sh_name, firstRow = T)
      #openxlsx::freezePane(brack, sheet = sh_name, firstActiveCol = "H")
      openxlsx::addStyle(brack, sheet = sh_name, headerStyle, rows = 1, cols = 1:col_n,gridExpand = TRUE)
@@ -176,7 +176,7 @@ if (args[1] == "spneumoniae") {
      row_n <- nrow(data_lst[[i]]) + 1
      col_n <- ncol(data_lst[[i]])
      openxlsx::addWorksheet(brack, sheetName = sh_name)
-     openxlsx::writeData(brack, sheet = sh_name, data_lst[[i]])
+     openxlsx::writeDataTable(brack, sheet = sh_name, data_lst[[i]])
      openxlsx::freezePane(brack, sheet = sh_name, firstRow = T)
      #openxlsx::freezePane(brack, sheet = sh_name, firstActiveCol = "H")
      openxlsx::addStyle(brack, sheet = sh_name, headerStyle, rows = 1, cols = 1:col_n,gridExpand = TRUE)
@@ -201,7 +201,7 @@ if (args[1] == "spneumoniae") {
      row_n <- nrow(data_lst[[i]]) + 1
      col_n <- ncol(data_lst[[i]])
      openxlsx::addWorksheet(brack, sheetName = sh_name)
-     openxlsx::writeData(brack, sheet = sh_name, data_lst[[i]])
+     openxlsx::writeDataTable(brack, sheet = sh_name, data_lst[[i]])
      openxlsx::freezePane(brack, sheet = sh_name, firstRow = T)
      openxlsx::addStyle(brack, sheet = sh_name, headerStyle, rows = 1, cols = 1:col_n,gridExpand = TRUE)
      openxlsx::addStyle(brack, sheet = sh_name, bodyStyle, rows = 2:row_n, cols = 1:col_n,gridExpand = TRUE)
@@ -220,7 +220,7 @@ if (args[1] == "spneumoniae") {
      row_n <- nrow(data_lst[[i]]) + 1
      col_n <- ncol(data_lst[[i]])
      openxlsx::addWorksheet(brack, sheetName = sh_name)
-     openxlsx::writeData(brack, sheet = sh_name, data_lst[[i]])
+     openxlsx::writeDataTable(brack, sheet = sh_name, data_lst[[i]])
      openxlsx::freezePane(brack, sheet = sh_name, firstRow = T)
      openxlsx::addStyle(brack, sheet = sh_name, headerStyle, rows = 1, cols = 1:col_n,gridExpand = TRUE)
      openxlsx::addStyle(brack, sheet = sh_name, bodyStyle, rows = 2:row_n, cols = 1:col_n,gridExpand = TRUE)
