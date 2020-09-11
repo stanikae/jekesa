@@ -10,13 +10,18 @@ do
   name=$(basename $fq1 | awk -F '_S' '{print $1}')
   mkdir -p $spadesDir/$name
   #echo $threads
-  ram=$(expr ${threads} \* 3)	
+  ram=$(expr ${threads} \* 3)
+  if [[ $assembler == "noshovill" ]]; then
+  spades.py --careful -t $threads -o $spadesDir/$name -1 $fq1 -2 $fq2
+
+  else
   shovill --force --depth 100 --minlen 200 \
   --cpus $threads --ram $ram --assembler $assembler \
   --outdir $spadesDir/$name --R1 $fq1 --R2 $fq2 
+  fi
 
   # rename contigs files using nameID
-  for i in `find $spadesDir/$name -maxdepth 1 -type f -name "contigs.fa"`
+  for i in `find $spadesDir/$name -maxdepth 1 -type f \( -name "contigs.fa" -o -name "scaffolds.fasta" \)`
     do
         echo $i
         pathName=$(dirname $i)
@@ -27,7 +32,7 @@ do
          then
                 mv "$i" ${pathName}/${pathName2}_assembly.fasta
          else
-                mv "$i" ${pathName}/${pathName2}_scaffolds.fasta
+                mv "$i" ${pathName}/${pathName2}_assembly.fasta
         fi
   done
 
