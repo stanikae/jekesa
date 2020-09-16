@@ -1,5 +1,37 @@
 #!/bin/bash
 
+# functions
+edit_kraken_report () {
+  reportFile=$1
+  firstEdit=$2
+  reportTopHits=$3
+
+  cat $reportFile | sort -k1,1nr | \
+  egrep -v "root|cellular organisms|group" | \
+  awk '$4 !~ /K|D|P|C|O|F|G/' | tr '\t' ',' > $firstEdit
+  
+  firstLine=$(cat $firstEdit | head -n1)
+
+  if [[ "$firstLine" =~ "-" ]]; then
+    echo $firstLine | sed 's/,[[:space:]]\+/,/' > $reportTopHits
+    #
+    cat $firstEdit | awk -F ',' '$4 ~ /S/' | \
+    sort -t ',' -k1,1nr | head -n2 | \
+    sed -e 's/^[ \t]*//' | sed 's/,[[:space:]]\+/,/' >> $reportTopHits
+    #
+    cat $firstEdit | awk -F ',' '$4 ~ /U/' | \
+    sed -e 's/^[ \t]*//' | sed 's/,[[:space:]]\+/,/' >> $reportTopHits
+  else
+    cat $firstEdit | awk -F ',' '$4 ~ /S/' | \
+    sort -t ',' -k1,1nr | head -n3 | \
+    sed -e 's/^[ \t]*//' | sed 's/,[[:space:]]\+/,/' > $reportTopHits
+    #
+    cat $firstEdit | awk -F ',' '$4 ~ /U/' | \
+    sed -e 's/^[ \t]*//' | sed 's/,[[:space:]]\+/,/' >> $reportTopHits
+  fi
+}
+
+# run script
 for fq1 in $trimmedReads/*_R1_*.fq.gz
 do
   fq=$(echo $fq1 | awk -F "_R1" '{print $1 "_R2"}')
@@ -11,31 +43,53 @@ do
 
   # classify
   kraken2 --db $krakenDB --threads $threads --paired \
-  --output $krakenDir/${name}.kraken \
-  --report $krakenDir/${name}.kraken.report \
+  --output $krakenDir/"$name"/${name}.kraken \
+  --report $krakenDir/"$name"/${name}.kraken.report \
   --memory-mapping $fq1 $fq2 --gzip-compressed \
-  --unclassified-out $krakenDir/${name}#.fq
+  --unclassified-out $krakenDir/"$name"/${name}#_unclassified.fq
 
   # Grouping classification report by percentage
-  reportFile=$krakenDir/${name}.kraken.report
-  firstEdit=$krakenDir/${name}.kraken.report-downstream.txt
-  reportTopHits=$krakenDir/${name}.kraken.report-top-4.txt
+  edit_kraken_report $krakenDir/$name/${name}.kraken.report \
+  $krakenDir/$name/${name}.kraken.report-downstream.txt $krakenDir/$name/${name}.kraken.report-top-4.txt 
 
-  cat $reportFile | sort -k1,1nr | egrep -v "root|cellular organisms|group" | awk '$4 !~ /K|D|P|C|O|F|G/' | tr '\t' ',' > $firstEdit
-  firstLine=$(cat $firstEdit | head -n1)
-  #echo $firstLine
-  # awk '{if($4=="-")print} NR==5{exit}'
-
-  if [[ "$firstLine" =~ "-" ]]; then
-    echo $firstLine | sed 's/,[[:space:]]\+/,/' > $reportTopHits #~/tmp/kraken_new_report.txt
-    cat $firstEdit | awk -F ',' '$4 ~ /S/' | sort -t ',' -k1,1nr | head -n2 | sed -e 's/^[ \t]*//' | sed 's/,[[:space:]]\+/,/' >> $reportTopHits
-    cat $firstEdit | awk -F ',' '$4 ~ /U/' | sed -e 's/^[ \t]*//' | sed 's/,[[:space:]]\+/,/' >> $reportTopHits #~/tmp/kraken_new_report.txt
-  else
-    cat $firstEdit | awk -F ',' '$4 ~ /S/' | sort -t ',' -k1,1nr | head -n3 | sed -e 's/^[ \t]*//' | sed 's/,[[:space:]]\+/,/' > $reportTopHits
-    cat $firstEdit | awk -F ',' '$4 ~ /U/' | sed -e 's/^[ \t]*//' | sed 's/,[[:space:]]\+/,/' >> $reportTopHits #~/tmp/kraken_new_report.txt
-  fi
+#  reportFile="$krakenDir"/"$name"/${name}.kraken.report
+#  firstEdit="$krakenDir"/"$name"/${name}.kraken.report-downstream.txt
+#  reportTopHits="$krakenDir"/"$name"/${name}.kraken.report-top-4.txt
+#
+#  cat $reportFile | sort -k1,1nr | egrep -v "root|cellular organisms|group" | awk '$4 !~ /K|D|P|C|O|F|G/' | tr '\t' ',' > $firstEdit
+#  firstLine=$(cat $firstEdit | head -n1)
+#  #echo $firstLine
+#  # awk '{if($4=="-")print} NR==5{exit}'
+#
+#  if [[ "$firstLine" =~ "-" ]]; then
+#    echo $firstLine | sed 's/,[[:space:]]\+/,/' > $reportTopHits #~/tmp/kraken_new_report.txt
+#    cat $firstEdit | awk -F ',' '$4 ~ /S/' | sort -t ',' -k1,1nr | head -n2 | sed -e 's/^[ \t]*//' | sed 's/,[[:space:]]\+/,/' >> $reportTopHits
+#    cat $firstEdit | awk -F ',' '$4 ~ /U/' | sed -e 's/^[ \t]*//' | sed 's/,[[:space:]]\+/,/' >> $reportTopHits #~/tmp/kraken_new_report.txt
+#  else
+#    cat $firstEdit | awk -F ',' '$4 ~ /S/' | sort -t ',' -k1,1nr | head -n3 | sed -e 's/^[ \t]*//' | sed 's/,[[:space:]]\+/,/' > $reportTopHits
+#    cat $firstEdit | awk -F ',' '$4 ~ /U/' | sed -e 's/^[ \t]*//' | sed 's/,[[:space:]]\+/,/' >> $reportTopHits #~/tmp/kraken_new_report.txt
+#  fi
 
 done
+
+# check species identity for previously assembled genomes
+if [ -d $spadesDir/previousContigs ]; then
+ for contFile in $spadesDir/previousContigs/*_assembly.fasta
+      do
+        id=$(basename -s _assembly.fasta $contFile)
+        krak_out=$krakenDir/$id
+        if ! [ -d $krak_out ]; then
+          mkdir -p $krak_out
+        fi
+
+        kraken2 --db $krakenDB --threads $threads \
+        --output $krak_out/${id}.kraken --report $krak_out/${id}.kraken.report \
+        --memory-mapping  --unclassified-out $krak_out/${id}_unclassified.fa $contFile
+
+      # Group by percentage
+      edit_kraken_report $krak_out/${id}.kraken.report $krak_out/${id}.kraken.report-downstream.txt $krak_out/${id}.kraken.report-top-4.txt 
+ done
+fi
 
 # save kraken report to csv and convert to .xlsx
 inDir=$krakenDir #$project/kraken

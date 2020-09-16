@@ -6,9 +6,10 @@ if ! [ -d $confindrDir ]; then
   mkdir -p $confindrDir
 fi
 confindrDB=$DATABASES_DIR/confindr_db
-
+ 
 for read1 in $trimmedReads/*_R1_*.fq.gz
 do
+  if [ -s $read1 ];then
   fq=$(echo $read1 | awk -F "_R1" '{print $1 "_R2"}')
   fqfile=$(basename $fq)
   read2=$(find $trimmedReads -name "${fqfile}*val_2.fq.gz")
@@ -26,7 +27,23 @@ do
 
   confindr.py -t $threads -i ${confindrDir}/ -o ${confindrDir}/${name} -d $confindrDB
   rm $fq1 $fq2
+ fi
 done
+# check contamination in previously assembled genomes
+if [ -d "$spadesDir/previousContigs" ]; then
+ 
+ for contFile in $spadesDir/previousContigs/*_assembly.fasta
+      do
+        id=$(basename -s _assembly.fasta $contFile)
+        conf_out=$confindrDir/$id
+        if ! [ -d $conf_out ]; then
+          mkdir -p $conf_out
+        fi
+	
+	ln -s $contFile $conf_out 
+	confindr.py --fasta -t $threads -i $conf_out -o $conf_out -d $confindrDB
+ done
+fi
 
 # Save confindr results in one .csv file
 cat ${confindrDir}/*/*_report.csv > ${confindrDir}/confindr_merged.csv

@@ -217,6 +217,17 @@ else
 fi
 
 if [[ $assembler != "noshovill" ]]; then
+ # check if contigs directory path is provided
+  if [[ -d $contigsPath ]]; then
+    mkdir -p $spadesDir/previousContigs
+    for contFile in $contigsPath/*.f*a
+      do
+        pref=$(echo $contFile | awk -F "." '{print $NF}')
+        id=$(basename -s .${pref} $contFile)
+        rsync -c $contFile $spadesDir/previousContigs/${id}_assembly.fasta
+        echo -e "\t[`date +"%d-%b-%Y %T"`]\tAdded previously assembled contigs to project: $projectName"
+    done
+  fi
 # STEP 04: Species identification
 stage=$(grep "speciesID-step04" "$project/progress")
 if [ -z "$stage" ]; then
