@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#confindrDir=$project/ariba_${now}_analysis
 if ! [ -d $confindrDir ]; then
   echo "creating confindr work directory"
   mkdir -p $confindrDir
@@ -13,7 +12,6 @@ do
   fq=$(echo $read1 | awk -F "_R1" '{print $1 "_R2"}')
   fqfile=$(basename $fq)
   read2=$(find $trimmedReads -name "${fqfile}*val_2.fq.gz")
-  #read2=$(echo $fq1 | awk -F "R1" '{print $1 "R2" $2}')
   #outdir for each name
   name=$(basename $read1 | awk -F '_S' '{print $1}')
 

@@ -34,6 +34,7 @@ combine_bactIns () {
 
 for fq1 in $trimmedReads/*_R1_*fq.gz
 do
+ if [ -s $fq1 ]; then
   fq=$(echo $fq1 | awk -F "_R1" '{print $1 "_R2"}')
   fqfile=$(basename $fq)
   fq2=$(find $trimmedReads -name "${fqfile}*val_2.fq.gz")
@@ -50,37 +51,12 @@ do
   bactinspector check_species -p $threads -i $trimmedReads -o $bact_out -fq $fq1
   # edit check_species output
   check_species_edit $bact_out/species_investigation*.tsv $bact_out/species-inv-top1.tsv
-  # edit check_species output
-#  check_species_edit $bact_out/species_investigation*.tsv $bact_out/species-investigation-top1.tsv
-#  sed -i 's/_S.*_val_1//' $bact_out/species_investigation*.tsv
-#  if [[ $(wc -l $bact_out/species_investigation_*.tsv | awk '{ print $1 }' ) -gt 2 ]]; then
-#	#cat $bact_out/species_investigation_*.tsv | head -n2 > $bact_out/species_investigation-top1.tsv
-#	(head -n1 $bact_out/species_investigation_*.tsv) && (tail -n -1 $bact_out/species_investigation_*.tsv | \
-#	sort -k3,3nr ) | head -n2 | \
-#	awk -F '\t' '{ print $1,$2" ("$3"%)" }' OFS=',' | \
-#	tail -n -1> $bact_out/species_investigation-top1.tsv
-#  else
-#	cat $bact_out/species_investigation*.tsv | \
-#	awk -F '\t' '{ print $1,$2" ("$3"%)" }' OFS=',' | \
-#	tail -n -1 > $bact_out/species_investigation-top1.tsv
-#  fi
-
-  #Rscript $SCRIPTS_DIR/converting_tsv_2_xlsx.R $bact_out/species_investigation-top1.tsv $reportsDir/${projectName}_species_investigation.xlsx
 
   echo -e "`date`\tRunning bactInspector closest_match"
   bactinspector closest_match -p $threads -i $bact_out -o $bact_out -r -m ${name}*.msh
   # edit closet_species output
   combine_bactIns $bact_out/closest_refseq.tsv $bact_out/closest_matches_*.tsv $bact_out/species-inv-top1.tsv $bact_out/${name}_bactInspector.csv
-#  echo -e "sampleID\trefseq_closest_match" > $bact_out/closest_refseq.tsv
-#  refseq=$(cut -f9 $bact_out/closest_matches_*.tsv | tail -n -1)
-#  echo -e "$name\t$refseq" >> $bact_out/closest_refseq.tsv
-#
-#  # Combine species identification and closest match results
-#  speciesID=$(cat $bact_out/species_investigation-top1.tsv | tail -n -1 )
-#
-#  #echo -e "sampleID,bactInspector_match,refseq_closest_match" > $bact_out/${name}_bactInspector.csv
-#  #echo -e "$name,$speciesID,$refseq" > $bact_out/${name}_bactInspector.csv
-#  echo -e "$speciesID,$refseq" > $bact_out/${name}_bactInspector.csv
+ fi
 done
 
 # check species identity for previously assembled genomes

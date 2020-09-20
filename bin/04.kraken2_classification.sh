@@ -34,6 +34,7 @@ edit_kraken_report () {
 # run script
 for fq1 in $trimmedReads/*_R1_*.fq.gz
 do
+  if [ -s $fq1 ]; then
   fq=$(echo $fq1 | awk -F "_R1" '{print $1 "_R2"}')
   fqfile=$(basename $fq)
   fq2=$(find $trimmedReads -name "${fqfile}*val_2.fq.gz")
@@ -51,25 +52,7 @@ do
   # Grouping classification report by percentage
   edit_kraken_report $krakenDir/$name/${name}.kraken.report \
   $krakenDir/$name/${name}.kraken.report-downstream.txt $krakenDir/$name/${name}.kraken.report-top-4.txt 
-
-#  reportFile="$krakenDir"/"$name"/${name}.kraken.report
-#  firstEdit="$krakenDir"/"$name"/${name}.kraken.report-downstream.txt
-#  reportTopHits="$krakenDir"/"$name"/${name}.kraken.report-top-4.txt
-#
-#  cat $reportFile | sort -k1,1nr | egrep -v "root|cellular organisms|group" | awk '$4 !~ /K|D|P|C|O|F|G/' | tr '\t' ',' > $firstEdit
-#  firstLine=$(cat $firstEdit | head -n1)
-#  #echo $firstLine
-#  # awk '{if($4=="-")print} NR==5{exit}'
-#
-#  if [[ "$firstLine" =~ "-" ]]; then
-#    echo $firstLine | sed 's/,[[:space:]]\+/,/' > $reportTopHits #~/tmp/kraken_new_report.txt
-#    cat $firstEdit | awk -F ',' '$4 ~ /S/' | sort -t ',' -k1,1nr | head -n2 | sed -e 's/^[ \t]*//' | sed 's/,[[:space:]]\+/,/' >> $reportTopHits
-#    cat $firstEdit | awk -F ',' '$4 ~ /U/' | sed -e 's/^[ \t]*//' | sed 's/,[[:space:]]\+/,/' >> $reportTopHits #~/tmp/kraken_new_report.txt
-#  else
-#    cat $firstEdit | awk -F ',' '$4 ~ /S/' | sort -t ',' -k1,1nr | head -n3 | sed -e 's/^[ \t]*//' | sed 's/,[[:space:]]\+/,/' > $reportTopHits
-#    cat $firstEdit | awk -F ',' '$4 ~ /U/' | sed -e 's/^[ \t]*//' | sed 's/,[[:space:]]\+/,/' >> $reportTopHits #~/tmp/kraken_new_report.txt
-#  fi
-
+ fi
 done
 
 # check species identity for previously assembled genomes

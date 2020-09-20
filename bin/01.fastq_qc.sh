@@ -7,10 +7,12 @@ adapters=$CONDA_BASE/envs/jekesa/opt/fastqc*/Configuration/adapter_list.txt
 
 for fq in $project/*f*q.gz
  do
-    fastqc -o $fastqc_out --contaminants $contaminants --adapters $adapters --threads $threads $fq
+    if [ -s $fq ];then
+      fastqc -o $fastqc_out --contaminants $contaminants --adapters $adapters --threads $threads $fq
+    fi
 done
 
 # combine all fastqc reports using mulitQC
-#multiqc -o $reportsDir/$projectName $fastqc_out --pdf --export --filename ${projectName}_b4_qc
-multiqc -o $reportsDir/${projectName}-beforeQC $fastqc_out --pdf --export --filename ${projectName}_b4_qc
-
+if [ "$(ls -A $fastqc_out)" ]; then
+ multiqc -o $reportsDir/${projectName}-beforeQC $fastqc_out --pdf --export --filename ${projectName}_b4_qc
+fi

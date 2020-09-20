@@ -2,6 +2,7 @@
 
 for fq1 in $trimmedReads/*_R1_*.fq.gz
 do
+ if [ -s $fq1 ];then
   fq=$(echo $fq1 | awk -F "_R1" '{print $1 "_R2"}')
   fqfile=$(basename $fq)
   fq2=$(find $trimmedReads -name "${fqfile}*val_2.fq.gz")
@@ -42,7 +43,21 @@ do
   --output-dir $quastDir/${name}_assembly \
   --labels "$name" $spadesDir/$name/${name}*.fa* \
   --pe1 $fq1 --pe2 $fq2 >> $quastDir/05.quast.log 2>&1
+ fi
 done
+
+# run quast on previously assembled contigs if supplied by user
+echo "Checking if previously assembled contigs are present?"
+if [ -d $spadesDir/previousContigs ]; then
+  for contFile in $spadesDir/previousContigs/*_assembly.fasta
+    do
+        id=$(basename -s _assembly.fasta $contFile)
+        # run quast
+        echo "Running QUAST on previously assembled contigs"
+        quast.py -m 200 -t $threads --fast --labels "$id" \
+        -o $quastDir/${id}_assembly $contFile >> $quastDir/05.quast.log 2>&1
+done
+fi
 
 # multiqc reports
 nohup multiqc -o $reportsDir/${projectName}-quast $quastDir \

@@ -266,13 +266,7 @@ if [ -z "$stage" ]; then
    mkdir -p $spadesDir; mkdir -p $statsDir; mkdir -p $quastDir; mkdir -p $mlstDir
   fi
   # perform de novo assembly
-  $SCRIPTS_DIR/05.shovill.sh >> $spadesDir/shovill_assembly.log 2>&1
-  # check if MLST scheme is present in the mlst database
-  #mlst --longlist > $project/schemeList.txt
-  #declare -x schemeList=$project/schemeList.txt
-  #nohup $SCRIPTS_DIR/05.mlst.sh >> $mlstDir/mlst.log 2>&1
-  #wait
-  #echo "assembly-step05" >> $project/progress
+  #$SCRIPTS_DIR/05.shovill.sh >> $spadesDir/shovill_assembly.log 2>&1
 
   # check if contigs directory path is provided
   if [[ -d $contigsPath ]]; then
@@ -285,7 +279,11 @@ if [ -z "$stage" ]; then
         echo -e "\t[`date +"%d-%b-%Y %T"`]\tAdded previously assembled contigs to project: $projectName"
     done
   fi
-  # check if MLST scheme is present in the mlst database
+
+  # perform de novo assembly
+  $SCRIPTS_DIR/05.shovill.sh >> $spadesDir/shovill_assembly.log 2>&1
+ 
+ # check if MLST scheme is present in the mlst database
   mlst --longlist > $project/schemeList.txt
   declare -x schemeList=$project/schemeList.txt
   nohup $SCRIPTS_DIR/05.mlst.sh >> $mlstDir/mlst.log 2>&1
@@ -295,9 +293,6 @@ if [ -z "$stage" ]; then
   if [[ -n $assemOnly ]]; then
     $SCRIPTS_DIR/05.merge-assemblyOnly-results.R $reportsDir \
     ${projectName}-denovo-assembly-report.xlsx > $project/tmp/05.merge.assemblyOnly.results.log 2>&1
-    # soft link assembled contigs to results directory
-    #mkdir -p $reportsDir/assembled-contigs
-    #find $spadesDir -maxdepth 2 -type f -name "*_assembly.fasta" -exec ln -s {} $reportsDir/assembled-contigs/ \;
     echo -e "\t[`date +"%d-%b-%Y %T"`]\tCompleted de novo assembly for project: $projectName .... now exiting"
     exit
   fi
