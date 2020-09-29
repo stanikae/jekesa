@@ -45,7 +45,7 @@ fi
 #echo -e "\t[`date +"%d-%b-%Y %T"`]\tSaving WGS typing results in MS excel format"
 if [ -e $mlstDir/mlst_merged.tsv ]; then
   Rscript $SCRIPTS_DIR/tsv2xlsx.R $mlstDir/mlst_merged.tsv \
-  $reportsDir/05.mlst.xlsx >> $projects/tmp/05.mlst.tsv2xlsx.log 2>&1
+  $reportsDir/05.mlst.xlsx >> $project/tmp/05.mlst.tsv2xlsx.log 2>&1
 fi
 
 

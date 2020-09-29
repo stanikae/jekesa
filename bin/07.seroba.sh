@@ -1,8 +1,8 @@
 #!/bin/bash
 
-for fq1 in $trimmedReads/*R1*f*q*
+for fq1 in $trimmedReads/*_R1_*f*q*
  do
-  fq=$(echo $fq1 | awk -F "R1" '{print $1 "R2"}')
+  fq=$(echo $fq1 | awk -F "_R1" '{print $1 "_R2"}')
   fqfile=$(basename $fq)
   fq2=$(find $trimmedReads -name "${fqfile}*val_2.fq.gz")
   # outdir for each name

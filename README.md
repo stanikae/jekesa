@@ -60,6 +60,7 @@ OPTIONS:
                 detailed analysis. Otherwise for any other schema use: 'other'. To check other available schema names use: mlst --longList.
         -t      Number of threads to use <integer>, (minimum value should be: 6)
         -g      Only perform de novo assembly
+        -c      Path to assembled contigs to include in the typing analysis (only mlst and resistance profiling).
         -h      Show this help
         -v      Show version
 
@@ -170,5 +171,5 @@ Stanford Kwenda
 ## License
 [GPL 3.0](https://github.com/stanikae/jekesa/blob/master/LICENSE)
 ## Citation
-Kwenda S., Allam M., Khumalo Z.T.H., Mtshali S., Mnyameni F., Ismail A. _Jekesa_ **Github** [https://github.com/stanikae/jekesa](https://github.com/stanikae/jekesa)
+Kwenda S., Allam M., Khumalo Z.T.H., Mtshali S., Mnyameni F., Ismail A. _Jekesa: an automated easy-to-use pipeline for bacterial whole genome typing_ **Github** [https://github.com/stanikae/jekesa](https://github.com/stanikae/jekesa)
 

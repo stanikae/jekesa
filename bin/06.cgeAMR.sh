@@ -1,14 +1,20 @@
 #!/bin/bash
 
-export PATH="$HOME/anaconda3/envs/r_env/bin:$PATH"
+#export PATH="$HOME/anaconda3/envs/r_env/bin:$PATH"
 #export PATH="$HOME/anaconda3/envs/resfinder/bin:$PATH"
+
 CONDA_BASE=$(conda info --base)
+export PATH="$CONDA_BASE/envs/r_env/bin:$PATH"
 
 # activate the resfinder environment
 source ${CONDA_BASE}/etc/profile.d/conda.sh
 conda deactivate
 eval "$(conda shell.bash hook)"
 conda activate resfinder
+
+# on some linux systems this will not add the resfinder env to path
+# so adding the resfinder bin to path here just in case
+export PATH="$CONDA_BASE/envs/resfinder/bin:$PATH"
 
 # CGE amr detection
 # resistance gene prediction using assembled contigs
@@ -24,8 +30,8 @@ for contigs in $(find $spadesDir -name "*_assembly.fasta")
   $resfinder/$name/${name}.resfindr.tsv >> $project/tmp/06.json2tsv.log 2>&1
 
   # point mutation detection using assembled contigs
-  if grep -Fq "$MLSTscheme" $DATABASES_DIR/pointfinder_mlst_matches.csv; then 
-     line=$(grep "$MLSTscheme" "$DATABASES_DIR"/pointfinder_mlst_matches.csv)
+  if grep -Fqw "$MLSTscheme" $DATABASES_DIR/pointfinder_mlst_matches.csv; then 
+     line=$(grep -w -m 1 "$MLSTscheme" "$DATABASES_DIR"/pointfinder_mlst_matches.csv)
      pointID=$(echo $line | awk -F',' '{print $2}')
      mkdir -p $pointfinder/$name
      # run pointfinder

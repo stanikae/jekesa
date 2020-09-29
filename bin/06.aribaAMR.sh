@@ -1,8 +1,9 @@
 #!/bin/bash
 
-for read1 in $trimmedReads/*R1*.fq.gz
+for read1 in $trimmedReads/*_R1_*.fq.gz
 do
-  fq=$(echo $read1 | awk -F "R1" '{print $1 "R2"}')
+ if [ -s $read1 ];then    
+  fq=$(echo $read1 | awk -F "_R1" '{print $1 "_R2"}')
   fqfile=$(basename $fq)
   read2=$(find $trimmedReads -name "${fqfile}*val_2.fq.gz")
   
@@ -19,25 +20,17 @@ do
   #rm $aribaDir/${name}_1.fastq.gz $aribaDir/${name}_2.fastq.gz
   rm $fq1 $fq2
   mv $aribaDir/${name}.run/report.tsv $aribaDir/${name}.run/${name}-report.tsv
-
+ fi
 done
 
 # summarizing the identified resistance genes
+if [ "$(ls -A $aribaDir)" ]; then
 # get known variants
 ariba summary --known_variants $aribaDir/${projectName}-aribaAMR_known_variants.summary `find $aribaDir -name "*-report.tsv"`
 # get novel variants
 ariba summary --novel_variants $aribaDir/${projectName}-aribaAMR_novel_variants.summary `find $aribaDir -name "*-report.tsv"`
 # ariba cluster all
 ariba summary --preset cluster_all $aribaDir/${projectName}-aribaAMR_cluster_all.summary `find $aribaDir -name "*-report.tsv"`
-
-# editing the report summary
-#if [[ "$MLSTscheme" == "spneumoniae" ]]; then
-#  for var in $(echo -e "known_variants\nnovel_variants\ncluster_all"); do
-#    cat $aribaDir/${projectName}-aribaAMR_${var}.summary.csv | \
-#    sed 's|.*\.run/||' | sed 's|-report.tsv||' \
-#    sed 's|Streptococcus_pneumoniae|SPN|g' > $aribaDir/${projectName}-aribaAMR-${var}-final.csv
-#  done
-#else
 
 for var in $(echo -e "known_variants\nnovel_variants\ncluster_all"); do
   cat $aribaDir/${projectName}-aribaAMR_${var}.summary.csv | \
@@ -52,4 +45,4 @@ done
 
 # copy ariba AMR .tre and .csv files to reports directory
 rsync -a $aribaDir/*{tre,csv} $reportsDir/ariba-AMR/
-
+fi

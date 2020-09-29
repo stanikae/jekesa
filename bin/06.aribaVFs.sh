@@ -1,8 +1,9 @@
 #!/bin/bash
 
-for read1 in $trimmedReads/*R1*.fq.gz
+for read1 in $trimmedReads/*_R1_*.fq.gz
 do
-  fq=$(echo $read1 | awk -F "R1" '{print $1 "R2"}')
+ if [ -s $read1 ];then
+  fq=$(echo $read1 | awk -F "_R1" '{print $1 "_R2"}')
   fqfile=$(basename $fq)
   read2=$(find $trimmedReads -name "${fqfile}*val_2.fq.gz")
   # outdir for each name
@@ -18,10 +19,11 @@ do
   #rm $aribaVF_Dir/${name}_1.fastq.gz $aribaVF_Dir/${name}_2.fastq.gz
   rm $fq1 $fq2
   mv $aribaVF_Dir/${name}.run/report.tsv $aribaVF_Dir/${name}.run/${name}-report.tsv
-
+ fi
 done
 
 # summarizing the identified virulence factors
+if [ "$(ls -A $aribaVF_Dir)" ]; then
 # get known variants
 ariba summary --known_variants $aribaVF_Dir/${projectName}-aribaVF_known_variants.summary `find $aribaVF_Dir -name "*-report.tsv"`
 # get novel variants
@@ -38,14 +40,7 @@ for var in $(echo -e "known_variants\nnovel_variants\ncluster_all"); do
   $reportsDir/06.aribaVFs-${var}.xlsx >> $project/tmp/06.aribaVFs-${var}.csv2xlsx.log 2>&1
 done
 
-# merge and write ariba AMR and VF reports to xlsx
-#Rscript $SCRIPTS_DIR/merge_files.R \
-#        $reportsDir \
-#        ${projectName}-aribaAMR-known_variants-final.xlsx \
-#        ${projectName}-aribaVFs-known_variants-final.xlsx \
-#        ${projectName}-ariba_final.xlsx >> $project/tmp/merge_files.log 2>&1
-
 # copy ariba VF .tre and .csv files to reports directory
 rsync -a $aribaVF_Dir/*{tre,csv} $reportsDir/ariba-VFs/
-
+fi
 
