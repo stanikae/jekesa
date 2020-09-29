@@ -1,0 +1,13 @@
+#Summary
+#Generated on	Tue Sep 29 10:47:01 SAST 2020
+#Version	5
+chroms	1
+bases	4304200
+defined	3887660
+undefined	416540
+contigs	806
+scaffolds	802
+interpad	500
+source	/mnt/c/Users/stanfordk/Documents/Data-Delivery/Thu/VN-project/contigs-84/VC-VNHN-P07-2.fasta
+bytes	3980908
+last modified	1601026232739
