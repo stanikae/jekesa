@@ -49,7 +49,7 @@ conda deactivate
 
 # copy *.tsv files to the same folder
 mkdir -p $cge_out/CSVs
-find $cge_out -name "*res4.csv" -exec rsync {} $cge_out/TSVs/ \;
+find $cge_out -name "*res4.csv" -exec rsync {} $cge_out/CSVs/ \;
 # merge resfinder output from multiple samples
 $SCRIPTS_DIR/06.resfinder2tsv.R $cge_out/CSVs $reportsDir/06.res4-results.xlsx > $project/tmp/06.res4_2_tsv.log 2>&1
 

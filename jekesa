@@ -320,11 +320,11 @@ if [ -z "$stage" ]; then
     mkdir -p $cge_out
   fi
   # run resfinder and pointfinder
-  #nohup $SCRIPTS_DIR/06.cgeAMR.sh >> $project/tmp/cgeAMR.log 2>&1
+  nohup $SCRIPTS_DIR/06.cgeAMR.sh >> $project/tmp/cgeAMR.log 2>&1
   nohup $SCRIPTS_DIR/06.resfinder4.sh >> $project/tmp/06.res4-AMR.log 2>&1
   # run ariba for AMR and VF detection
-  #nohup $SCRIPTS_DIR/06.aribaAMR.sh >> $aribaDir/ariba_AMRtyping.log 2>&1
-  #nohup $SCRIPTS_DIR/06.aribaVFs.sh >> $project/tmp/ariba_VFtyping.log 2>&1
+  nohup $SCRIPTS_DIR/06.aribaAMR.sh >> $aribaDir/ariba_AMRtyping.log 2>&1
+  nohup $SCRIPTS_DIR/06.aribaVFs.sh >> $project/tmp/ariba_VFtyping.log 2>&1
   wait 
   # merge and write ariba AMR and VF reports to xlsx
   Rscript $SCRIPTS_DIR/merge_files.R $reportsDir \
