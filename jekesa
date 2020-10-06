@@ -293,6 +293,7 @@ if [ -z "$stage" ]; then
   if [[ -n $assemOnly ]]; then
     $SCRIPTS_DIR/05.merge-assemblyOnly-results.R $reportsDir \
     ${projectName}-denovo-assembly-report.xlsx > $project/tmp/05.merge.assemblyOnly.results.log 2>&1
+    echo "assembly-step05" >> $project/progress
     echo -e "\t[`date +"%d-%b-%Y %T"`]\tCompleted de novo assembly for project: $projectName .... now exiting"
     exit
   fi
@@ -438,9 +439,43 @@ for fq1 in $project/*_R1_*f*q*
 done
 
 #############################################################################################################
-###                          Construct phylogenetic tree of samples in this analysis                      ###
+###                          Neighbor joining tree of samples in this analysis                      ###
 #############################################################################################################
-# construct phylogenetic tree of samples in this analysis
+# perform reference-free alignment and construct neighbor-joining tree of samples in this analysis
+stage=$(grep "clustering-step08" "$project/progress")
+if [ -z "$stage" ]; then
+  echo -e "\t[`date +"%d-%b-%Y %T"`]\tNow performing reference free alignments and clustering"
+  declare -x skaDir=$project/ska
+  #declare -x poppunkDir=$project/poppunkNJ
+  #declare -x njDir=$project/rapidNJ
+  if [ -d $skaDir ]; then
+    rm -r "$skaDir" #"$poppunkDir" "$njDir"
+    mkdir -p $skaDir #; mkdir -p $poppunkDir; mkdir -p $njDir
+  else
+    mkdir -p $skaDir #; mkdir -p $poppunkDir; mkdir -p $njDir
+  fi
+  # run ska and poppunk
+  $SCRIPTS_DIR/08.skaNJ.sh $reportsDir/assembled-contigs $skaDir >> $project/tmp/08.ska.log 2>&1
+  #bash $SCRIPTS_DIR/poppunk-launcher.sh poppunk-analysis/reference_list.txt spn_db/info_csv.csv >> $project/tmp/08.ska.log 2>&1
+  
+  # copy results files to the project's results directory
+  declare -x skaRes=$reportsDir/ska
+  if [ -d $skaRes ]; then
+     rm -r "$skaRes"
+  fi
+  mkdir -p $skaRes
+  rsync -rc $skaDir/ska-vcfs $skaRes/
+  rsync -c $skaDir/*{nwk,dot,aln,tsv,txt} $skaRes/
+
+  # convert sample SNP comparison file
+  Rscript $SCRIPTS_DIR/tsv2xlsx.R $skaDir/distances.distances.tsv \
+  $reportsDir/08.ska-SNP-distances.xlsx >> $project/tmp/08.ska.tsv2xlsx.log 2>&1
+  
+  echo "clustering-step08" >> $project/progress
+else
+ echo -e "\t[`date +"%d-%b-%Y %T"`]\tReference-free alignment and clustering for project: $projectName already completed, moving to next step"
+fi  
+
 #Rscript -e 'library(readr);library(readxl);library(tidyverse); 
 #tab=read_excel("Reports_191031_M02621_26_May_2020/191031_M02621_WGS-typing-final-report.xlsx"); write_csv(tab, "spn_db/info_csv.csv")'
 #Rscript -e 'library(readr);library(readxl);library(tidyverse); tab=read_excel("Reports_191031_M02621_26_May_2020/191031_M02621_WGS-typing-final-report.xlsx"); tab=dplyr::select(tab,SampleID,GPSC,Pili,serotype,SCHEME,ST,PBP1A,PBP2B,PBP2X);write_csv(tab, "spn_db/info_csv.csv")'
