@@ -15,7 +15,7 @@ do
   if [ -s $fq1 ]; then
   fq2=$(echo $fq1 | awk -F "_R1" '{print $1 "_R2" $2}')
 	
-  trim_galore -q 20 \
+  trim_galore -q 30 \
   --length 50 --trim-n -o $trimmedReads --gzip \
   --paired $fq1 $fq2 \
   --cores 4 --no_report_file \
