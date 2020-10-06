@@ -22,13 +22,13 @@ addData <- list()
 for(i in seq_along(dat1)){
   resName <- names(dat1)[i]
   # check length
-  errorVec <- try(length(dat1[[i]][[i]]))
+  errorVec <- try(length(dat1[[i]][[1]]))
   if("try-error" %in% class(errorVec)) {
     len <- length(dat1[[i]])
     l2df <- dat1[[i]]
   }else{
-    len <- length(dat1[[i]][[i]])
-    l2df <- dat1[[i]][[i]]
+    len <- length(dat1[[i]][[1]])
+    l2df <- dat1[[i]][[1]]
   }
   len
   df <- data.frame(matrix(unlist(l2df), nrow=length(l2df), byrow=T))
