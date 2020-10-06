@@ -64,6 +64,19 @@ else
    poppunk --create-db --r-files $poppunk_dir/reference_list.txt --output strain_db --threads $threads --plot-fit 5 >> $project/tmp/poppunk.log
    #poppunk --easy-run --r-files reference_list.txt --output spn_db --threads $threads --plot-fit 5 --min-k 13 --full-db --microreact --phandango
    # --cytoscape
+   score=$(cat ${tmp}/ppk-${now}.log | grep "Score" | awk '{print $NF}')
+   #echo $score
+   ## score – a value of at least 0.8 would be expected for a good fit
+   if (( $(echo "$score < 0.8" | bc -l) )); then
+      echo -e "$score is less than 0.9, now running refitting model using dbscan"
+      poppunk --fit-model \
+      --distances ${db_name}_${now}/${db_name}_${now}.dists \
+      --ref-db ${db_name}_${now} --output ${db_name}_${now} \
+      --full-db --dbscan \
+      --info-csv $epi_info \
+      --microreact --phandango --cytoscape --grapetree > ${tmp}/ppk-dbscan-${now}.log 2>&1
+   fi
+
 fi
 ## NOTES
 # Check the distances (in the .err log file) to see that no random probabilities are greater than 0.05
