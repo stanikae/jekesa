@@ -15,8 +15,8 @@ Jekesa (Illuminate) currently runs on a server (single compute node). The pipeli
 * Multi-locus sequence typing based on assembled contigs using [mlst](https://github.com/tseemann/mlst) and PubMLST database.
 
 #### Resistance profiling
-- Both known and novel variants in anti-microbial resistance genes, predicted from clean reads using [ariba](https://github.com/sanger-pathogens/ariba) and either [CARD](https://card.mcmaster.ca/) (The Comprehensive Antibiotic Resistance Database) or [resfinder database](https://bitbucket.org/genomicepidemiology/resfinder_db/src/master/).
-- Additional resistance profiling using [resfinder]() and [pointfinder]() to determine chromosomal mutations and acquired AMR genes, and their associated resistance phenotypes.
+- Detection of acquired AMR genes and chromosomal mutations and their associated resistance phenotypes performed using  [resfinder](https://bitbucket.org/genomicepidemiology/resfinder/src/master/) and [pointfinder](https://bitbucket.org/genomicepidemiology/pointfinder_db/src/master/). 
+- In addition, known and novel variants in anti-microbial resistance genes, predicted from clean reads using [ariba](https://github.com/sanger-pathogens/ariba) and either [CARD](https://card.mcmaster.ca/) (The Comprehensive Antibiotic Resistance Database) or [resfinder database](https://bitbucket.org/genomicepidemiology/resfinder_db/src/master/).
 
 #### Virulence gene predicition
 - Detection of variants (known/novel) in virulence factor genes, from cleaned reads, using [ariba](https://github.com/sanger-pathogens/ariba) and the [VFDB](http://www.mgc.ac.cn/VFs/).
@@ -37,13 +37,18 @@ Jekesa (Illuminate) currently runs on a server (single compute node). The pipeli
 #### _Salmonella enterica_ specific analysis
 - Serotyping using both [SISTR](https://github.com/phac-nml/sistr_cmd) and [SeqSero2](https://github.com/denglab/SeqSero2).
 
+#### Reference-free alignments, pairwise SNP differences, and neighbor-joining tree construction
+- Reference free alignments performed using [SKA](https://github.com/simonrharris/SKA). In addition, SKA distance is used to calculate pairiwise SNP differences between samples.
+- The generated variant alignments are used to generate a neighbor-joining tree using [rapidNJ](https://birc.au.dk/software/rapidnj/).
+
 #### Output and reporting
 All results will be strored in `Results-ProjectName` including:
 * The final report named `ProjectName-WGS-typing-report.xlsx`
 * Results from each step of the analysis in .xlsx format
 * Neighbor joining tree file (and associated files) generated using [PopPUNK](https://github.com/johnlees/PopPUNK).
 * Subfolders contatining:
-  * assembled-contigsa
+  * assembled-contigs
+  * additional results from [SKA](https://github.com/simonrharris/SKA).
   * additional reports from ARIBA, including files for generating trees showing clustering of samples based on detected variants
   * [MultiQC](https://github.com/ewels/MultiQC) reports for visualization of quality control reports, pre- and post- filtering of sequence reads.
 * Detailed HTML report generated using `rmarkdown`
@@ -72,6 +77,7 @@ cd jekesa
 bin/find-link-fastq.sh  path/to/analysis/directory path/to/sampleID/list  path/to/raw/fastqfiles 
 
 # Now run the jekesa pipeline
+conda activate jekesa
 jekesa -p path/to/analysis/directory -a skesa -s spyogenes -t 16 &
 ````
 ## Installation
@@ -95,55 +101,6 @@ cd jekesa
 git pull
 conda env update -n jekesa --file ./lib/jekesa.yml --prune
 `````
-#### Setting up required databases
-##### ARIBA database set-up
-
-`````
-# 1. First re-install cd-hit and change the max_seq size
-cd /opt # or any of your preferred location
-git clone https://github.com/weizhongli/cdhit.git
-cd cdhit
-make MAX_SEQ=10000000
-export PATH="/opt/cdhit:$PATH"
-
-# 2. Download and set-up the CARD database
-# version ...  of CARD is already prepared and provided in jekesa/dbs/ariba_DBs
-# only perform the following steps if you need a more recent CARD database
-cd db/ariba_DBs
-ariba getref card out.card
-ariba prepareref -f out.card.fa -m out.card.tsv out.card.prepareref
-`````
-##### SEROBA database set-up
-`````
-# Clone the git repository:
-cd /opt # or any of your preferred location
-git clone https://github.com/sanger-pathogens/seroba.git
-cp -r /opt/seroba/database jekesa/db/seroba_db
-seroba createDBs jekesa/db/seroba_db/ 71
-`````
-##### Minikraken_DB download and set-up
-`````
-mkdir -p $HOME/minikraken_db # choose most appropriate location for your system
-wget -c -P $HOME/minikraken_db/ ftp://ftp.ccb.jhu.edu/pub/data/kraken2_dbs/minikraken2_v2_8GB_201904_UPDATE.tgz
-cd $HOME/minikraken_db
-tar xzvf minikraken_db/minikraken2_v2_8GB_201904_UPDATE.tgz
-rm $HOME/minikraken_db/minikraken2_v2_8GB_201904_UPDATE.tgz
-ln -s $HOME/minikraken_db/minikraken2_v2_8GB_201904_UPDATE jekesa/db/kraken_db
-`````
-##### PopPUNK database set-up for S. pneumoniae and S. pyogenes
-`````
-mkdir -p $HOME/poppunk_db # choose most appropriate location for your system
-wget -c -P $HOME/poppunk_db https://www.pneumogen.net/gps/GPS_query.tar.bz2
-wget -c -P $HOME/poppunk_db https://www.pneumogen.net/gps/gpsc_definitive.csv
-wget -c -P $HOME/poppunk_db https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/17424146/GAS_query_v2.tar.bz2
-cd $HOME/poppunk_db
-tar -jxf GAS_query_v2.tar.bz2
-tar -jxf GPS_query.tar.bz2
-ln -s $HOME/poppunk_db jekesa/db/kraken_db
-`````
-##### ConFindr databases
-To set up ConFindr databases kindly follow instructions here: `https://olc-bioinformatics.github.io/ConFindr/install/` as this requires registration on PubMLST.
-
 #### Setting-up environment for srst2 and its dependencies
 
 `````
@@ -161,6 +118,21 @@ conda env create -n r_env --file ./lib/r_env.yml
 cd jekesa
 conda env create -n resfinder --file ./lib/resfinder.yml
 `````
+#### Setting-up environment for resfinder4 and its dependencies
+`````
+cd jekesa
+conda env create -n cge --file ./lib/cge.yml
+`````
+#### Setting up required databases
+To download and set-up required databases, execute the `00.download_databases.sh` script
+`````
+cd jekesa
+bash bin/00.download_databases.sh /path/to/installation/directory
+`````
+
+##### ConFindr databases
+To set up ConFindr databases kindly follow instructions here: `https://olc-bioinformatics.github.io/ConFindr/install/` as this requires registration on PubMLST.
+
 #### To deactivate jekesa (At the end of the analysis)
 `````
 conda deactivate jekesa
