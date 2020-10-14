@@ -127,6 +127,7 @@ conda env create -n cge --file ./lib/cge.yml
 To download and set-up required databases, execute the `00.download_databases.sh` script
 `````
 cd jekesa
+conda activate jekesa
 bash bin/00.download_databases.sh /path/to/installation/directory
 `````
 
