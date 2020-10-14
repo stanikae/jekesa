@@ -41,6 +41,12 @@ if(file.exists(paste(dir, "06.pointfinder.xlsx", sep = "/"))){
   pointFin <- data.frame(matrix(ncol = 2, nrow = 0))
   colnames(pointFin) <- c("SampleID","PointFinder")
 }
+
+if(file.exists(paste(dir, "06.res4-results.xlsx", sep = "/"))){
+  res4 <- read_excel(paste(dir, "06.res4-results.xlsx", sep = "/"), col_names = TRUE)
+  names(res4)[1] <- "SampleID"
+}
+
 print("ALL data sets are loaded")
 
 ############# filter quast results ####################################
@@ -187,6 +193,8 @@ if (args[1] == "spneumoniae") {
   openxlsx::saveWorkbook(brack, paste(dir,args[3], sep = "/"), overwrite = T)
 
 } else if (args[1] == "senterica") {
+  sheetNames <- c("WGS-Typing-Report","AMR-and-VrulenceGene_variants","resfinder4")
+
   sistrDF <- read_excel(paste(dir, "07.sistr.xlsx", sep = "/"), col_names = TRUE)
   seqseroDF <- read_excel(paste(dir, "07.seqsero.xlsx", sep = "/"), col_names = TRUE)
   names(sistrDF)[1] <- "SampleID"
@@ -194,7 +202,7 @@ if (args[1] == "spneumoniae") {
   # Merging the data sets
   cmd_df <- plyr::join_all(list(contam_df,metric_df,seqseroDF,sistrDF,cge_df), by='SampleID', type='full')
   cmd_df <- cmd_df %>% arrange(SampleID)
-  data_lst <- list(cmd_df,ariba_df)
+  data_lst <- list(cmd_df,ariba_df,res4)
 
   for(i in seq_along(data_lst)){
      sh_name <- sheetNames[i]

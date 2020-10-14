@@ -309,16 +309,20 @@ if [ -z "$stage" ]; then
   declare -x aribaDir=$project/ariba
   declare -x aribaVF_Dir=$project/aribaVF
   declare -x resfinder=$project/resfinder
+  declare -x cge_out=$project/res4_results
   declare -x pointfinder=$project/pointfinder
   declare -x plasmidDir=$project/plasmids
   if [ -d $aribaDir ]; then
-    rm -r "$aribaDir" "$aribaVF_Dir" "$resfinder" "$pointfinder" "$plasmidDir"
+    rm -r "$aribaDir" "$aribaVF_Dir" "$resfinder" "$pointfinder" "$plasmidDir" "$cge_out"
     mkdir -p $aribaDir; mkdir -p $aribaVF_Dir; mkdir -p $resfinder; mkdir -p $pointfinder; mkdir -p $plasmidDir
+    mkdir -p $cge_out
   else
     mkdir -p $aribaDir; mkdir -p $aribaVF_Dir; mkdir -p $resfinder; mkdir -p $pointfinder; mkdir -p $plasmidDir
+    mkdir -p $cge_out
   fi
   # run resfinder and pointfinder
   nohup $SCRIPTS_DIR/06.cgeAMR.sh >> $project/tmp/cgeAMR.log 2>&1
+  nohup $SCRIPTS_DIR/06.resfinder4.sh >> $project/tmp/06.res4-AMR.log 2>&1
   # run ariba for AMR and VF detection
   nohup $SCRIPTS_DIR/06.aribaAMR.sh >> $aribaDir/ariba_AMRtyping.log 2>&1
   nohup $SCRIPTS_DIR/06.aribaVFs.sh >> $project/tmp/ariba_VFtyping.log 2>&1
