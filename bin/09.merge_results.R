@@ -85,11 +85,11 @@ for (j in seq_along(names(data_list))){
       # reorder columns
       if(ncol(metrics2) == 5){
         col_order <- c("assembly","# contigs (>= 0 bp)", "N50", "Largest contig", "Total length")
-        metrics2 <- metrics2 %>% select(all_of(col_order))
+        metrics2 <- metrics2 %>% select(col_order)
         colnames(metrics2) <- c("SampleID","Contig.num", "N50.value", "Longest.contig", "Total.bases.assembly")
       } else{
         col_order <- c("assembly","# contigs (>= 0 bp)", "GC (%)", "N50", "Largest contig", "Total length")
-        metrics2 <- metrics2 %>% select(all_of(col_order))
+        metrics2 <- metrics2 %>% select(col_order)
         colnames(metrics2) <- c("SampleID","Contig.num", "Contigs.GC.content", "N50.value", "Longest.contig", "Total.bases.assembly")
       }
       
@@ -117,12 +117,12 @@ for (j in seq_along(names(data_list))){
   }
 }
 
-ariba_names <- c("06.aribaAMR-known_variants","06.aribaVFs-known_variants")
+#ariba_names <- c("06.aribaAMR-known_variants","06.aribaVFs-known_variants")
 metrics_names <- c("03.countReads","03.coverageDepth","05.quast","05.mlst")
 contam_names <- c("04.bactInspector","04.confindr","04.kraken")
 cge_names <- c("06.resfinder","06.pointfinder")
 
-names_lst <- list(ariba_names,metrics_names,contam_names,cge_names)
+names_lst <- list(contam_names,metrics_names,cge_names)
 
 cmd_lst <- list()
 for (i in seq_along(names_lst)){

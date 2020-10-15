@@ -53,10 +53,13 @@ cge_git () {
 }
 
 # ------------------------ MiniKraken ----------------------------
-cd $installDir
+if ! [ -d $installDir/kraken2_db ]; then
+   mkdir -p $installDir/kraken2_db
+fi
+cd $installDir/kraken2_db
 db_download "${kraken_download_url}" "kraken8gb_standard.tar.gz"
 tar -zxf kraken8gb_standard.tar.gz
-ln -s $installDir/kraken8gb_standard $DBPATH/kraken_db
+ln -nsf $installDir/kraken2_db $DBPATH/kraken_db
 # ----- PopPunk S. pneumoniae and S. pyogenes databases ----------
 if ! [ -d $installDir/poppunk_db ]; then
    mkdir -p $installDir/poppunk_db
@@ -69,7 +72,7 @@ db_download "${poppunk_gas_db_url}" "GAS_query_v2.tar.bz2"
 tar -jxf GAS_query_v2.tar.bz2
 tar -jxf GPS_query.tar.bz2
 
-ln -s $installDir/poppunk_db $DBPATH/poppunk_db
+ln -nsf $installDir/poppunk_db $DBPATH/poppunk_db
 # -------------------------- ConFindr ----------------------------
 echo "To download ConFindr databases, kindly follow the instructions"
 echo "at https://olc-bioinformatics.github.io/ConFindr/install/#downloading-confindr-databases"
@@ -84,14 +87,14 @@ export PATH="$CONDA_BASE/envs/cge/bin:$PATH"
 
 cd $installDir
 cge_git "${resfinder_db_url}" db_resfinder
-ln -s $installDir/db_resfinder $DBPATH/resfinder_db
+ln -nsf $installDir/db_resfinder $DBPATH/resfinder_db
 # --------------------------- PointFinder ------------------------
 cd $installDir
 cge_git "${pointfinder_db_url}" db_pointfinder
-ln -s $installDir/db_pointfinder $DBPATH/pointfinder_db
+ln -nsf $installDir/db_pointfinder $DBPATH/pointfinder_db
 # --------------------------- DisinFinder -------------------------
 cd $installDir
 cge_git "${disinfinder_db_url}" db_disinfinder
-ln -s $installDir/db_disinfinder $DBPATH/disinfinder_db
+ln -nsf $installDir/db_disinfinder $DBPATH/disinfinder_db
 # --------------------------- ResFinder4 -------------------------
 
