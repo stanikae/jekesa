@@ -18,7 +18,7 @@ grp_dfs <- function(lst, name_vec){
     name_vec2 <- names(grp_list)
     grp_list <- grp_list[name_vec2]
     for (j in seq_along(names(grp_list))){
-      grp_list[[j]]["SampleID"] <- str_remove(grp_list[[j]]["SampleID"], "_.*") # to remove hard coded var names
+      grp_list[[j]]["SampleID"] <- str_remove(grp_list[[j]][["SampleID"]], "_.*") # to remove hard coded var names
     }
     grp_df <- plyr::join_all(grp_list, by='SampleID', type='full') # to remove hard coded var names
     return(grp_df)
