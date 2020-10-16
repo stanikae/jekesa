@@ -15,8 +15,7 @@ library(readxl)
 grp_dfs <- function(lst, name_vec){
   grp_list <- lst[names(lst) %in% name_vec]
   if(length(grp_list) != 0){
-    name_vec2 <- names(grp_list)
-    grp_list <- grp_list[name_vec2]
+    grp_list <- grp_list[name_vec]
     for (j in seq_along(names(grp_list))){
       grp_list[[j]]["SampleID"] <- str_remove(grp_list[[j]][["SampleID"]], "_.*") # to remove hard coded var names
     }
@@ -25,13 +24,12 @@ grp_dfs <- function(lst, name_vec){
   }
 }
 
-
 # ------------------ get input using arguments -----------------------
 args <- commandArgs(TRUE)
 #getwd()
-schemeName <- args[1]
-dir <- file.path(args[2])
-outfile <- args[3]
+#schemeName <- args[1]
+dir <- file.path(args[1])
+outfile <- args[2]
 
 out_dir <- dir
 # check if directory exists and create it if it doesn't
@@ -65,9 +63,7 @@ for (j in seq_along(names(data_list))){
         aribaVF <- data_list[[j]] %>% mutate(aribaVFs = rep("VFvariants", nrow(data_list[[j]])))
         data_list[[j]] <- aribaVF %>% dplyr::select(name,aribaVFs, everything())
       }
-      
   }
-  
   # rename colnames
   if (id != "08.ska-SNP-distances"){
     if(id == "04.kraken"){
@@ -96,7 +92,7 @@ for (j in seq_along(names(data_list))){
       data_list[[j]] <- metrics2
     }
     
-    colnames(data_list[[j]])[1] <- "SampleID"
+    #colnames(data_list[[j]])[1] <- "SampleID"
     
     if(id == "05.mlst"){
       names(data_list[[j]])[2] <- "Scheme.MLST"
@@ -106,7 +102,6 @@ for (j in seq_along(names(data_list))){
       if(ncol(data_list[[j]]) == 3){
         data_list[[j]] <- data_list[[j]] %>% dplyr::select(-Est.GenomeSize)
       }
-       
     }
     if(id == "assigned-gpscs"){
       colnames(data_list[[j]]) <- str_remove(colnames(data_list[[j]]), "_scaffolds.fasta|_assembly.fasta")
@@ -114,10 +109,17 @@ for (j in seq_along(names(data_list))){
     if(id == "assigned-clusters"){
       colnames(data_list[[j]]) <- str_remove(colnames(data_list[[j]]), "_scaffolds.fasta|_assembly.fasta")
     }
+    if(is.na(colnames(data_list[[j]])[1])){next}
+    colnames(data_list[[j]])[1] <- "SampleID"
   }
 }
-
-#ariba_names <- c("06.aribaAMR-known_variants","06.aribaVFs-known_variants")
+# --------------- join ARIBA dfs ------------------------------------
+ariba_names <- c("06.aribaAMR-known_variants","06.aribaVFs-known_variants")
+ariba_list <- data_list[str_detect(names(data_list), "^06.ariba")]
+if(length(ariba_list) != 0){
+ariba_df <- grp_dfs(data_list,ariba_names)
+}
+# ---------------- group the other reports --------------------------
 metrics_names <- c("03.countReads","03.coverageDepth","05.quast","05.mlst")
 contam_names <- c("04.bactInspector","04.confindr","04.kraken")
 cge_names <- c("06.resfinder","06.pointfinder")
@@ -130,10 +132,10 @@ for (i in seq_along(names_lst)){
   cmd_lst[[i]] <- g_df
   cmd_lst <- purrr::compact(cmd_lst)
 }
-# Merging the data sets                                                                                                                                      
+# --------------- Merging the data sets --------------------------------                                                                                                                                      
 cmd_df <- plyr::join_all(cmd_lst, by='SampleID', type='full')
 
-# ------------- add species specific data -----------------------------------------------------------
+# ------------- add species specific data -------------------------------
 specific_list <- data_list[str_detect(names(data_list), "^07")]
 if (length(specific_list) >= 1){
   specific_df <- plyr::join_all(specific_list, by='SampleID', type='full')
