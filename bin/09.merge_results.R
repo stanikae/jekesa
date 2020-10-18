@@ -53,6 +53,7 @@ aribaVF <- data.frame()
 for (j in seq_along(names(data_list))){
   id=names(data_list)[j]
   if(str_detect(id, "WGS-typing-report")){ next}
+  if(str_detect(id, "06.amrfinder.xlsx")){next}
   if (str_detect(id,"06.ariba")){
     colnames(data_list[[j]]) <- str_remove(colnames(data_list[[j]]), ".match")
     
@@ -142,17 +143,25 @@ if (length(specific_list) >= 1){
   cmd_df <- dplyr::full_join(cmd_df,specific_df, by='SampleID')
 }
 
+# ---------------- add amrfinderplus results -----------------------------------------
+#data_lst <- list(data_lst)
+amrfinder_list <- data_list[str_detect(names(data_list), "06.amrfinder")]
+amrfp_df <- data.frame()
+if(length(amrfinder_list) == 1){
+  amrfp_df <- plyr::join_all(amrfinder_list, by='Name', type='full')
+}
 # --------------- add ska pairwise-SNP-differences --------------------------------------------------
+sheetNames <- vector()
 ska_list <- data_list[str_detect(names(data_list), "^08.ska")]
 if(length(ska_list) == 1){
   ska_df <- plyr::join_all(ska_list, by='SampleID', type='full')
-  data_lst <- list(cmd_df,ariba_df,ska_df)
+  data_lst <- list(cmd_df,ariba_df,ska_df,amrfp_df)
+  sheetNames <- c("WGS-Typing-Report","AMR-and-VrulenceGene_variants","Pairwise-SNP-differences","AMR-and-Virulence-Genes")
 }else{
-  data_lst <- list(cmd_df,ariba_df)
+  data_lst <- list(cmd_df,ariba_df,amrfp_df)
+  sheetNames <- c("WGS-Typing-Report","AMR-and-VrulenceGene_variants","AMR-and-Virulence-Genes")
 }
-
 # --------------- join and write results to .xlsx file ----------------------------------------------
-sheetNames <- c("WGS-Typing-Report","AMR-and-VrulenceGene_variants","Pairwise-SNP-differences")
 brack <- openxlsx::createWorkbook()
 ## create and add a style to the column headers
 headerStyle <- createStyle(fontName ="Times New Roman",fontSize =11, textDecoration ="bold") #, halign = "center")

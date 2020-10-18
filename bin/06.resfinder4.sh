@@ -27,7 +27,7 @@ for contigs in $(find $spadesDir -name "*_assembly.fasta")
   mkdir -p $cge_out/$name
 
   if grep -Fq "$MLSTscheme" $DATABASES_DIR/resfinder4_mlst_matches.csv; then
-     line=$(grep "$MLSTscheme" "$DATABASES_DIR"/pointfinder_mlst_matches.csv)
+     line=$(grep "$MLSTscheme" "$DATABASES_DIR"/resfinder4_mlst_matches.csv)
      pointID=$(echo $line | awk -F',' '{print $2}')
 
      python3 /home/stan/git-repos/resfinder/run_resfinder.py -ifa $contigs \
