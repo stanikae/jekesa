@@ -117,6 +117,7 @@ for (j in seq_along(names(data_list))){
 # --------------- join ARIBA dfs ------------------------------------
 ariba_names <- c("06.aribaAMR-known_variants","06.aribaVFs-known_variants")
 ariba_list <- data_list[str_detect(names(data_list), "^06.ariba")]
+ariba_df <- data.frame()
 if(length(ariba_list) != 0){
 ariba_df <- grp_dfs(data_list,ariba_names)
 }
