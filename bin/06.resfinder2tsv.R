@@ -14,10 +14,10 @@ dir_vec
 if (str_detect(dir_vec,"TSVs")){
    # combine tsvs in one data frame
    tbl <- list.files(path = indir,pattern = "*.tsv", full.names = T) %>% 
-       map_df(~read_delim(., delim = "\t"))
+       map_df(~read_delim(., delim = "\t", col_types = cols(.default = "c")))
 }else{
   tbl <- list.files(path = indir,pattern = "*.csv", full.names = T) %>%
-  map_df(~read_delim(., delim = ","))
+  map_df(~read_delim(., delim = ",", col_types = cols(.default = "c")))
 }
 # combine tsvs in one data frame
 #tbl <- list.files(path = indir,pattern = "*.tsv", full.names = T) %>% 
