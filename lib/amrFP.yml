@@ -1,0 +1,9 @@
+name: amrFP
+channels:
+  - r
+  - anaconda
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - ncbi-amrfinderplus
