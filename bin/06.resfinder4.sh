@@ -30,14 +30,14 @@ for contigs in $(find $spadesDir -name "*_assembly.fasta")
      line=$(grep "$MLSTscheme" "$DATABASES_DIR"/resfinder4_mlst_matches.csv)
      pointID=$(echo $line | awk -F',' '{print $2}')
 
-     python3 /home/stan/git-repos/resfinder/run_resfinder.py -ifa $contigs \
-     -o $cge_out/$name -b ${CONDA_BASE}/envs/cge/bin/blastn -db_res $DATABASES_DIR/resfinder4_db \
+     python3 $SCRIPTS_DIR/resfinder/run_resfinder.py -ifa $contigs \
+     -o $cge_out/$name -b ${CONDA_BASE}/envs/cge/bin/blastn -db_res $DATABASES_DIR/resfinder_db \
      -s $pointID -t 0.90 -l 0.60 -acq >> $cge_out/06.res4.log 2>&1
      # save res4 output to csv
      Rscript $SCRIPTS_DIR/06.res4_to_csv.R $cge_out/$name $name >> $project/tmp/06.res4_to_csv.log 2>&1
   else
-     python3 /home/stan/git-repos/resfinder/run_resfinder.py -ifa $contigs \
-     -o $cge_out/$name -b ${CONDA_BASE}/envs/cge/bin/blastn -db_res $DATABASES_DIR/resfinder4_db \
+     python3 $SCRIPTS_DIR/resfinder/run_resfinder.py -ifa $contigs \
+     -o $cge_out/$name -b ${CONDA_BASE}/envs/cge/bin/blastn -db_res $DATABASES_DIR/resfinder_db \
      -t 0.90 -l 0.60 -acq >> $cge_out/06.res4.log 2>&1
      # save res4 output to csv
      Rscript $SCRIPTS_DIR/06.res4_to_csv.R $cge_out/$name $name >> $project/tmp/06.res4_to_csv.log 2>&1
