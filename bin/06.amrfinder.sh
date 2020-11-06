@@ -5,15 +5,15 @@ export PATH="$CONDA_BASE/envs/r_env/bin:$PATH"
 #export PATH="$HOME/anaconda3/envs/resfinder/bin:$PATH"
 
 # activate the amrfinder environment
-source ${CONDA_BASE}/etc/profile.d/conda.sh
-conda deactivate
-eval "$(conda shell.bash hook)"
-conda activate amrFP
+#source ${CONDA_BASE}/etc/profile.d/conda.sh
+#conda deactivate
+#eval "$(conda shell.bash hook)"
+#conda activate amrFP
 # check activated env
-export PATH="$CONDA_BASE/envs/amrFP/bin:$PATH"
-echo -e "Active env:\t$CONDA_DEFAULT_ENV" >> $amrFP_out/06.amrfinder.log 2>&1
-echo -e "env path: $CONDA_PREFIX" >> $amrFP_out/06.amrfinder.log 2>&1
-echo -e "Full path: $PATH" >> $amrFP_out/06.amrfinder.log 2>&1
+#export PATH="$CONDA_BASE/envs/amrFP/bin:$PATH"
+#echo -e "Active env:\t$CONDA_DEFAULT_ENV" >> $amrFP_out/06.amrfinder.log 2>&1
+#echo -e "env path: $CONDA_PREFIX" >> $amrFP_out/06.amrfinder.log 2>&1
+#echo -e "Full path: $PATH" >> $amrFP_out/06.amrfinder.log 2>&1
 
 # AMR and virulence genes detection using NCBI AMRFinderPlus
 amrFP_out=$project/amrfinder
@@ -45,7 +45,7 @@ for contigs in $(find $spadesDir -name "*_assembly.fasta")
 
 done
 # deactivate resfinder environment
-conda deactivate
+#conda deactivate
 
 # copy *.tsv files to the same folder
 mkdir -p $amrFP_out/TSVs
