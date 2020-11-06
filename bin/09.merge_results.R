@@ -149,15 +149,21 @@ if (length(specific_list) >= 1){
 amrfinder_list <- data_list[str_detect(names(data_list), "06.amrfinder")]
 amrfp_df <- data.frame()
 if(length(amrfinder_list) == 1){
-  amrfp_df <- plyr::join_all(amrfinder_list, by='Name', type='full')
+  amrfp_df <- plyr::join_all(amrfinder_list, by='SampleID', type='full')
 }
-# --------------- add ska pairwise-SNP-differences --------------------------------------------------
+# --------------- add resfinder4 results ---------------------------------------------
+res4_list <- data_list[str_detect(names(data_list), "06.res4-results")]
+res4_df <- data.frame()
+if(length(res4_list) == 1){
+  res4_df <- plyr::join_all(res4_list, by='SampleID', type='full')
+}
+# --------------- add ska pairwise-SNP-differences -----------------------------------
 sheetNames <- vector()
 ska_list <- data_list[str_detect(names(data_list), "^08.ska")]
 if(length(ska_list) == 1){
   ska_df <- plyr::join_all(ska_list, by='SampleID', type='full')
-  data_lst <- list(cmd_df,ariba_df,ska_df,amrfp_df)
-  sheetNames <- c("WGS-Typing-Report","AMR-and-VrulenceGene_variants","Pairwise-SNP-differences","AMR-and-Virulence-Genes")
+  data_lst <- list(cmd_df,ariba_df,ska_df,amrfp_df,res4_df)
+  sheetNames <- c("WGS-Typing-Report","AMR-and-VrulenceGene_variants","Pairwise-SNP-differences","AMR-and-Virulence-Genes","ResFinder4")
 }else{
   data_lst <- list(cmd_df,ariba_df,amrfp_df)
   sheetNames <- c("WGS-Typing-Report","AMR-and-VrulenceGene_variants","AMR-and-Virulence-Genes")
