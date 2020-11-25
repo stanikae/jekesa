@@ -27,7 +27,7 @@ for contigs in $(find $spadesDir -name "*_assembly.fasta")
   mkdir -p $amrFP_out/$name
 
   if grep -Fq "$MLSTscheme" $DATABASES_DIR/amrfinder_mlst_matches.csv; then
-     line=$(grep "$MLSTscheme" "$DATABASES_DIR"/amrfinder_mlst_matches.csv)
+     line=$(grep -w "$MLSTscheme" "$DATABASES_DIR"/amrfinder_mlst_matches.csv)
      pointID=$(echo $line | awk -F',' '{print $2}')
 
      amrfinder --plus --nucleotide $contigs --name $name --threads $threads \
