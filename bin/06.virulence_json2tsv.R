@@ -81,7 +81,9 @@ for (n in seq_along(dat2_nams)){
 
 mx <- max(lengths(addData))
 d1 <- data.frame(lapply(addData, `length<-`, mx))
-d1 <- dplyr::select(d1, -virulence_ecoli)
+if(any(names(d1) == "virulence_ecoli")){
+  d1 <- dplyr::select(d1, -virulence_ecoli)
+}
 # remove rownames
 rownames(d1) <- NULL
 #add sampleID column
