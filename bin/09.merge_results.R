@@ -124,7 +124,7 @@ ariba_df <- grp_dfs(data_list,ariba_names)
 # ---------------- group the other reports --------------------------
 metrics_names <- c("03.countReads","03.coverageDepth","05.quast","05.mlst")
 contam_names <- c("04.bactInspector","04.confindr","04.kraken")
-cge_names <- c("06.resfinder","06.pointfinder")
+cge_names <- c("06.resfinder","06.pointfinder", "06.virufinder")
 
 names_lst <- list(contam_names,metrics_names,cge_names)
 

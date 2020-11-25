@@ -19,6 +19,13 @@ if (str_detect(dir_vec,"TSVs")){
   tbl <- list.files(path = indir,pattern = "*.csv", full.names = T) %>%
   map_df(~read_delim(., delim = ",", col_types = cols(.default = "c")))
 }
+
+# replace NAs with "No hit found"
+tbl_logic_vec <- as.data.frame(sapply(tbl, is.na))
+for(nm in names(tbl)){
+  tbl[[nm]][tbl_logic_vec[[nm]]] = "No hit found"
+}
+
 # combine tsvs in one data frame
 #tbl <- list.files(path = indir,pattern = "*.tsv", full.names = T) %>% 
 #       map_df(~read_delim(., delim = "\t"))

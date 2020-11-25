@@ -313,18 +313,20 @@ if [ -z "$stage" ]; then
   declare -x pointfinder=$project/pointfinder
   declare -x plasmidDir=$project/plasmids
   declare -x amrFP_out=$project/amrfinder
+  declare -x virufinder=$project/virulencefinder
   if [ -d $resfinder ]; then
-    rm -r "$aribaDir" "$aribaVF_Dir" "$resfinder" "$pointfinder" "$plasmidDir" "$cge_out" "$amrFP_out"
+    rm -r "$aribaDir" "$aribaVF_Dir" "$resfinder" "$pointfinder" "$plasmidDir" "$cge_out" "$amrFP_out" "$virufinder"
     mkdir -p $aribaDir; mkdir -p $aribaVF_Dir; mkdir -p $resfinder; mkdir -p $pointfinder; mkdir -p $plasmidDir
-    mkdir -p $cge_out; mkdir -p $amrFP_out
+    mkdir -p $cge_out; mkdir -p $amrFP_out; mkdir -p $virufinder
   else
     mkdir -p $aribaDir; mkdir -p $aribaVF_Dir; mkdir -p $resfinder; mkdir -p $pointfinder; mkdir -p $plasmidDir
-    mkdir -p $cge_out; mkdir -p $amrFP_out
+    mkdir -p $cge_out; mkdir -p $amrFP_out; mkdir -p $virufinder
   fi
   # run resfinder and pointfinder
   nohup $SCRIPTS_DIR/06.cgeAMR.sh >> $project/tmp/cgeAMR.log 2>&1
-  nohup $SCRIPTS_DIR/06.resfinder4.sh >> $project/tmp/06.res4-AMR.log 2>&1
+  #nohup $SCRIPTS_DIR/06.resfinder4.sh >> $project/tmp/06.res4-AMR.log 2>&1
   nohup $SCRIPTS_DIR/06.amrfinder.sh >> $project/tmp/06.amrfinder.log 2>&1
+  nohup $SCRIPTS_DIR/06.virufinder.sh >> $project/tmp/06.virufinder.log 2>&1
   # run ariba for AMR and VF detection
   #nohup $SCRIPTS_DIR/06.aribaAMR.sh >> $aribaDir/ariba_AMRtyping.log 2>&1
   #nohup $SCRIPTS_DIR/06.aribaVFs.sh >> $project/tmp/ariba_VFtyping.log 2>&1
@@ -422,6 +424,18 @@ if [ -z "$stage" ]; then
      mkdir -p $sistr; mkdir -p $seqsero
    fi
    nohup $SCRIPTS_DIR/07.salmonella.sh >> $project/tmp/07.salmonella.log 2>&1
+
+ elif [[ "$MLSTscheme" == "ecoli" ]]; then
+   echo -e "\t[`date +"%d-%b-%Y %T"`]\tMLST scheme is $MLSTscheme, now performing E. coli specifc analysis"
+   declare -x serotyper=$project/serotyper
+   if [ -d $serotyper ]; then
+     rm -r "$serotyper"
+     mkdir -p $serotyper
+   else
+     mkdir -p $serotyper
+   fi
+   nohup $SCRIPTS_DIR/07.ecoli.sh >> $project/tmp/07.ecoli.log 2>&1
+
  else
    echo -e "\t[`date +"%d-%b-%Y %T"`]\tIndepth SPN, GAS, and salmonella specific analysis not required for $projectName"
  fi
