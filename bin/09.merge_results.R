@@ -14,8 +14,9 @@ library(readxl)
 # ---------------------------- FUNCTIONS -----------------------------
 grp_dfs <- function(lst, name_vec){
   grp_list <- lst[names(lst) %in% name_vec]
+  grp_list <- purrr::compact(grp_list)
   if(length(grp_list) != 0){
-    grp_list <- grp_list[name_vec]
+    #grp_list <- grp_list[name_vec]
     for (j in seq_along(names(grp_list))){
       grp_list[[j]]["SampleID"] <- str_remove(grp_list[[j]][["SampleID"]], "_.*") # to remove hard coded var names
     }
@@ -122,11 +123,12 @@ if(length(ariba_list) != 0){
 ariba_df <- grp_dfs(data_list,ariba_names)
 }
 # ---------------- group the other reports --------------------------
-metrics_names <- c("03.countReads","03.coverageDepth","05.quast","05.mlst")
+metrics_names <- c("03.countReads","03.coverageDepth","05.quast")
+mlst_name <- c("05.mlst")
 contam_names <- c("04.bactInspector","04.confindr","04.kraken")
 cge_names <- c("06.resfinder","06.pointfinder", "06.virufinder")
 
-names_lst <- list(contam_names,metrics_names,cge_names)
+names_lst <- list(contam_names,metrics_names,mlst_name,cge_names)
 
 cmd_lst <- list()
 for (i in seq_along(names_lst)){

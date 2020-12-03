@@ -95,7 +95,11 @@ sed -i 's/|/\t/g' $pointfinder/06.pointfinder.tsv
 # convert resfinder .tsv to .xlsx
 #Rscript $SCRIPTS_DIR/tsv2xlsx.R $resfinder/06.resfinder.tsv \
 #$reportsDir/06.resfinder.xlsx >> $project/tmp/06.resfinder.tsv2xlsx.log 2>&1
+Rscript -e 'args <- commandArgs(TRUE); dir=args[1]; print(dir)' \
+        -e 'library(stringr);library(readr);path=dir' \
+        -e 'pnt=read_tsv(path); names(pnt)=str_c("pointfinder.",names(pnt))' \
+        -e 'write_tsv(pnt,args[2])' $pointfinder/06.pointfinder.tsv $pointfinder/06.pntfndr.tsv
 
 # convert pointfinder .tsv to .xlsx
-Rscript $SCRIPTS_DIR/tsv2xlsx.R $pointfinder/06.pointfinder.tsv \
+Rscript $SCRIPTS_DIR/tsv2xlsx.R $pointfinder/06.pntfndr.tsv \
 $reportsDir/06.pointfinder.xlsx >> $project/tmp/06.pointfinder.tsv2xlsx.log 2>&1
