@@ -81,6 +81,13 @@ conda activate jekesa
 jekesa -p path/to/analysis/directory -a skesa -s spyogenes -t 16 &
 ````
 ## Installation
+````
+# JEKESA
+mkdir -p jekesa_v1.0
+wget -P jekesa_v1.0 https://anaconda.org/stanikae/jekesa/2021.01.15.141403/download/jekesa_v1.0.yml
+conda env create -n jekesa --file jekesa_v1.0/jekesa_v1.0.yml
+````
+
 
 ````
 Clone the git repository:
