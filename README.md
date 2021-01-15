@@ -82,34 +82,39 @@ jekesa -p path/to/analysis/directory -a skesa -s spyogenes -t 16 &
 ````
 ## Installation
 ````
-# JEKESA
-mkdir -p jekesa_v1.0
-cd jekesa_v1.0
-wget https://anaconda.org/stanikae/jekesa/2021.01.15.141403/download/jekesa_v1.0.yml
-conda env create -n jekesa --file jekesa_v1.0.yml
-````
-### Installation of dependancies
-#### R packages
-````
-wget https://anaconda.org/stanikae/r_env/2021.01.15.141706/download/jekesa-v1.0_r_env.yml
-conda env create -n r_env --file jekesa-v1.0_r_env.yml
-````
-#### [CGE tools](https://cge.cbs.dtu.dk/services/)
-````
-## ResFinder4 
-wget https://anaconda.org/stanikae/resfinder/2021.01.15.143308/download/jekesa-v1.0_cge.yml
-conda env create -n resfinder --file jekesa-v1.0_cge.yml
-
-## Other CGE tools
-wget https://anaconda.org/stanikae/cge/2021.01.15.143507/download/jekesa-v1.0_resfinder4.yml
-conda env create -n cge --file jekesa-v1.0_resfinder4.yml
-````
-## Or use the instructions below (set-up via git)
-````
 Clone the git repository:
 git clone https://github.com/stanikae/jekesa.git
+cd jekesa
 ````
 After cloning the jekesa git repo, do the following to install the required dependencies and to setup the conda environment:
+`````
+````
+# JEKESA
+wget -P lib https://anaconda.org/stanikae/jekesa/2021.01.15.141403/download/jekesa_v1.0.yml
+conda env create -n jekesa --file ./lib/jekesa_v1.0.yml
+````
+### Installation of dependancies
+#### 1. R packages
+````
+wget -P lib https://anaconda.org/stanikae/r_env/2021.01.15.141706/download/jekesa-v1.0_r_env.yml
+conda env create -n r_env --file ./lib/jekesa-v1.0_r_env.yml
+````
+#### 2. [CGE tools](https://cge.cbs.dtu.dk/services/)
+````
+## ResFinder4 
+wget -P https://anaconda.org/stanikae/resfinder/2021.01.15.143308/download/jekesa-v1.0_cge.yml
+conda env create -n resfinder --file ./lib/jekesa-v1.0_cge.yml
+
+## Other CGE tools
+wget -P https://anaconda.org/stanikae/cge/2021.01.15.143507/download/jekesa-v1.0_resfinder4.yml
+conda env create -n cge --file ./lib/jekesa-v1.0_resfinder4.yml
+````
+
+````
+## Activate jekesa
+conda activate jekesa 
+````
+#### Or use the instructions below
 `````
 cd jekesa
 conda env create -n jekesa --file ./lib/jekesa.yml
