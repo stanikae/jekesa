@@ -84,11 +84,27 @@ jekesa -p path/to/analysis/directory -a skesa -s spyogenes -t 16 &
 ````
 # JEKESA
 mkdir -p jekesa_v1.0
-wget -P jekesa_v1.0 https://anaconda.org/stanikae/jekesa/2021.01.15.141403/download/jekesa_v1.0.yml
-conda env create -n jekesa --file jekesa_v1.0/jekesa_v1.0.yml
+cd jekesa_v1.0
+wget https://anaconda.org/stanikae/jekesa/2021.01.15.141403/download/jekesa_v1.0.yml
+conda env create -n jekesa --file jekesa_v1.0.yml
 ````
+### Installation of dependancies
+#### R packages
+````
+wget https://anaconda.org/stanikae/r_env/2021.01.15.141706/download/jekesa-v1.0_r_env.yml
+conda env create -n r_env --file jekesa-v1.0_r_env.yml
+````
+#### [CGE tools](https://cge.cbs.dtu.dk/services/)
+````
+## ResFinder4 
+wget https://anaconda.org/stanikae/resfinder/2021.01.15.143308/download/jekesa-v1.0_cge.yml
+conda env create -n resfinder --file jekesa-v1.0_cge.yml
 
-
+## Other CGE tools
+wget https://anaconda.org/stanikae/cge/2021.01.15.143507/download/jekesa-v1.0_resfinder4.yml
+conda env create -n cge --file jekesa-v1.0_resfinder4.yml
+````
+## Or use the instructions below (set-up via git)
 ````
 Clone the git repository:
 git clone https://github.com/stanikae/jekesa.git
