@@ -87,7 +87,6 @@ git clone https://github.com/stanikae/jekesa.git
 cd jekesa
 ````
 After cloning the jekesa git repo, do the following to install the required dependencies and to setup the conda environment:
-`````
 ````
 # JEKESA
 wget -P lib https://anaconda.org/stanikae/jekesa/2021.01.15.141403/download/jekesa_v1.0.yml
