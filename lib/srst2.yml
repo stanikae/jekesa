@@ -6,6 +6,9 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - python=2.7.5
-  - srst2=0.2.0
+  - python=2.*.*
   - samtools=0.1.18
+  - scipy=1.*.*
+  - pip
+  - pip:
+      - srst2

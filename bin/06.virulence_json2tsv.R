@@ -36,7 +36,7 @@ if (mlst == "ecoli" || mlst =="ecoli_2"){
   dat2 <- dat1[["Enterococcus"]]
   dat2_nams <- names(dat2)
 }else if(mlst == "saureus"){
-  dat2 <- dat1[["Staphylococcus aureus"]]
+  dat2 <- dat1[["S. aureus"]]
   dat2_nams <- names(dat2)
 }else if(mlst == "lmonocytogenes"){
   dat2 <- dat1[["Listeria"]]

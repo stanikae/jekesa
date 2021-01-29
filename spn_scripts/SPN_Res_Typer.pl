@@ -17,7 +17,7 @@ print Dumper \%INC;
 #module load bowtie2/2.1.0
 #module load Python/2.7
 #module load freebayes/0.9.21
-
+# anaconda3/envs/srst2/bin/srst2
 my $CONDA_BASE = $(conda info --base)
 local $ENV{PATH} = "$ENV{CONDA_BASE}/envs/srst2/bin:$ENV{PATH}";
 #local $ENV{PATH} = "$ENV{HOME}/anaconda3/envs/srst2/bin:$ENV{PATH}";
