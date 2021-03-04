@@ -57,7 +57,7 @@ fi
 # using rapidnj
 alnFile=$(find $outdir -name "reference_free_var*.aln")
 if [[ -s $alnFile ]]; then
- rapidnj -i fa $alnFile -x $outdir/nj-tree.nwk
+ rapidnj -i fa $alnFile --bootstrap 1000 -x $outdir/nj-tree.nwk
 else
  echo "No alignment file found"
 fi
