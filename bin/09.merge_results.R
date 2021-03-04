@@ -142,8 +142,8 @@ cmd_df <- plyr::join_all(cmd_lst, by='SampleID', type='full')
 # ------------- add species specific data -------------------------------
 specific_list <- data_list[str_detect(names(data_list), "^07")]
 if (length(specific_list) >= 1){
-  specific_df <- plyr::join_all(specific_list, by='SampleID', type='full')
-  cmd_df <- dplyr::full_join(cmd_df,specific_df, by='SampleID')
+  try(specific_df <- plyr::join_all(specific_list, by='SampleID', type='full'), silent=T)
+  try(cmd_df <- dplyr::full_join(cmd_df,specific_df, by='SampleID'), silent=T)
 }
 
 # ---------------- add amrfinderplus results -----------------------------------------

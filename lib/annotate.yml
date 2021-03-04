@@ -1,0 +1,11 @@
+name: annotate
+channels:
+  - r
+  - anaconda
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+ - prokka=1.14.6
+ - snippy=4.6.0
+ - gubbins=2.4.1
