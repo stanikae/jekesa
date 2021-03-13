@@ -121,42 +121,12 @@ conda deactivate
 ## Activate jekesa
 conda activate jekesa 
 ````
-#### Or use the instructions below
-`````
-cd jekesa
-conda env create -n jekesa --file ./lib/jekesa.yml
-`````
-To activate JEKESA environment run:
-`````
-conda activate jekesa 
-`````
-If you already have jekesa installed, you can upgrade as follows:
+
+### If you already have jekesa installed, you can upgrade as follows:
 `````
 cd jekesa
 git pull
 conda env update -n jekesa --file ./lib/jekesa.yml --prune
-`````
-#### Setting-up environment for srst2 and its dependencies
-
-`````
-cd jekesa
-conda env create -n srst2 --file ./lib/srst2.yml
-`````
-#### Setting-up R environment and the required libraries
-
-`````
-cd jekesa
-conda env create -n r_env --file ./lib/r_env.yml
-`````
-#### Setting-up environment for resfinder and pointfinder and their dependencies
-`````
-cd jekesa
-conda env create -n resfinder --file ./lib/resfinder.yml
-`````
-#### Setting-up environment for resfinder4 and its dependencies
-`````
-cd jekesa
-conda env create -n cge --file ./lib/cge.yml
 `````
 #### Setting up required databases
 To download and set-up required databases, execute the `00.download_databases.sh` script
@@ -165,7 +135,6 @@ cd jekesa
 conda activate jekesa
 bash bin/00.download_databases.sh /path/to/installation/directory
 `````
-
 ##### ConFindr databases
 To set up ConFindr databases kindly follow instructions here: `https://olc-bioinformatics.github.io/ConFindr/install/` as this requires registration on PubMLST.
 
