@@ -1,5 +1,5 @@
 # JEKESA
-An automated bacterial whole genome assembly and typing pipeline which primarily uses Illumina paired-end whole genome sequencing (WGS) data. In addition, Jekesa performs extensive analyses for _Streptococcus pneumoniae_ and _Streptococcus pyogenes_ (Group A Streptococcus) using some of the [CDC Streptococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) scripts for PBP and EMM typing; as well as MIC (minimum inhibitory concentration) profiling. Furthermore, Jekesa, also performs in-depth analysis for salmonella, including antigen detection, serotyping, and assignment of subspecies groups based on cgMLST profiles. Lastly, Jekesa, performs reference-free alignments as well as generating a neighbor-joining tree.
+An automated bacterial whole genome assembly and typing pipeline which primarily uses Illumina paired-end whole genome sequencing (WGS) data. In addition, Jekesa performs extensive analyses for _Escherichia coli_, Salmonella, _Streptococcus pneumoniae_ and _Streptococcus pyogenes_ (Group A Streptococcus), including in-depth virulence predicitions for various other pathogens (refer to sections below). Furthermore, Jekesa, also performs whole-genome reference-free alignments, pairwise SNP-site analysis and clustering, and generates a neighbor-joining tree which can be easily visualized using e.g. [Microreact](https://microreact.org/showcase).
 
 ## Pipeline overview
 Jekesa (Illuminate) currently runs on a server (single compute node). The pipeline is written in Bash, R, and Rmarkdown, and generates the results report in an excel worksheet (.xlsx format) and html format.
@@ -26,11 +26,11 @@ Jekesa (Illuminate) currently runs on a server (single compute node). The pipeli
 #### Plasmid detection
 - Coming soon
 
-#### _Salmonella enterica_ specific analysis
-- Serotyping using both [SISTR](https://github.com/phac-nml/sistr_cmd) and [SeqSero2](https://github.com/denglab/SeqSero2).
-
 #### _Escherichia coli_ specific analysis
 - Serotyping using [SerotypeFinder](https://bitbucket.org/genomicepidemiology/serotypefinder/src/master/).
+
+#### _Salmonella enterica_ specific analysis
+- Serotyping using both [SISTR](https://github.com/phac-nml/sistr_cmd) and [SeqSero2](https://github.com/denglab/SeqSero2).
 
 #### _Streptococcus pneumoniae_ specific analysis
 - Serotyping using [seroba](https://github.com/sanger-pathogens/seroba)
@@ -43,7 +43,7 @@ Jekesa (Illuminate) currently runs on a server (single compute node). The pipeli
 - Calculate core and accessory distances and cluster/define genomes/strains using [PopPUNK](https://github.com/johnlees/PopPUNK), as well as assign new genomes to clusters.
 
 #### Reference-free alignments, pairwise SNP differences, and neighbor-joining tree construction
-- Reference free alignments performed using [SKA](https://github.com/simonrharris/SKA). In addition, SKA distance is used to calculate pairiwise SNP differences between samples.
+- Reference free alignments performed using [SKA](https://github.com/simonrharris/SKA). In addition, SKA distance is used to calculate pairiwise SNP differences between samples and assign SNP-based clusters.
 - The generated variant alignments are used to generate a neighbor-joining tree using [rapidNJ](https://birc.au.dk/software/rapidnj/) with 1000 bootstrap replicates.
 
 #### Output and reporting
