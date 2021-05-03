@@ -15,14 +15,22 @@ Jekesa (Illuminate) currently runs on a server (single compute node). The pipeli
 * Multi-locus sequence typing based on assembled contigs using [mlst](https://github.com/tseemann/mlst) and PubMLST database.
 
 #### Resistance profiling
-- Detection of acquired AMR genes and chromosomal mutations and their associated resistance phenotypes performed using  [resfinder](https://bitbucket.org/genomicepidemiology/resfinder/src/master/) and [pointfinder](https://bitbucket.org/genomicepidemiology/pointfinder_db/src/master/). 
-- In addition, known and novel variants in anti-microbial resistance genes, predicted from clean reads using [ariba](https://github.com/sanger-pathogens/ariba) and either [CARD](https://card.mcmaster.ca/) (The Comprehensive Antibiotic Resistance Database) or [resfinder database](https://bitbucket.org/genomicepidemiology/resfinder_db/src/master/).
+- Detection of acquired AMR genes and chromosomal mutations and their associated resistance phenotypes performed using [resfinder](https://bitbucket.org/genomicepidemiology/resfinder/src/master/), [AMRFinderPlus](https://github.com/ncbi/amr/wiki/Running-AMRFinderPlus) and [pointfinder](https://bitbucket.org/genomicepidemiology/pointfinder_db/src/master/). 
+- Optionally, known and novel variants in anti-microbial resistance genes, predicted from clean reads using [ariba](https://github.com/sanger-pathogens/ariba) and either [CARD](https://card.mcmaster.ca/) (The Comprehensive Antibiotic Resistance Database) or [resfinder database](https://bitbucket.org/genomicepidemiology/resfinder_db/src/master/).
 
 #### Virulence gene predicition
-- Detection of variants (known/novel) in virulence factor genes, from cleaned reads, using [ariba](https://github.com/sanger-pathogens/ariba) and the [VFDB](http://www.mgc.ac.cn/VFs/).
+- Virulence genes detected using [AMRFinderPlus](https://github.com/ncbi/amr/wiki/Running-AMRFinderPlus). 
+- In addition, in-depth virulence gene detection for specific pathogens such as *E. coli, E. faecalis, E. faecium, S aureus and L. monocytogenes* is performed using [VirulenceFinder](https://bitbucket.org/genomicepidemiology/virulencefinder/src/master/).
+- Optionally, detection of variants (known/novel) in virulence factor genes, from cleaned reads, using [ariba](https://github.com/sanger-pathogens/ariba) and the [VFDB](http://www.mgc.ac.cn/VFs/). *ARIBA can be activated by uncommenting the ARIBA specific scripts in the main JEKESA script.*
 
 #### Plasmid detection
 - Coming soon
+
+#### _Salmonella enterica_ specific analysis
+- Serotyping using both [SISTR](https://github.com/phac-nml/sistr_cmd) and [SeqSero2](https://github.com/denglab/SeqSero2).
+
+#### _Escherichia coli_ specific analysis
+- Serotyping using [SerotypeFinder](https://bitbucket.org/genomicepidemiology/serotypefinder/src/master/).
 
 #### _Streptococcus pneumoniae_ specific analysis
 - Serotyping using [seroba](https://github.com/sanger-pathogens/seroba)
@@ -34,12 +42,9 @@ Jekesa (Illuminate) currently runs on a server (single compute node). The pipeli
 - EMM typing and MIC profiling using [CDC Stretococcus Lab](https://github.com/BenJamesMetcalf/Spn_Scripts_Reference) GAS scripts and sequence databases.
 - Calculate core and accessory distances and cluster/define genomes/strains using [PopPUNK](https://github.com/johnlees/PopPUNK), as well as assign new genomes to clusters.
 
-#### _Salmonella enterica_ specific analysis
-- Serotyping using both [SISTR](https://github.com/phac-nml/sistr_cmd) and [SeqSero2](https://github.com/denglab/SeqSero2).
-
 #### Reference-free alignments, pairwise SNP differences, and neighbor-joining tree construction
 - Reference free alignments performed using [SKA](https://github.com/simonrharris/SKA). In addition, SKA distance is used to calculate pairiwise SNP differences between samples.
-- The generated variant alignments are used to generate a neighbor-joining tree using [rapidNJ](https://birc.au.dk/software/rapidnj/).
+- The generated variant alignments are used to generate a neighbor-joining tree using [rapidNJ](https://birc.au.dk/software/rapidnj/) with 1000 bootstrap replicates.
 
 #### Output and reporting
 All results will be strored in `Results-ProjectName` including:
@@ -126,7 +131,8 @@ conda activate jekesa
 `````
 cd jekesa
 git pull
-conda env update -n jekesa --file ./lib/jekesa.yml --prune
+wget -P lib https://anaconda.org/stanikae/jekesa/2021.01.15.141403/download/jekesa_v1.0.yml
+conda env update -n jekesa --file ./lib/jekesa_v1.0.yml --prune
 `````
 #### Setting up required databases
 To download and set-up required databases, execute the `00.download_databases.sh` script
