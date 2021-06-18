@@ -106,11 +106,11 @@ conda env create -n r_env --file ./lib/jekesa-v1.0_r_env.yml
 #### 2. [CGE tools](https://cge.cbs.dtu.dk/services/)
 ````
 ## ResFinder4 
-wget -P lib https://anaconda.org/stanikae/resfinder/2021.01.15.143308/download/jekesa-v1.0_cge.yml
+wget -P lib https://anaconda.org/stanikae/resfinder/2021.06.18.105709/download/jekesa-v1.0_cge.yml
 conda env create -n resfinder --file ./lib/jekesa-v1.0_cge.yml
 
 ## Other CGE tools
-wget -P lib https://anaconda.org/stanikae/cge/2021.01.15.143507/download/jekesa-v1.0_resfinder4.yml
+wget -P lib https://anaconda.org/stanikae/cge/2021.06.18.111232/download/jekesa-v1.0_resfinder4.yml
 conda env create -n cge --file ./lib/jekesa-v1.0_resfinder4.yml
 ````
 #### 3. srst2 env (For CDC StrepLab scripts)
