@@ -118,7 +118,7 @@ conda env create -n cge --file ./lib/jekesa-v1.0_resfinder4.yml
 wget -P lib https://anaconda.org/stanikae/srst2/2021.06.18.115358/download/jekesa-v1.0_srst2.yml
 conda env create -n srst2 --file ./lib/jekesa-v1.0_srst2.yml
 conda activate srst2
-pip install spn_scripts/srst2/
+pip install spn_scripts/srst2_env/
 conda deactivate
 ````
 
