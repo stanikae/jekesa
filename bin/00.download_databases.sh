@@ -63,6 +63,9 @@ fi
 #
 if ! [ -h $DBPATH/kraken_db ]; then
  ln -nsf $installDir/kraken8gb_standard $DBPATH/kraken_db
+else
+ rm $DBPATH/kraken_db
+ ln -nsf $installDir/kraken8gb_standard $DBPATH/kraken_db
 fi
 # ----- PopPunk S. pneumoniae and S. pyogenes databases ----------
 if ! [ -d $installDir/poppunk_db ]; then
@@ -77,6 +80,9 @@ if ! [ -d $installDir/poppunk_db ]; then
 fi
 #
 if ! [ -h $DBPATH/poppunk_db ]; then
+   ln -nsf $installDir/poppunk_db $DBPATH/poppunk_db
+else
+   rm $DBPATH/poppunk_db
    ln -nsf $installDir/poppunk_db $DBPATH/poppunk_db
 fi
 # -------------------------- ConFindr ----------------------------
@@ -96,6 +102,9 @@ cge_git "${resfinder_db_url}" db_resfinder
 #
 if ! [ -h $DBPATH/resfinder_db ]; then
  ln -nsf $installDir/db_resfinder $DBPATH/resfinder_db
+else
+ rm $DBPATH/resfinder_db
+ ln -nsf $installDir/db_resfinder $DBPATH/resfinder_db
 fi
 # --------------------------- PointFinder ------------------------
 cd $installDir
@@ -103,12 +112,18 @@ cge_git "${pointfinder_db_url}" db_pointfinder
 #
 if ! [ -h $DBPATH/pointfinder_db ]; then
  ln -nsf $installDir/db_pointfinder $DBPATH/pointfinder_db
+else
+ rm $DBPATH/pointfinder_db
+ ln -nsf $installDir/db_pointfinder $DBPATH/pointfinder_db
 fi
 # --------------------------- DisinFinder -------------------------
 cd $installDir
 cge_git "${disinfinder_db_url}" db_disinfinder
 #
 if ! [ -h $DBPATH/disinfinder_db ]; then
+  ln -nsf $installDir/db_disinfinder $DBPATH/disinfinder_db
+else 
+  rm $DBPATH/disinfinder_db
   ln -nsf $installDir/db_disinfinder $DBPATH/disinfinder_db
 fi
 # --------------------------- ResFinder4 -------------------------
@@ -119,12 +134,18 @@ cge_git "${serotypefinder_db_url}" db_stfinder
 #
 if ! [ -h $DBPATH/db_stfinder ]; then 
  ln -nsf $installDir/db_stfinder $DBPATH/db_stfinder
+else
+ rm $DBPATH/db_stfinder
+ ln -nsf $installDir/db_stfinder $DBPATH/db_stfinder
 fi
 # --------------------------- VirulenceFinder --------------------
 cd $installDir
 cge_git "${virulencefinder_db_url}" db_virulencefinder
 #
 if ! [ -h $DBPATH/db_virulencefinder ]; then
+ ln -nsf $installDir/db_virulencefinder $DBPATH/db_virulencefinder
+else
+ rm $DBPATH/db_virulencefinder
  ln -nsf $installDir/db_virulencefinder $DBPATH/db_virulencefinder
 fi
 # ----------------------------------------------------------------
