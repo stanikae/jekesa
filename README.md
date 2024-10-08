@@ -94,28 +94,23 @@ cd jekesa
 After cloning the jekesa git repo, do the following to install the required dependencies and to setup the conda environment:
 ````
 # JEKESA
-wget -P lib https://anaconda.org/stanikae/jekesa/2021.01.15.141403/download/jekesa_v1.0.yml
 conda env create -n jekesa --file ./lib/jekesa_v1.0.yml
 ````
 ### Installation of dependancies
 #### 1. R packages
 ````
-wget -P lib https://anaconda.org/stanikae/r_env/2021.01.15.141706/download/jekesa-v1.0_r_env.yml
 conda env create -n r_env --file ./lib/jekesa-v1.0_r_env.yml
 ````
 #### 2. [CGE tools](https://cge.cbs.dtu.dk/services/)
 ````
 ## ResFinder4 
-wget -P lib https://anaconda.org/stanikae/resfinder/2021.06.18.105709/download/jekesa-v1.0_cge.yml
 conda env create -n resfinder --file ./lib/jekesa-v1.0_cge.yml
 
 ## Other CGE tools
-wget -P lib https://anaconda.org/stanikae/cge/2021.06.18.111232/download/jekesa-v1.0_resfinder4.yml
 conda env create -n cge --file ./lib/jekesa-v1.0_resfinder4.yml
 ````
 #### 3. srst2 env (For CDC StrepLab scripts)
 ````
-wget -P lib https://anaconda.org/stanikae/srst2/2021.06.18.115358/download/jekesa-v1.0_srst2.yml
 conda env create -n srst2 --file ./lib/jekesa-v1.0_srst2.yml
 conda activate srst2
 pip install spn_scripts/srst2_env/
@@ -131,7 +126,6 @@ conda activate jekesa
 `````
 cd jekesa
 git pull
-wget -P lib https://anaconda.org/stanikae/jekesa/2021.01.15.141403/download/jekesa_v1.0.yml
 conda env update -n jekesa --file ./lib/jekesa_v1.0.yml --prune
 `````
 #### Setting up required databases
